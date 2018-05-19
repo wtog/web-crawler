@@ -1,4 +1,4 @@
-# web-cralwer
+# web-crawler
 
 #### 项目介绍
 参考 webmagic [http://webmagic.io](http://webmagic.io) 撸的 [scala + akka] 爬虫
