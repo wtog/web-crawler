@@ -1,9 +1,15 @@
 package wt.downloader
 
+import java.util.concurrent.TimeUnit
+
+import io.netty.handler.codec.http.{DefaultHttpHeaders, EmptyHttpHeaders, HttpHeaders}
 import org.asynchttpclient.Dsl.asyncHttpClient
-import org.asynchttpclient.{AsyncCompletionHandler, AsyncHttpClient, Response}
-import wt.exceptions.NonNullArgumentsException
+import org.asynchttpclient._
+import org.asynchttpclient.uri.Uri
+import wt.exceptions.{IllegalArgumentsException, NonNullArgumentsException}
 import wt.processor.Page
+
+import scala.concurrent.{Future, Promise}
 
 /**
   * @author : tong.wang
@@ -14,26 +20,56 @@ object AsyncHttpClientDownloader extends Downloader {
 
   var clientsPool: Map[String, AsyncHttpClient] = Map()
 
-  override def download(request: RequestHeaders): Page = {
+  def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestHeaders): BoundRequestBuilder = {
+    import io.netty.handler.codec.http.HttpHeaders._
+
+    val httpHeaders  = new DefaultHttpHeaders
+    requestHeaders.headers match {
+      case Some(headers) =>
+        headers.foreach {it => httpHeaders.add(it._1, it._2)}
+      case None => logger.debug("no extra headers")
+    }
+
+    httpHeaders.add(Names.USER_AGENT, requestHeaders.userAgent)
+    httpHeaders.add(Names.ACCEPT_CHARSET, requestHeaders.charset.get)
+    requestBuilder.setHeaders(httpHeaders)
+    requestBuilder
+  }
+
+  override def download(request: RequestHeaders): Future[Page] = {
     val requestGeneral = request.requestHeaderGeneral.getOrElse(throw NonNullArgumentsException("requestGeneral"))
     val domain = request.domain
 
-    downloadClients(domain).prepare(requestGeneral.method, requestGeneral.url.getOrElse(throw NonNullArgumentsException("url")))
-      .execute(new AsyncCompletionHandler[Page]() {
-        override def onCompleted(response: Response): Page = {
-          if (response.getStatusCode == 200) {
-            Page(requestGeneral = requestGeneral, isDownloadSuccess = true, pageSource = Some(response.getResponseBody))
-          } else {
-            logger.warn(s"http download failed ${response.getStatusCode}")
-            Page(requestGeneral = requestGeneral)
-          }
-        }
 
-        override def onThrowable(t: Throwable): Unit = {
-          logger.error("http download failed ", t.getMessage)
+    val requestBuilder: BoundRequestBuilder = requestGeneral.method.toUpperCase match {
+      case "GET" =>
+        downloadClients(domain).prepareGet(requestGeneral.url.get)
+      case "POST" =>
+        downloadClients(domain).preparePost(requestGeneral.url.get)
+      case other =>
+        logger.warn(s"unknown httpmethod ${other}")
+        throw IllegalArgumentsException(other)
+    }
+
+    val promise = Promise[Page]
+    clientPrepare(requestBuilder, request).execute(new AsyncCompletionHandler[Response]() {
+      override def onCompleted(response: Response): Response = {
+        if (response.getStatusCode == 200) {
+          promise.success(Page(requestGeneral = requestGeneral, isDownloadSuccess = true, bytes = Some(response.getResponseBodyAsBytes)))
+        } else {
+          promise.failure(new IllegalStateException(s"http download failed ${response.getStatusCode}"))
         }
+        response
+      }
+
+      override def onThrowable(t: Throwable): Unit = {
+        logger.error("http download failed ", t.getMessage)
+      }
     })
-  }.get()
+
+    promise.future
+  }
+
 
   def downloadClients(domain: String): AsyncHttpClient = {
     if (!clientsPool.contains(domain)){

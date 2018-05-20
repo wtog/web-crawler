@@ -2,7 +2,7 @@ package wt
 
 import org.slf4j.{Logger, LoggerFactory}
 import wt.actor.ActorManager
-import wt.downloader.{AsyncHttpClientDownloader, DownloadEvent, Downloader, RequestHeaderGeneral}
+import wt.downloader._
 import wt.pipeline.{ConsolePipeline, Pipeline}
 import wt.processor.PageProcessor
 import wt.queue.{LinkQueue, RequestQueue}
@@ -19,7 +19,7 @@ case class Spider(
   urls: List[String],
   pipelineList: List[Pipeline] = List(ConsolePipeline()),
   pageProcessor: PageProcessor,
-  downloader: Downloader = AsyncHttpClientDownloader,
+  downloader: Downloader = ApacheHttpClientDownloader,
   targetUrls: RequestQueue = new LinkQueue()) {
 
   val logger: Logger = LoggerFactory.getLogger(Spider.getClass)

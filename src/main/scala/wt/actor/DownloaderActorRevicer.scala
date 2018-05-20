@@ -4,6 +4,8 @@ import akka.actor.Actor
 import org.slf4j.{Logger, LoggerFactory}
 import wt.downloader.DownloadEvent
 
+import scala.util.{Failure, Success}
+
 /**
   * @author : tong.wang
   * @since : 5/16/18 11:54 PM
@@ -19,16 +21,19 @@ class DownloaderActorRevicer extends Actor {
         case Some(request) =>
           val spider = downloadEvent.spider
 
-          val page = spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request)))
+          import wt.actor.ExecutionContexts.downloadDispatcher
+          spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
+            case Success(page) =>
+              if (page.isDownloadSuccess) {
+                ActorManager.processorActor ! ProcessorEvent(downloadEvent.spider, page)
 
-          if (page.isDownloadSuccess) {
-            ActorManager.processorActor ! ProcessorEvent(downloadEvent.spider, page)
-
-            if (logger.isDebugEnabled()) {
-              logger.debug("send page")
-            }
-          } else {
-            logger.warn("failed to download")
+                if (logger.isDebugEnabled()) {
+                  logger.debug("send page")
+                }
+              } else {
+                logger.warn("failed to download")
+              }
+            case Failure(e) => throw e
           }
         case None => {}
       }

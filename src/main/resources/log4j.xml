@@ -4,11 +4,16 @@
 
     <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss,SSS} %-5p %c(%F:%L) ## %m%n" />
+            <param name="ConversionPattern" value="%d %-5p %c(%F:%L) [%t]%x %m%n" />
         </layout>
     </appender>
 
     <logger name="wt" additivity="false">
+        <level value="info" />
+        <appender-ref ref="stdout" />
+    </logger>
+
+    <logger name="org.apache" additivity="false">
         <level value="info" />
         <appender-ref ref="stdout" />
     </logger>

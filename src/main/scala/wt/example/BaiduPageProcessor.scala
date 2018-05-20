@@ -19,6 +19,7 @@ object BaiduPageProcessor extends PageProcessor {
   }
 
   override def requestHeaders: RequestHeaders = {
-    RequestHeaders(domain = "www.baidu.com")
+    RequestHeaders(domain = "www.baidu.com",
+                    headers = Some(Map("Content-Type" -> "text/html; charset=GB2312")))
   }
 }

@@ -1,7 +1,9 @@
 package wt.processor
 
+import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 
+import wt.Utils.CharsetUtils
 import wt.downloader.{RequestHeaderGeneral, RequestHeaders}
 import wt.queue.{LinkQueue, RequestQueue}
 import wt.selector.HtmlParser
@@ -20,7 +22,8 @@ trait PageProcessor {
 
 case class Page(
   isDownloadSuccess: Boolean = false,
-  pageSource: Option[String] = None,
+  bytes: Option[Array[Byte]] = None,
+  responseHeaders: Map[String, String] = Map("Content-Type" -> Charset.defaultCharset().toString),
   requestGeneral: RequestHeaderGeneral) {
 
   lazy val resultItems: (LinkedBlockingQueue[Any], Int) = (new LinkedBlockingQueue, 100)
@@ -28,6 +31,16 @@ case class Page(
 
   lazy val jsoupParser = HtmlParser(pageSource.getOrElse(throw new IllegalArgumentException("pageSource is empty")), requestGeneral.url.get).JsoupParser.document.get
 
+  def pageSource: Option[String] = {
+    bytes match {
+      case Some(b) =>
+        CharsetUtils.detectCharset(Some(responseHeaders("Content-Type")), b) match {
+          case (_, c @ Some(_)) => c
+          case (actualCharset, None) => Option(new String(b, actualCharset))
+        }
+      case None => None
+    }
+  }
 
   def addTargetRequest(urlAdd: String): Unit = {
     this.requestQueue._1.push(RequestHeaderGeneral(url = Some(urlAdd)))
@@ -37,4 +50,7 @@ case class Page(
     this.resultItems._1.add(result)
   }
 
+  override def toString: String = {
+    s"${requestGeneral.url.get} downloaded ${isDownloadSuccess}"
+  }
 }

@@ -7,6 +7,7 @@ package wt.Utils
   */
 object UrlUtils {
   val domainRegex = """[\w]+://""".r
+  val chartsetRegex = """charset\s*=\s*['"]*([^\s;'"]*)""".r
 
   def getDomain(url: String): String = {
     val urlPath = domainRegex.replaceFirstIn(url, "")
@@ -18,4 +19,11 @@ object UrlUtils {
     }
   }
 
+  def fixIllegalCharacterInUrl(url: String): String = {
+    url.replace(" ", "%20").replaceAll("#+", "#")
+  }
+
+  def getCharset(contentType: String): Option[String] = {
+    chartsetRegex.findFirstIn(contentType)
+  }
 }

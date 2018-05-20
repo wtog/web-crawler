@@ -5,6 +5,6 @@ package wt.downloader.proxy
   * @since : 5/20/18 11:08 AM
   * @version : 1.0.0
   */
-class Proxy {
+object ProxyProvider {}
 
-}
+case class Proxy(host: String, port: Int, username: String, password: String)

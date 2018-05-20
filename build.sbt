@@ -21,7 +21,8 @@ lazy val log = Seq(
 )
 
 lazy val httpUtils = Seq(
-  "org.asynchttpclient" % "async-http-client" % "2.4.7"
+  "org.asynchttpclient" % "async-http-client" % "2.4.7",
+  "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 )
 
 lazy val httpParser = Seq(

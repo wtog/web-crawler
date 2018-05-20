@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit
 
 import wt.example.BaiduPageProcessor
 import wt.pipeline.ConsolePipeline
-import wt.processor.PageProcessor
 
 /**
   * @author : tong.wang
@@ -18,8 +17,6 @@ class SpiderSpec extends BaseTest {
     Spider(List("http://www.baidu.com"), pageProcessor = BaiduPageProcessor, pipelineList = pipelineList1).start()
     TimeUnit.SECONDS.sleep(5)
     println(pipelineList1.head.pageSize.get())
-
-
   }
 
   "spider 10s 2" should "crawl page size over 100" in {
@@ -28,4 +25,5 @@ class SpiderSpec extends BaseTest {
     TimeUnit.SECONDS.sleep(5)
     println(pipelineList2.head.pageSize.get())
   }
+
 }
