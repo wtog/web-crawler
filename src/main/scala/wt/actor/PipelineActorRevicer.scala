@@ -22,4 +22,4 @@ class PipelineActorRevicer extends Actor {
   }
 }
 
-case class PipelineEvent(spider: Spider, pageResultItems: (String, Any))
+case class PipelineEvent(spider: Spider, pageResultItems: (String, Map[String, Any]))

@@ -18,6 +18,7 @@ import org.apache.http.util.EntityUtils
 import org.apache.http.{HttpRequest, HttpRequestInterceptor, HttpResponse}
 import org.slf4j.{Logger, LoggerFactory}
 import wt.Utils.UrlUtils
+import wt.downloader.proxy.{ProxyDTO, ProxyProvider}
 import wt.exceptions.NonNullArgumentsException
 import wt.processor.Page
 
@@ -35,7 +36,7 @@ object ApacheHttpClientDownloader extends Downloader {
     import wt.actor.ExecutionContexts.downloadDispatcher
 
     Future {
-      val requestContext = HttpUriRequestConverter.convert(request, None)
+      val requestContext = HttpUriRequestConverter.convert(request, if (request.useProxy) Some(ProxyProvider.getProxy()) else None)
       val httpResponse = clientsDomain(request).execute(requestContext.httpUriRequest, requestContext.httpClientContext)
 
       httpResponse.getStatusLine.getStatusCode match {
@@ -63,7 +64,7 @@ case class HttpClientRequestContext(httpUriRequest: HttpUriRequest, httpClientCo
 
 object HttpUriRequestConverter {
 
-  def convert(request: RequestHeaders, proxy: Option[Proxy]): HttpClientRequestContext = {
+  def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): HttpClientRequestContext = {
     val requestBuilder = selectRequestMethod(request).setUri(UrlUtils.fixIllegalCharacterInUrl(request.requestHeaderGeneral.get.url.get))
 
     request.headers match {

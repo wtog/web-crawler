@@ -10,10 +10,9 @@ import wt.processor.{Page, PageProcessor}
   */
 object BaiduPageProcessor extends PageProcessor {
   override def process(page: Page): Unit = {
-//    println("processor " + page.sourceCode)
     val document = page.jsoupParser
 
-    page.addPageResultItem(document.title())
+    page.addPageResultItem(Map("title" -> document.title()))
     
     page.addTargetRequest("http://www.baidu.com")
   }

@@ -38,7 +38,7 @@ class PageProcessorActorRevicer extends Actor {
     case other => logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }
 
-  def addToPipeline(url: String, pageResultItems: (LinkedBlockingQueue[Any], Int))(spider: Spider) = {
+  def addToPipeline(url: String, pageResultItems: (LinkedBlockingQueue[Map[String, Any]], Int))(spider: Spider) = {
     pageResultItems match {
       case (resultItems, batchPollSize) => {
         while (!resultItems.isEmpty) {

@@ -5,6 +5,8 @@ package wt.downloader.proxy
   * @since : 5/20/18 11:08 AM
   * @version : 1.0.0
   */
-object ProxyProvider {}
+object ProxyProvider {
+  def getProxy(): ProxyDTO = ProxyDTO("", port = 80, "", "")
+}
 
-case class Proxy(host: String, port: Int, username: String, password: String)
+case class ProxyDTO(host: String, port: Int, username: String, password: String)

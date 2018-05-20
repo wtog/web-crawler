@@ -2,6 +2,8 @@ package wt.pipeline
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import org.slf4j.{Logger, LoggerFactory}
+
 
 /**
   * @author : tong.wang
@@ -9,13 +11,15 @@ import java.util.concurrent.atomic.AtomicInteger
   * @version : 1.0.0
   */
 trait Pipeline {
-  def process(pageResultItem: (String, Any))
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  def process(pageResultItem: (String, Map[String, Any]))
 }
 
 
 case class ConsolePipeline() extends Pipeline {
   val pageSize: AtomicInteger = new AtomicInteger(0)
-  override def process(pageResultItem: (String, Any)): Unit = {
+  override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     pageSize.incrementAndGet()
   }
 }

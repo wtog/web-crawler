@@ -29,8 +29,8 @@ object CharsetUtils {
           metas.attr("charset")
         }
 
-        if (actualCharset.toUpperCase.equals(defaultCharset.toString.toUpperCase)) {
-          (actualCharset, Some(content))
+        if (actualCharset.isEmpty || actualCharset.toUpperCase.equals(defaultCharset.toString.toUpperCase)) {
+          (defaultCharset.toString(), Some(content))
         } else {
           (actualCharset, None)
         }

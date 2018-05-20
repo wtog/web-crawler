@@ -26,7 +26,7 @@ case class Page(
   responseHeaders: Map[String, String] = Map("Content-Type" -> Charset.defaultCharset().toString),
   requestGeneral: RequestHeaderGeneral) {
 
-  lazy val resultItems: (LinkedBlockingQueue[Any], Int) = (new LinkedBlockingQueue, 100)
+  lazy val resultItems: (LinkedBlockingQueue[Map[String, Any]], Int) = (new LinkedBlockingQueue, 100)
   lazy val requestQueue: (RequestQueue, Int) = (new LinkQueue(), 100)
 
   lazy val jsoupParser = HtmlParser(pageSource.getOrElse(throw new IllegalArgumentException("pageSource is empty")), requestGeneral.url.get).JsoupParser.document.get
@@ -46,7 +46,7 @@ case class Page(
     this.requestQueue._1.push(RequestHeaderGeneral(url = Some(urlAdd)))
   }
 
-  def addPageResultItem(result: Any) = {
+  def addPageResultItem(result: Map[String, Any]) = {
     this.resultItems._1.add(result)
   }
 
