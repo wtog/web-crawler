@@ -15,9 +15,7 @@ class PipelineActorRevicer extends Actor {
 
   override def receive: Receive = {
     case pipelineEvent: PipelineEvent =>
-      val spider = pipelineEvent.spider
-      val pageResultItem = pipelineEvent.pageResultItems
-      spider.pipelineList.foreach(_.process(pageResultItem))
+      pipelineEvent.spider.pipelineList.foreach(_.process(pipelineEvent.pageResultItems))
     case other => logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }
 }

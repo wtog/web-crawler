@@ -26,4 +26,8 @@ object UrlUtils {
   def getCharset(contentType: String): Option[String] = {
     chartsetRegex.findFirstIn(contentType)
   }
+
+  def getDomainAndURI(url:String): String = {
+    domainRegex.replaceFirstIn(url, "").substring(0, url.indexOf("?"))
+  }
 }

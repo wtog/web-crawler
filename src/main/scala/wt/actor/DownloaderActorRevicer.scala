@@ -17,26 +17,26 @@ class DownloaderActorRevicer extends Actor {
 
   override def receive: Receive = {
     case downloadEvent: DownloadEvent =>
-      downloadEvent.request match {
-        case Some(request) =>
-          val spider = downloadEvent.spider
+      downloadEvent.request.foreach(request => {
+        val spider = downloadEvent.spider
 
-          import wt.actor.ExecutionContexts.downloadDispatcher
-          spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
-            case Success(page) =>
-              if (page.isDownloadSuccess) {
-                ActorManager.processorActor ! ProcessorEvent(downloadEvent.spider, page)
+        import wt.actor.ExecutionContexts.downloadDispatcher
 
-                if (logger.isDebugEnabled()) {
-                  logger.debug("send page")
-                }
-              } else {
-                logger.warn("failed to download")
-              }
-            case Failure(e) => throw e
-          }
-        case None => {}
-      }
+        spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
+          case Success(page) =>
+            if (page.isDownloadSuccess) {
+              spider.downloadSuccessSum()
+              ActorManager.processorActor ! ProcessorEvent(downloadEvent.spider, page)
+            } else {
+              logger.warn("failed to download")
+              spider.downloadFailedSum()
+            }
+          case Failure(e) =>
+            spider.downloadFailedSum()
+            throw e
+        }
+      })
+
     case other => logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }
 }

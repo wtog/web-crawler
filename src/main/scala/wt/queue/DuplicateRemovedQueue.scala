@@ -10,9 +10,8 @@ import wt.downloader.RequestHeaderGeneral
 abstract class DuplicateRemovedQueue extends RequestQueue {
 
   override def push(request: RequestHeaderGeneral): Unit = {
-    
     pushWhenNoDuplicate(request)
   }
 
-  def pushWhenNoDuplicate(request: RequestHeaderGeneral)
+  protected def pushWhenNoDuplicate(request: RequestHeaderGeneral)
 }
