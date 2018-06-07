@@ -12,7 +12,7 @@ import scala.concurrent.Future
   * @version : 1.0.0
   */
 trait Downloader {
-  lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  protected lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def download(request: RequestHeaders): Future[Page]
 }
@@ -39,3 +39,4 @@ case class RequestHeaders(
    useGzip: Boolean = true,
    disableCookieManagement: Boolean = false,
    useProxy: Boolean = false)
+

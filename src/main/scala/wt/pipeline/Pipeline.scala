@@ -17,9 +17,9 @@ trait Pipeline {
 }
 
 
-case class ConsolePipeline() extends Pipeline {
-  val pageSize: AtomicInteger = new AtomicInteger(0)
+object ConsolePipeline extends Pipeline {
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
-    pageSize.incrementAndGet()
+    val (url, result) = pageResultItem
+    println(s"crawl result: ${url} - ${result}")
   }
 }

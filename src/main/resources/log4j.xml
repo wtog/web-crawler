@@ -18,6 +18,11 @@
         <appender-ref ref="stdout" />
     </logger>
 
+    <logger name="org.apache.http.wire" additivity="false">
+        <level value="info" />
+        <appender-ref ref="stdout" />
+    </logger>
+
     <logger name="akka" additivity="false">
         <level value="info" />
         <appender-ref ref="stdout" />

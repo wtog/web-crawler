@@ -1,5 +1,6 @@
 package wt.queue
 
+import org.slf4j.{Logger, LoggerFactory}
 import wt.downloader.RequestHeaderGeneral
 
 /**
@@ -8,6 +9,7 @@ import wt.downloader.RequestHeaderGeneral
   * @version : 1.0.0
   */
 trait RequestQueue {
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def push(request: RequestHeaderGeneral)
 

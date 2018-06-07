@@ -19,7 +19,7 @@ import scala.concurrent.Future
   */
 case class Spider(
   urls: List[String],
-  pipelineList: List[Pipeline] = List(ConsolePipeline()),
+  pipelineList: List[Pipeline] = List(ConsolePipeline),
   pageProcessor: PageProcessor,
   downloader: Downloader = ApacheHttpClientDownloader,
   targetUrls: RequestQueue = new LinkQueue()) {

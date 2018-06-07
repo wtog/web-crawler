@@ -3,6 +3,8 @@ package wt.downloader
 import java.security.cert.X509Certificate
 
 import javax.net.ssl.{SSLContext, TrustManager, X509TrustManager}
+import org.apache.http.auth.{AuthState, ChallengeState, UsernamePasswordCredentials}
+import org.apache.http.client.CookieStore
 import org.apache.http.client.config.{CookieSpecs, RequestConfig}
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.HttpClientContext
@@ -10,12 +12,13 @@ import org.apache.http.config.{RegistryBuilder, SocketConfig}
 import org.apache.http.conn.socket.{ConnectionSocketFactory, PlainConnectionSocketFactory}
 import org.apache.http.conn.ssl.{DefaultHostnameVerifier, SSLConnectionSocketFactory}
 import org.apache.http.entity.StringEntity
+import org.apache.http.impl.auth.BasicScheme
 import org.apache.http.impl.client._
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.impl.cookie.BasicClientCookie
 import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
-import org.apache.http.{HttpRequest, HttpRequestInterceptor, HttpResponse}
+import org.apache.http.{HttpHost, HttpRequest, HttpRequestInterceptor, HttpResponse}
 import org.slf4j.{Logger, LoggerFactory}
 import wt.Utils.UrlUtils
 import wt.downloader.proxy.{ProxyDTO, ProxyProvider}
@@ -36,8 +39,12 @@ object ApacheHttpClientDownloader extends Downloader {
     import wt.actor.ExecutionContexts.downloadDispatcher
 
     Future {
-      val requestContext = HttpUriRequestConverter.convert(request, if (request.useProxy) Some(ProxyProvider.getProxy()) else None)
-      val httpResponse = clientsDomain(request).execute(requestContext.httpUriRequest, requestContext.httpClientContext)
+      def getResponse(p: Option[ProxyDTO]): CloseableHttpResponse = {
+        val (httpUriRequest, httpClientContext) = HttpUriRequestConverter.convert(request, p)
+        clientsDomain(request).execute(httpUriRequest, httpClientContext)
+      }
+
+      val httpResponse = ProxyProvider.requestWithProxy[CloseableHttpResponse](request.useProxy, getResponse)
 
       httpResponse.getStatusLine.getStatusCode match {
         case 200 =>
@@ -52,41 +59,51 @@ object ApacheHttpClientDownloader extends Downloader {
 
   def clientsDomain(requestHeaders: RequestHeaders): CloseableHttpClient = {
     val domain = requestHeaders.domain
-    if (!clientsPool.contains(domain)) {
-      clientsPool += (domain -> HttpClientGenerator.generateClient(requestHeaders))
-    }
-    clientsPool(domain)
+
+    clientsPool.getOrElse(domain, HttpClientGenerator.generateClient(requestHeaders))
   }
 
 }
 
-case class HttpClientRequestContext(httpUriRequest: HttpUriRequest, httpClientContext: HttpClientContext)
-
 object HttpUriRequestConverter {
+  lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): HttpClientRequestContext = {
-    val requestBuilder = selectRequestMethod(request).setUri(UrlUtils.fixIllegalCharacterInUrl(request.requestHeaderGeneral.get.url.get))
-
-    request.headers match {
-      case Some(headers) =>
-        headers.foreach { it => requestBuilder.addHeader(it._1, it._2) }
-      case None =>
-    }
-
-    val requestConfigBuilder = RequestConfig.custom
-    requestConfigBuilder.setConnectionRequestTimeout(request.timeOut)
+  def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): (HttpUriRequest, HttpContext) = {
+    val requestUrl = request.requestHeaderGeneral.get.url.get
+    val requestBuilder = selectRequestMethod(request).setUri(UrlUtils.fixIllegalCharacterInUrl(requestUrl))
+    val requestConfig = RequestConfig.custom
+    requestBuilder.setConfig(requestConfig
+      .setConnectionRequestTimeout(request.timeOut)
       .setSocketTimeout(request.timeOut)
       .setConnectTimeout(request.timeOut)
       .setCookieSpec(CookieSpecs.STANDARD)
+      .build)
 
-
-    requestBuilder.setConfig(requestConfigBuilder.build)
-    val httpUriRequest = requestBuilder.build
+    request.headers foreach { headers =>
+      headers.foreach { it => requestBuilder.addHeader(it._1, it._2) }
+    }
 
     val httpContext = new HttpClientContext
-    val cookieStore = new BasicCookieStore
+    proxy.foreach { p =>
+      logger.info(s"use proxy ${request.domain}")
+      requestConfig.setProxy(new HttpHost(p.host, p.port))
+      val authState = new AuthState
+      authState.update(new BasicScheme(ChallengeState.PROXY), new UsernamePasswordCredentials(p.username, p.password))
+      httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, authState)
+    }
 
-    HttpClientRequestContext(httpUriRequest, httpContext)
+    request.cookies foreach { cookie =>
+      val cookieStore = new BasicCookieStore
+      cookie.foreach { case (name, value) => {
+        val cook = new BasicClientCookie(name, value)
+        cook.setDomain(UrlUtils.removePort(requestUrl))
+        cookieStore.addCookie(cook)
+        }
+      }
+      httpContext.setCookieStore(cookieStore)
+    }
+
+    (requestBuilder.build, httpContext)
   }
 
   private def selectRequestMethod(request: RequestHeaders): RequestBuilder = {

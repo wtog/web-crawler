@@ -30,4 +30,14 @@ object UrlUtils {
   def getDomainAndURI(url:String): String = {
     domainRegex.replaceFirstIn(url, "").substring(0, url.indexOf("?"))
   }
+
+  def removePort(url: String) = {
+    val domain = getDomain(url)
+    val portIndex = domain.indexOf(":")
+    if (portIndex == -1) {
+      domain
+    } else {
+      domain.substring(0, portIndex)
+    }
+  }
 }
