@@ -5,13 +5,13 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import org.slf4j.{Logger, LoggerFactory}
 import wt.Spider
+import wt.actor.ActorManager
 import wt.downloader.proxy.ProxyProvider.checkUrl
 import wt.downloader.proxy.ProxyStatusEnums.ProxyStatusEnums
 import wt.downloader.proxy.crawler.{A2UPageProcessor, Data5UPageProcessor}
 
-import scala.collection.generic.AtomicIndexFlag
 import scala.concurrent.Future
-import scala.io.Source
+import scala.concurrent.duration._
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -28,14 +28,33 @@ object ProxyProvider {
 
   var proxyList: Set[ProxyDTO] = Set()
 
+  val proxyListStatus = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    ActorManager.system.scheduler.schedule(5 seconds, 5 seconds, new Runnable {
+      override def run(): Unit = {
+        proxyList.foreach { proxy: ProxyDTO =>
+          logger.info(s"host: ${proxy.host}, status: ${proxy.status} usability: ${proxy.usability}") }
+      }
+    })
+  }
+
   val proxyCrawlerList = {
-    List(Spider(A2UPageProcessor.targetUrl, pageProcessor = A2UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)),
-         Spider(Data5UPageProcessor.targetUrl, pageProcessor = Data5UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)))
+    List((Spider(A2UPageProcessor.targetUrl, pageProcessor = A2UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds),
+         (Spider(Data5UPageProcessor.targetUrl, pageProcessor = Data5UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds))
   }
 
   def getProxy: Option[ProxyDTO] = {
     if (!proxySpiderCrawling.getAndSet(true)) {
-      proxyCrawlerList.foreach(_.start())
+      import scala.concurrent.ExecutionContext.Implicits.global
+      
+      proxyCrawlerList.foreach {
+        case (spider, scheduleTime) => {
+          ActorManager.system.scheduler.schedule(0 seconds, scheduleTime, new Runnable {
+            override def run(): Unit = spider.start()
+          })
+        }
+      }
+
     }
 
     if (proxyList.nonEmpty) {
@@ -48,16 +67,15 @@ object ProxyProvider {
           
         usability
       })
+      
       chosen match {
         case proxyDto @ Some(p) =>
           p.status = ProxyStatusEnums.USING
           proxyDto
         case none @ None =>
-          logger.warn("no proxy available")
           none
       }
     } else {
-      logger.warn("no proxy")
       None
     }
   }
@@ -92,14 +110,13 @@ case class ProxyDTO(host: String,
                     username: String,
                     password: String,
                     var status: ProxyStatusEnums = ProxyStatusEnums.IDEL,
-                    checkTimes: AtomicInteger = new AtomicInteger(0)) {
-
-  private lazy val logger: Logger = LoggerFactory.getLogger(ProxyDTO.getClass)
+                    checkTimes: AtomicInteger = new AtomicInteger(0),
+                    var usability: Float = 0F) {
 
   val successTimes: AtomicInteger = new AtomicInteger(0)
 
   def usabilityCheck(): Float = {
-    Try {
+    usability = Try {
       import java.net.Proxy
       val proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
       val connection = checkUrl.openConnection(proxy).asInstanceOf[HttpURLConnection]
@@ -109,7 +126,7 @@ case class ProxyDTO(host: String,
 
       connection.getResponseCode match {
         case 200 =>
-          successTimes.incrementAndGet() / checkTimes.incrementAndGet()
+          successTimes.incrementAndGet() / checkTimes.get()
         case _ =>
           successTimes.get() / checkTimes.incrementAndGet()
       }
@@ -117,6 +134,8 @@ case class ProxyDTO(host: String,
       case NonFatal(_) =>
         successTimes.get() / checkTimes.incrementAndGet()
     }.get
+
+    usability
   }
 }
 
