@@ -8,7 +8,8 @@ import wt.processor.{Page, PageProcessor}
   * @since : 5/16/18 11:42 PM
   * @version : 1.0.0
   */
-object BaiduPageProcessor extends PageProcessor {
+case class BaiduPageProcessor() extends PageProcessor {
+
   override def process(page: Page): Unit = {
     val document = page.jsoupParser
 
@@ -20,5 +21,9 @@ object BaiduPageProcessor extends PageProcessor {
   override def requestHeaders: RequestHeaders = {
     RequestHeaders(domain = "www.baidu.com",
                     headers = Some(Map("Content-Type" -> "text/html; charset=GB2312")))
+  }
+
+  override def targetUrls: List[String] = {
+    List("http://www.baidu.com")
   }
 }

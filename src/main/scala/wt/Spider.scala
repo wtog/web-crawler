@@ -18,11 +18,9 @@ import scala.concurrent.Future
   * @version : 1.0.0
   */
 case class Spider(
-  urls: List[String],
   pipelineList: List[Pipeline] = List(ConsolePipeline),
   pageProcessor: PageProcessor,
-  downloader: Downloader = ApacheHttpClientDownloader,
-  targetUrls: RequestQueue = new LinkQueue()) {
+  downloader: Downloader = ApacheHttpClientDownloader) {
 
   val logger: Logger = LoggerFactory.getLogger(Spider.getClass)
 
@@ -44,23 +42,9 @@ case class Spider(
     execute()
   }
 
-  private def initRequest(): Unit = {
-    this.urls.foreach(it => {
-      this.targetUrls.push(RequestHeaderGeneral(url = Some(it)))
-    })
-  }
-
   private def execute: () => Unit = () => {
-    initRequest()
-
-    var flag = true
-    while (flag) {
-      targetUrls.poll() match {
-        case r @ Some(_) =>
-          ActorManager.downloaderActor ! DownloadEvent(this, r)
-        case None =>
-          flag = targetUrls.isEmpty
-      }
-    }
+    this.pageProcessor.targetUrls.foreach(it => {
+      ActorManager.downloaderActor ! DownloadEvent(this, Some(RequestHeaderGeneral(url = Some(it))))
+    })
   }
 }

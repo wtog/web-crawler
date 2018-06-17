@@ -30,17 +30,16 @@ object ProxyProvider {
 
   val proxyListStatus = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    ActorManager.system.scheduler.schedule(5 seconds, 5 seconds, new Runnable {
+    ActorManager.system.scheduler.schedule(15 seconds, 15 seconds, new Runnable {
       override def run(): Unit = {
-        proxyList.foreach { proxy: ProxyDTO =>
-          logger.info(s"host: ${proxy.host}, status: ${proxy.status} usability: ${proxy.usability}") }
+        logger.info(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p => p.status == ProxyStatusEnums.USING)}")
       }
     })
   }
 
   val proxyCrawlerList = {
-    List((Spider(A2UPageProcessor.targetUrl, pageProcessor = A2UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds),
-         (Spider(Data5UPageProcessor.targetUrl, pageProcessor = Data5UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds))
+    List((Spider(pageProcessor = A2UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds),
+         (Spider(pageProcessor = Data5UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds))
   }
 
   def getProxy: Option[ProxyDTO] = {

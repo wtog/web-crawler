@@ -29,4 +29,8 @@ object A2UPageProcessor extends PageProcessor {
   override def requestHeaders: RequestHeaders = {
     RequestHeaders(domain = "raw.githubusercontent.com")
   }
+
+  override def targetUrls: List[String] = {
+    List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
+  }
 }

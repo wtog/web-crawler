@@ -15,6 +15,8 @@ import wt.selector.HtmlParser
   * @version : 1.0.0
   */
 trait PageProcessor {
+  def targetUrls: List[String]
+
   def process(page: Page)
 
   def requestHeaders: RequestHeaders

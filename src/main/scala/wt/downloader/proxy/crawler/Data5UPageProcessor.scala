@@ -9,9 +9,7 @@ import wt.processor.{Page, PageProcessor}
   * @version : 1.0.0
   */
 object Data5UPageProcessor extends PageProcessor  {
-  val targetUrl: List[String] = List("http://www.data5u.com/free/gwgn/index.shtml",
-                                      "http://www.data5u.com/free/gngn/index.shtml")
-  
+
   override def process(page: Page): Unit = {
     val document = page.jsoupParser
 
@@ -32,5 +30,10 @@ object Data5UPageProcessor extends PageProcessor  {
 
   override def requestHeaders: RequestHeaders = {
     RequestHeaders(domain = "www.data5u.com")
+  }
+
+  override def targetUrls: List[String] = {
+    List("http://www.data5u.com/free/gwgn/index.shtml",
+      "http://www.data5u.com/free/gngn/index.shtml")
   }
 }

@@ -14,13 +14,13 @@ class SpiderSpec extends BaseTest {
 
   "spider 10s 1" should "crawl page size over 100" in {
     val pipelineList1 = List(ConsolePipeline)
-    Spider(List("http://www.baidu.com"), pageProcessor = BaiduPageProcessor, pipelineList = pipelineList1).start()
+    Spider(pageProcessor = BaiduPageProcessor(), pipelineList = pipelineList1).start()
     TimeUnit.SECONDS.sleep(5)
   }
 
   "spider 10s 2" should "crawl page size over 100" in {
     val pipelineList2 = List(ConsolePipeline)
-    Spider(List("http://www.baidu.com"), pageProcessor = BaiduPageProcessor, pipelineList = pipelineList2).start()
+    Spider(pageProcessor = BaiduPageProcessor(), pipelineList = pipelineList2).start()
     TimeUnit.SECONDS.sleep(5)
   }
 
