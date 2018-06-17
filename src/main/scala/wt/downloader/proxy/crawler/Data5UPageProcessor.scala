@@ -1,6 +1,8 @@
 package wt.downloader.proxy.crawler
 
 import wt.downloader.RequestHeaders
+import wt.downloader.proxy.ProxyCrawlerPipeline
+import wt.pipeline.Pipeline
 import wt.processor.{Page, PageProcessor}
 
 /**
@@ -36,4 +38,6 @@ object Data5UPageProcessor extends PageProcessor  {
     List("http://www.data5u.com/free/gwgn/index.shtml",
       "http://www.data5u.com/free/gngn/index.shtml")
   }
+
+  override def pipelines: Set[Pipeline] = Set(ProxyCrawlerPipeline)
 }

@@ -2,7 +2,8 @@ package wt.actor
 
 import akka.actor.Actor
 import org.slf4j.{Logger, LoggerFactory}
-import wt.downloader.DownloadEvent
+import wt.Spider
+import wt.downloader.RequestHeaderGeneral
 
 import scala.util.{Failure, Success}
 
@@ -41,3 +42,4 @@ class DownloaderActorRevicer extends Actor {
   }
 }
 
+case class DownloadEvent(spider: Spider, request: Option[RequestHeaderGeneral])

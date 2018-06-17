@@ -38,8 +38,8 @@ object ProxyProvider {
   }
 
   val proxyCrawlerList = {
-    List((Spider(pageProcessor = A2UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds),
-         (Spider(pageProcessor = Data5UPageProcessor, pipelineList = List(ProxyCrawlerPipeline)), 30 seconds))
+    List((Spider(pageProcessor = A2UPageProcessor), 30 seconds),
+         (Spider(pageProcessor = Data5UPageProcessor), 30 seconds))
   }
 
   def getProxy: Option[ProxyDTO] = {

@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue
 
 import wt.Utils.CharsetUtils
 import wt.downloader.{RequestHeaderGeneral, RequestHeaders}
+import wt.pipeline.{ConsolePipeline, Pipeline}
 import wt.queue.{LinkQueue, RequestQueue}
 import wt.selector.HtmlParser
 
@@ -16,6 +17,8 @@ import wt.selector.HtmlParser
   */
 trait PageProcessor {
   def targetUrls: List[String]
+
+  def pipelines: Set[Pipeline] = Set(ConsolePipeline)
 
   def process(page: Page)
 

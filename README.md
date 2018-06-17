@@ -5,19 +5,20 @@
 
 
 #### 使用说明
-    - scala
 
-        - sbt assembly # 打 jar 包
+- sbt
 
-        ```
-            java -jar target/scala-2.12/web-crawler-0.1.0.jar
-        ```
+	- sbt assembly # 打 jar 包
 
-    - docker
+		```
+		java -jar target/scala-2.12/web-crawler-0.1.0.jar
+		```
 
-        build image
-        - docker build -f docker/Dockerfile -t web-crawler:0.1.0 .
+- docker
 
-        start container
-        - docker run -it --init --name web-crawl web-crawler:0.1.0 java -jar /apps/web-crawler-0.1.0.jar
+	* build image
+		- docker build -f docker/Dockerfile -t web-crawler:0.1.0 .
+
+	* start container
+		- docker run -it --init --name web-crawler web-crawler:0.1.0 java -jar /apps/web-crawler-0.1.0.jar
 

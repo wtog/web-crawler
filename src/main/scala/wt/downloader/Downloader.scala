@@ -17,8 +17,6 @@ trait Downloader {
   def download(request: RequestHeaders): Future[Page]
 }
 
-case class DownloadEvent(spider: Spider, request: Option[RequestHeaderGeneral])
-
 case class RequestHeaderGeneral(
    method: String = "GET",
    url: Option[String],

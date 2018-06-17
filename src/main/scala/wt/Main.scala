@@ -19,9 +19,9 @@ object Main {
 
     val processorList = services.zip(Stream from 1)
     println("show page processor list: ")
-    println("0. all")
+    println("  0. all")
     for ((service, order) <- processorList) {
-      println(s"${order}. ${service.getClass.getSimpleName}")
+      println(s"  ${order}. ${service.getClass.getSimpleName}")
     }
 
     println("choose number to execute.")
