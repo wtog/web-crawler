@@ -1,4 +1,4 @@
-package wt.Utils
+package wt.utils
 
 /**
   * @author : tong.wang

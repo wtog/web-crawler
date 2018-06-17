@@ -24,14 +24,14 @@ object Main {
       println(s"  ${order}. ${service.getClass.getSimpleName}")
     }
 
-    println("choose number to execute.")
+    println("\nchoose number to execute.")
     println("input like 1,2,3 means to execute 1 and 2 and 3 processor")
-    val chooseNumber = StdIn.readLine()
 
+    val chooseNumber = StdIn.readLine()
     val chosen = chooseNumber.split(",").distinct
 
-    val executeProcessor = if (chosen.isEmpty) {
-      println("default is all")
+    val executeProcessor = if (chosen.isEmpty || chooseNumber.contains("0")) {
+      println("execute all processor")
       processorList.map(it => it._1)
     } else {
       processorList.collect {

@@ -3,7 +3,7 @@ package wt.pipeline
 import java.io.RandomAccessFile
 import java.util.concurrent.TimeUnit
 
-import wt.Utils.UrlUtils
+import wt.utils.UrlUtils
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

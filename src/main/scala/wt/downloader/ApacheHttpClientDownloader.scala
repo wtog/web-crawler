@@ -20,7 +20,7 @@ import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
 import org.apache.http.{HttpHost, HttpRequest, HttpRequestInterceptor, HttpResponse}
 import org.slf4j.{Logger, LoggerFactory}
-import wt.Utils.UrlUtils
+import wt.utils.UrlUtils
 import wt.downloader.proxy.{ProxyDTO, ProxyProvider}
 import wt.exceptions.NonNullArgumentsException
 import wt.processor.Page

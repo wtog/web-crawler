@@ -1,4 +1,4 @@
-package wt.Utils
+package wt.utils
 
 import java.nio.charset.Charset
 
@@ -30,7 +30,7 @@ object CharsetUtils {
         }
 
         if (actualCharset.isEmpty || actualCharset.toUpperCase.equals(defaultCharset.toString.toUpperCase)) {
-          (defaultCharset.toString(), Some(content))
+          (defaultCharset.toString, Some(content))
         } else {
           (actualCharset, None)
         }

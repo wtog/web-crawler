@@ -3,7 +3,7 @@ package wt.processor
 import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 
-import wt.Utils.CharsetUtils
+import wt.utils.CharsetUtils
 import wt.downloader.{RequestHeaderGeneral, RequestHeaders}
 import wt.pipeline.{ConsolePipeline, Pipeline}
 import wt.queue.{LinkQueue, RequestQueue}
