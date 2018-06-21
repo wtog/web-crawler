@@ -23,7 +23,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import wt.utils.UrlUtils
 import wt.downloader.proxy.{ProxyDTO, ProxyProvider}
 import wt.exceptions.NonNullArgumentsException
-import wt.processor.Page
+import wt.processor.{Page, RequestHeaders}
 
 import scala.concurrent.Future
 
@@ -88,7 +88,7 @@ object HttpUriRequestConverter {
       logger.info(s"use proxy ${request.domain}")
       requestConfig.setProxy(new HttpHost(p.host, p.port))
       val authState = new AuthState
-      authState.update(new BasicScheme(ChallengeState.PROXY), new UsernamePasswordCredentials(p.username, p.password))
+      authState.update(new BasicScheme(ChallengeState.PROXY), new UsernamePasswordCredentials(p.username.getOrElse(""), p.password.getOrElse("")))
       httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, authState)
     }
 

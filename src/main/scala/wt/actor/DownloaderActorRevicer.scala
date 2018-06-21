@@ -3,7 +3,7 @@ package wt.actor
 import akka.actor.Actor
 import org.slf4j.{Logger, LoggerFactory}
 import wt.Spider
-import wt.downloader.RequestHeaderGeneral
+import wt.processor.RequestHeaderGeneral
 
 import scala.util.{Failure, Success}
 

@@ -1,6 +1,7 @@
 package wt.downloader.proxy
 
 import java.net.{HttpURLConnection, InetSocketAddress, URL}
+import java.util.Objects
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import org.slf4j.{Logger, LoggerFactory}
@@ -32,6 +33,7 @@ object ProxyProvider {
     import scala.concurrent.ExecutionContext.Implicits.global
     ActorManager.system.scheduler.schedule(15 seconds, 15 seconds, new Runnable {
       override def run(): Unit = {
+        proxyList = (proxyList -- proxyList.filter(p => p.status == ProxyStatusEnums.IDEL && p.usabilityCheck() < 0.5 && p.checkTimes.get() > 6))
         logger.info(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p => p.status == ProxyStatusEnums.USING)}")
       }
     })
@@ -42,10 +44,10 @@ object ProxyProvider {
          (Spider(pageProcessor = Data5UPageProcessor), 30 seconds))
   }
 
-  def getProxy: Option[ProxyDTO] = {
+  def startProxyCrawl() = {
     if (!proxySpiderCrawling.getAndSet(true)) {
       import scala.concurrent.ExecutionContext.Implicits.global
-      
+
       proxyCrawlerList.foreach {
         case (spider, scheduleTime) => {
           ActorManager.system.scheduler.schedule(0 seconds, scheduleTime, new Runnable {
@@ -53,27 +55,20 @@ object ProxyProvider {
           })
         }
       }
-
     }
+  }
+
+  def getProxy: Option[ProxyDTO] = {
+    startProxyCrawl()
 
     if (proxyList.nonEmpty) {
-      val chosen = proxyList.filter(_.status == ProxyStatusEnums.IDEL).find(it => {
+      proxyList.filter(_.status == ProxyStatusEnums.IDEL).find(it => {
         val usability = it.usabilityCheck() > 0.5
 
-        if (it.checkTimes.get() > 10 && !usability) {
-          proxyList -= it
-        }
-          
+        if (it.checkTimes.get() > 10 && !usability) proxyList -= it
+
         usability
       })
-      
-      chosen match {
-        case proxyDto @ Some(p) =>
-          p.status = ProxyStatusEnums.USING
-          proxyDto
-        case none @ None =>
-          none
-      }
     } else {
       None
     }
@@ -83,10 +78,10 @@ object ProxyProvider {
     import wt.actor.ExecutionContexts.downloadDispatcher
     if (useProxy) {
       getProxy match {
-        case Some(p) =>
-          p.status = ProxyStatusEnums.USING
+        case proxy @ Some(p) =>
           try {
-            val proxyRequest = httpRequest(getProxy)
+            p.status = ProxyStatusEnums.USING
+            val proxyRequest = httpRequest(proxy)
             p.status = ProxyStatusEnums.IDEL
             proxyRequest
           } catch {
@@ -106,8 +101,8 @@ object ProxyProvider {
 
 case class ProxyDTO(host: String,
                     port: Int,
-                    username: String,
-                    password: String,
+                    username: Option[String] = None,
+                    password: Option[String] = None,
                     var status: ProxyStatusEnums = ProxyStatusEnums.IDEL,
                     checkTimes: AtomicInteger = new AtomicInteger(0),
                     var usability: Float = 0F) {
@@ -136,6 +131,16 @@ case class ProxyDTO(host: String,
 
     usability
   }
+  
+  override def hashCode(): Int = Objects.hash(this.host.asInstanceOf[Object], this.port.asInstanceOf[Object])
+
+  override def equals(obj: scala.Any): Boolean = (obj) match {
+    case t: ProxyDTO =>
+      t.host == this.host && t.port == this.port
+    case _ => false
+  }
+
+  override def toString: String = s"${host}:${port}"
 }
 
 object ProxyStatusEnums extends Enumeration {

@@ -1,13 +1,10 @@
 package wt.downloader
 
-import java.util.concurrent.TimeUnit
-
-import io.netty.handler.codec.http.{DefaultHttpHeaders, EmptyHttpHeaders, HttpHeaders}
+import io.netty.handler.codec.http.DefaultHttpHeaders
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient._
-import org.asynchttpclient.uri.Uri
 import wt.exceptions.{IllegalArgumentsException, NonNullArgumentsException}
-import wt.processor.Page
+import wt.processor.{Page, RequestHeaders}
 
 import scala.concurrent.{Future, Promise}
 

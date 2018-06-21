@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.slf4j.{Logger, LoggerFactory}
 import wt.actor.{ActorManager, DownloadEvent}
 import wt.downloader._
-import wt.processor.PageProcessor
+import wt.processor.{PageProcessor, RequestHeaderGeneral}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

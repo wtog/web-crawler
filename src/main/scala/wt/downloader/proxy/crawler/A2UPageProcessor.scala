@@ -1,9 +1,8 @@
 package wt.downloader.proxy.crawler
 
-import wt.downloader.RequestHeaders
 import wt.downloader.proxy.ProxyCrawlerPipeline
 import wt.pipeline.Pipeline
-import wt.processor.{Page, PageProcessor}
+import wt.processor.{Page, PageProcessor, RequestHeaders}
 
 /**
   * https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt

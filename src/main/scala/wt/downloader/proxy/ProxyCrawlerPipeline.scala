@@ -12,12 +12,13 @@ object ProxyCrawlerPipeline extends Pipeline {
   implicit def MapToProxyDTO(map: Map[String, Any]): ProxyDTO = {
     ProxyDTO(map("host").asInstanceOf[String],
              Integer.valueOf(map.getOrElse("port", "80").toString),
-             map.getOrElse("username", "").asInstanceOf[String],
-             map.getOrElse("password", "").asInstanceOf[String])
+             Some(map.getOrElse("username", "").asInstanceOf[String]),
+             Some(map.getOrElse("password", "").asInstanceOf[String]))
   }
 
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (_, result) = pageResultItem
+
     ProxyProvider.proxyList += result
   }
 }

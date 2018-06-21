@@ -46,7 +46,11 @@ class PageProcessorActorRevicer extends Actor {
     val (requestQueue, batchPollSize) = targetRequests
     if (!requestQueue.isEmpty) {
       (0 to batchPollSize).foreach(_ => {
-        ActorManager.downloaderActor ! DownloadEvent(spider, requestQueue.poll())
+        import scala.concurrent.ExecutionContext.Implicits.global
+        import scala.concurrent.duration._
+        ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond, new Runnable {
+          override def run(): Unit = ActorManager.downloaderActor ! DownloadEvent(spider, requestQueue.poll())
+        })
       })
     }
 

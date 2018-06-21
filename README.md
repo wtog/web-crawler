@@ -8,17 +8,15 @@
 
 - sbt
 
-	- sbt assembly # 打 jar 包
+	1. sbt assembly # 打 jar 包
+	2. java -jar target/scala-2.12/web-crawler-0.1.0.jar
 
-		```
-		java -jar target/scala-2.12/web-crawler-0.1.0.jar
-		```
 
 - docker
 
-	* build image
+	1. build image
 		- docker build -f docker/Dockerfile -t web-crawler:0.1.0 .
 
-	* start container
+	2. start container
 		- docker run -it --init --name web-crawler web-crawler:0.1.0 java -jar /apps/web-crawler-0.1.0.jar
 

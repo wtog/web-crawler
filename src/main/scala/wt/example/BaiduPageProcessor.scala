@@ -1,7 +1,6 @@
 package wt.example
 
-import wt.downloader.RequestHeaders
-import wt.processor.{Page, PageProcessor}
+import wt.processor.{Page, PageProcessor, RequestHeaders}
 
 /**
   * @author : tong.wang
@@ -20,7 +19,7 @@ case class BaiduPageProcessor() extends PageProcessor {
 
   override def requestHeaders: RequestHeaders = {
     RequestHeaders(domain = "www.baidu.com",
-                    headers = Some(Map("Content-Type" -> "text/html; charset=GB2312")))
+                    headers = Some(Map("Content-Type" -> "text/html; charset=GB2312")), useProxy = true)
   }
 
   override def targetUrls: List[String] = {

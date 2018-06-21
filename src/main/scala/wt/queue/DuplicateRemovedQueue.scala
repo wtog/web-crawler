@@ -1,6 +1,6 @@
 package wt.queue
 
-import wt.downloader.RequestHeaderGeneral
+import wt.processor.RequestHeaderGeneral
 import wt.queue.duplicate.DuplicateRemovedStrategy
 
 /**

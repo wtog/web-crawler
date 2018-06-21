@@ -1,7 +1,7 @@
 package wt.queue
 
 import org.slf4j.{Logger, LoggerFactory}
-import wt.downloader.RequestHeaderGeneral
+import wt.processor.RequestHeaderGeneral
 
 /**
   * @author : tong.wang

@@ -2,7 +2,7 @@ package wt.queue
 
 import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
 
-import wt.downloader.RequestHeaderGeneral
+import wt.processor.RequestHeaderGeneral
 import wt.queue.duplicate.{DuplicateRemovedStrategy, HashSetStrategy}
 
 /**

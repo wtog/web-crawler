@@ -1,5 +1,6 @@
 package wt.pipeline
 
+import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
 import org.slf4j.{Logger, LoggerFactory}
@@ -20,6 +21,6 @@ trait Pipeline {
 object ConsolePipeline extends Pipeline {
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (url, result) = pageResultItem
-    println(s"crawl result: ${url} - ${result}")
+    logger.info(s"crawl result: ${url} - ${result}")
   }
 }
