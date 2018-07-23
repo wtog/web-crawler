@@ -1,0 +1,55 @@
+{
+  "kind": "DeploymentConfig",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "web-crawler"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "labels": {
+          "name": "web-crawler"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web-crawler",
+            "image": "wtnull/web-crawler-openshift",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    "replicas": 2,
+    "selector": {
+      "name": "web-crawler"
+    },
+    "triggers": [
+      {
+        "type": "ConfigChange"
+      },
+      {
+        "type": "ImageChange",
+        "imageChangeParams": {
+          "automatic": true,
+          "containerNames": [
+            "web-crawler"
+          ],
+          "from": {
+            "kind": "ImageStreamTag",
+            "name": "wtnull/web-crawler-openshift:latest"
+          }
+        }
+      }
+    ],
+    "strategy": {
+      "type": "Rolling"
+    }
+  }
+}
