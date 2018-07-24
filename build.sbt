@@ -11,7 +11,7 @@ lazy val root = (project in file(".")).
 
 lazy val commonSettings = Seq(
   name := "web-crawler",
-  organization := "io.wt",
+  organization := "io.github.wtog",
   version := ver,
   scalaVersion := "2.11.4"
 )
@@ -59,7 +59,7 @@ lazy val spark = Seq(
 
 lazy val assemblyConfig = Seq(
   assemblyJarName in assembly := s"web-crawler-${ver}.jar",
-  mainClass in Compile := Some("wt.Main"),
+  mainClass in Compile := Some("io.github.wtog.Main"),
   test in assembly := {},
   assemblyMergeStrategy in assembly := {
     case PathList("META-INF", xs @ _*) =>
