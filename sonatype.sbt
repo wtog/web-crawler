@@ -1,4 +1,4 @@
-organization := "io.wt"
+organization := "io.github.wtog"
 
 publishMavenStyle := true
 
