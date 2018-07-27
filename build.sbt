@@ -1,4 +1,4 @@
-lazy val ver = "0.1.0"
+lazy val ver = "0.1.0-SNAPSHOT"
 
 javacOptions++=Seq("-source","1.8","-target","1.8")
 
@@ -6,7 +6,7 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     assemblyConfig,
-    libraryDependencies ++= derby ++ log ++ httpUtils ++ httpParser ++ spark
+    libraryDependencies ++= derby ++ log ++ httpUtils ++ httpParser
   )
 
 lazy val commonSettings = Seq(
@@ -18,10 +18,32 @@ lazy val commonSettings = Seq(
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2/")
+  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2/")
+}
+publishMavenStyle := true
+publishArtifact in Test := false
+pomIncludeRepository := { _ => false }
+
+pomExtra in Global := {
+  <url>https://github.com/wtog/web-crawler</url>
+    <licenses>
+      <license>
+        <name>Apache 2</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+    </licenses>
+    <scm>
+      <url>git@github.com:wtog/web-crawler.git</url>
+      <connection>scm:git:git@github.com:wtog/web-crawler.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>wangtong</id>
+        <name>wangtong</name>
+        <url>https://github.com/wtog/</url>
+      </developer>
+    </developers>
 }
 
 lazy val akkaVersion = "2.5.12"
@@ -45,16 +67,6 @@ lazy val httpUtils = Seq(
 lazy val httpParser = Seq(
   "org.jsoup" % "jsoup" % "1.10.3",
   "us.codecraft" % "xsoup" % "0.3.1"
-)
-
-lazy val spark_version = "2.3.1"
-lazy val spark_dep_scope = "test"
-
-lazy val spark = Seq(
-  "org.apache.spark" %% "spark-core" % spark_version % spark_dep_scope,
-  "org.apache.spark" %% "spark-sql" % spark_version % spark_dep_scope,
-  "org.apache.spark" %% "spark-mllib" % spark_version % spark_dep_scope,
-  "org.apache.spark" %% "spark-streaming" % spark_version % spark_dep_scope
 )
 
 lazy val assemblyConfig = Seq(
