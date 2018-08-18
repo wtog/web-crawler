@@ -1,6 +1,6 @@
 lazy val ver = "0.1.0-SNAPSHOT"
 
-javacOptions++=Seq("-source","1.8","-target","1.8")
+javacOptions++=Seq("-source","1.8", "-target","1.8")
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -13,8 +13,10 @@ lazy val commonSettings = Seq(
   name := "web-crawler",
   organization := "io.github.wtog",
   version := ver,
-  scalaVersion := "2.11.4"
+  scalaVersion := "2.11.8"
 )
+
+mappings in (Compile, packageBin) ~= { _.filter(!_._1.getName.startsWith("log4j")) }
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
@@ -23,7 +25,7 @@ publishTo := {
 }
 publishMavenStyle := true
 publishArtifact in Test := false
-pomIncludeRepository := { _ => false }
+pomIncludeRepository := { _ => true }
 
 pomExtra in Global := {
   <url>https://github.com/wtog/web-crawler</url>
@@ -52,7 +54,7 @@ lazy val derby = Seq(
   "com.google.guava" % "guava" % "23.5-jre",
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-  "org.scalatest" %% "scalatest" % "3.0.0"
+  "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
 lazy val log = Seq(
@@ -60,12 +62,11 @@ lazy val log = Seq(
 )
 
 lazy val httpUtils = Seq(
-  "org.asynchttpclient" % "async-http-client" % "2.4.7",
+  "org.asynchttpclient" % "async-http-client" % "2.4.7" excludeAll(ExclusionRule("org.reactivestreams", "reactive-streams"), ExclusionRule("io.netty", "netty-handler")) ,
   "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 )
 
 lazy val httpParser = Seq(
-  "org.jsoup" % "jsoup" % "1.10.3",
   "us.codecraft" % "xsoup" % "0.3.1"
 )
 

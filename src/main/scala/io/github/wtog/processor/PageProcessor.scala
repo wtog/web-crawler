@@ -9,19 +9,36 @@ import io.github.wtog.queue.{LinkQueue, RequestQueue}
 import io.github.wtog.selector.HtmlParser
 import io.github.wtog.utils.CharsetUtils
 
-
 /**
   * @author : tong.wang
   * @since : 5/16/18 9:48 PM
   * @version : 1.0.0
   */
 trait PageProcessor {
+
+  /**
+    * the target urls for processor to crawl
+    * @return
+    */
   def targetUrls: List[String]
 
+  /**
+    * handle the crawled result
+    * @return
+    */
   def pipelines: Set[Pipeline] = Set(ConsolePipeline)
 
+  /**
+    * parse the html source code
+    * @param page
+    */
   def process(page: Page)
 
+  /**
+    * set RequestHeaders For processor
+    * ps: RequestHeaders(domain = "www.baidu.com")
+    * @return
+    */
   def requestHeaders: RequestHeaders
 }
 

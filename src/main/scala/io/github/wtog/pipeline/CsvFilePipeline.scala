@@ -74,25 +74,25 @@ object IOContentCache {
   val expire: Unit = {
     def removeExpire() = {
       while (true) {
-        cache.foreach(c => {
-          c._2.foreach(it => {
+        cache.foreach {case (url, list) => {
+          list.foreach(it => {
             val (expire, list) = it
             if (System.currentTimeMillis() > expire) {
               if (list.isEmpty) {
-                cache -= (c._1)
+                cache -= (url)
               } else {
-                writeContentFile(c._1, list, closeFile = true)
+                writeContentFile(url, list, closeFile = true)
                 list.clear()
               }
             } else {
               val listSize = list.size
-              if (listSize > 10) {
-                writeContentFile(c._1, list.slice(0, 10), closeFile = false)
-                cache += (c._1 -> Some((expire, list.slice(10, listSize))))
+              if (listSize > 100) {
+                writeContentFile(url, list.take(100), closeFile = false)
+                cache += (url -> Some((expire, list.drop(100))))
               }
             }
           })
-        })
+        }}
         TimeUnit.SECONDS.sleep(1)
       }
     }
