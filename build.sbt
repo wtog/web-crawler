@@ -16,7 +16,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.8"
 )
 
-mappings in (Compile, packageBin) ~= { _.filter(!_._1.getName.startsWith("log4j")) }
+mappings in (Compile, packageBin) ~= { _.filter(!_._1.getName.contentEquals("log4j.xml")) }
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
