@@ -6,17 +6,17 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 
 /**
-  * @author : tong.wang
-  * @since : 5/20/18 12:45 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/20/18 12:45 PM
+ * @version : 1.0.0
+ */
 object CharsetUtils {
   def detectCharset(contentType: Option[String], contentBytes: Array[Byte]): (String, Option[String]) = {
     val charset = UrlUtils.getCharset(contentType.getOrElse(""))
 
     charset match {
-      case Some(c) => (c, None)
-      case None =>
+      case Some(c) ⇒ (c, None)
+      case None ⇒
         val defaultCharset = Charset.defaultCharset()
         val content = new String(contentBytes, defaultCharset)
         val metas: Elements = Jsoup.parse(content).select("meta")

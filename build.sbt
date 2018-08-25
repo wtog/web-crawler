@@ -90,3 +90,5 @@ lazy val assemblyConfig = Seq(
     case x => MergeStrategy.first
   }
 )
+
+Format.formatSettings

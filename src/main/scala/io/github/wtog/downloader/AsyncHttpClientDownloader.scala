@@ -3,16 +3,16 @@ package io.github.wtog.downloader
 import io.netty.handler.codec.http.DefaultHttpHeaders
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient._
-import io.github.wtog.exceptions.{IllegalArgumentsException, NonNullArgumentsException}
-import io.github.wtog.processor.{Page, RequestHeaders}
+import io.github.wtog.exceptions.{ IllegalArgumentsException, NonNullArgumentsException }
+import io.github.wtog.processor.{ Page, RequestHeaders }
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 
 /**
-  * @author : tong.wang
-  * @since : 5/16/18 11:13 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/16/18 11:13 PM
+ * @version : 1.0.0
+ */
 object AsyncHttpClientDownloader extends Downloader {
 
   var clientsPool: Map[String, AsyncHttpClient] = Map()
@@ -20,11 +20,11 @@ object AsyncHttpClientDownloader extends Downloader {
   def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestHeaders): BoundRequestBuilder = {
     import io.netty.handler.codec.http.HttpHeaders._
 
-    val httpHeaders  = new DefaultHttpHeaders
+    val httpHeaders = new DefaultHttpHeaders
     requestHeaders.headers match {
-      case Some(headers) =>
-        headers.foreach {it => httpHeaders.add(it._1, it._2)}
-      case None => logger.debug("no extra headers")
+      case Some(headers) ⇒
+        headers.foreach { it ⇒ httpHeaders.add(it._1, it._2) }
+      case None ⇒ logger.debug("no extra headers")
     }
 
     httpHeaders.add(Names.USER_AGENT, requestHeaders.userAgent)
@@ -37,13 +37,12 @@ object AsyncHttpClientDownloader extends Downloader {
     val requestGeneral = request.requestHeaderGeneral.getOrElse(throw NonNullArgumentsException("requestGeneral"))
     val domain = request.domain
 
-
     val requestBuilder: BoundRequestBuilder = requestGeneral.method.toUpperCase match {
-      case "GET" =>
+      case "GET" ⇒
         downloadClients(domain).prepareGet(requestGeneral.url.get)
-      case "POST" =>
+      case "POST" ⇒
         downloadClients(domain).preparePost(requestGeneral.url.get)
-      case other =>
+      case other ⇒
         logger.warn(s"unknown httpmethod ${other}")
         throw IllegalArgumentsException(other)
     }
@@ -67,9 +66,8 @@ object AsyncHttpClientDownloader extends Downloader {
     promise.future
   }
 
-
   def downloadClients(domain: String): AsyncHttpClient = {
-    if (!clientsPool.contains(domain)){
+    if (!clientsPool.contains(domain)) {
       clientsPool += (domain -> asyncHttpClient())
     }
     clientsPool(domain)

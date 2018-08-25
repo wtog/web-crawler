@@ -2,15 +2,15 @@ package io.github.wtog.downloader
 
 import java.security.cert.X509Certificate
 
-import javax.net.ssl.{SSLContext, TrustManager, X509TrustManager}
-import org.apache.http.auth.{AuthState, ChallengeState, UsernamePasswordCredentials}
+import javax.net.ssl.{ SSLContext, TrustManager, X509TrustManager }
+import org.apache.http.auth.{ AuthState, ChallengeState, UsernamePasswordCredentials }
 import org.apache.http.client.CookieStore
-import org.apache.http.client.config.{CookieSpecs, RequestConfig}
+import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.HttpClientContext
-import org.apache.http.config.{RegistryBuilder, SocketConfig}
-import org.apache.http.conn.socket.{ConnectionSocketFactory, PlainConnectionSocketFactory}
-import org.apache.http.conn.ssl.{DefaultHostnameVerifier, SSLConnectionSocketFactory}
+import org.apache.http.config.{ RegistryBuilder, SocketConfig }
+import org.apache.http.conn.socket.{ ConnectionSocketFactory, PlainConnectionSocketFactory }
+import org.apache.http.conn.ssl.{ DefaultHostnameVerifier, SSLConnectionSocketFactory }
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.auth.BasicScheme
 import org.apache.http.impl.client._
@@ -18,20 +18,20 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.impl.cookie.BasicClientCookie
 import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
-import org.apache.http.{HttpHost, HttpRequest, HttpRequestInterceptor, HttpResponse}
-import org.slf4j.{Logger, LoggerFactory}
-import io.github.wtog.downloader.proxy.{ProxyDTO, ProxyProvider}
+import org.apache.http.{ HttpHost, HttpRequest, HttpRequestInterceptor, HttpResponse }
+import org.slf4j.{ Logger, LoggerFactory }
+import io.github.wtog.downloader.proxy.{ ProxyDTO, ProxyProvider }
 import io.github.wtog.exceptions.NonNullArgumentsException
-import io.github.wtog.processor.{Page, RequestHeaders}
+import io.github.wtog.processor.{ Page, RequestHeaders }
 import io.github.wtog.utils.UrlUtils
 
 import scala.concurrent.Future
 
 /**
-  * @author : tong.wang
-  * @since : 5/19/18 11:03 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/19/18 11:03 PM
+ * @version : 1.0.0
+ */
 object ApacheHttpClientDownloader extends Downloader {
   var clientsPool: Map[String, CloseableHttpClient] = Map()
 
@@ -47,10 +47,10 @@ object ApacheHttpClientDownloader extends Downloader {
       val httpResponse = ProxyProvider.requestWithProxy[CloseableHttpResponse](request.useProxy, getResponse)
 
       httpResponse.getStatusLine.getStatusCode match {
-        case 200 =>
+        case 200 ⇒
           val byteArray = EntityUtils.toByteArray(Option(httpResponse.getEntity).getOrElse(throw NonNullArgumentsException("apache downloader return empty content")))
           Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = true, bytes = Some(byteArray))
-        case other =>
+        case other ⇒
           logger.warn(s"failed download ${request.requestHeaderGeneral.get} return code is ${other}")
           Page(requestGeneral = request.requestHeaderGeneral.get)
       }
@@ -79,12 +79,12 @@ object HttpUriRequestConverter {
       .setCookieSpec(CookieSpecs.STANDARD)
       .build)
 
-    request.headers foreach { headers =>
-      headers.foreach { it => requestBuilder.addHeader(it._1, it._2) }
+    request.headers foreach { headers ⇒
+      headers.foreach { it ⇒ requestBuilder.addHeader(it._1, it._2) }
     }
 
     val httpContext = new HttpClientContext
-    proxy.foreach { p =>
+    proxy.foreach { p ⇒
       logger.info(s"use proxy ${request.domain}")
       requestConfig.setProxy(new HttpHost(p.host, p.port))
       val authState = new AuthState
@@ -92,12 +92,13 @@ object HttpUriRequestConverter {
       httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, authState)
     }
 
-    request.cookies foreach { cookie =>
+    request.cookies foreach { cookie ⇒
       val cookieStore = new BasicCookieStore
-      cookie.foreach { case (name, value) => {
-        val cook = new BasicClientCookie(name, value)
-        cook.setDomain(UrlUtils.removePort(requestUrl))
-        cookieStore.addCookie(cook)
+      cookie.foreach {
+        case (name, value) ⇒ {
+          val cook = new BasicClientCookie(name, value)
+          cook.setDomain(UrlUtils.removePort(requestUrl))
+          cookieStore.addCookie(cook)
         }
       }
       httpContext.setCookieStore(cookieStore)
@@ -108,12 +109,12 @@ object HttpUriRequestConverter {
 
   private def selectRequestMethod(request: RequestHeaders): RequestBuilder = {
     request.requestHeaderGeneral.get.method.toUpperCase match {
-      case "POST" => addFormParams(RequestBuilder.post, request)
-      case "HEAD" => RequestBuilder.head
-      case "OPTION" => RequestBuilder.options
-      case "PUT" => addFormParams(RequestBuilder.put, request)
-      case "TRACE" => RequestBuilder.trace
-      case _ => RequestBuilder.get()
+      case "POST"   ⇒ addFormParams(RequestBuilder.post, request)
+      case "HEAD"   ⇒ RequestBuilder.head
+      case "OPTION" ⇒ RequestBuilder.options
+      case "PUT"    ⇒ addFormParams(RequestBuilder.put, request)
+      case "TRACE"  ⇒ RequestBuilder.trace
+      case _        ⇒ RequestBuilder.get()
     }
   }
 
@@ -121,9 +122,9 @@ object HttpUriRequestConverter {
     val requestHeaderGeneral = request.requestHeaderGeneral
 
     requestHeaderGeneral match {
-      case Some(general) =>
+      case Some(general) ⇒
         requestBuilder.setEntity(new StringEntity(general.requestBody.get))
-      case None =>
+      case None ⇒
     }
 
     requestBuilder
@@ -153,7 +154,6 @@ object HttpClientGenerator {
 
       new SSLConnectionSocketFactory(createIgnoreVerifySSL, Array[String]("SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"), null, new DefaultHostnameVerifier); // 优先绕过安全证书
     }
-
 
     val reg = RegistryBuilder.create[ConnectionSocketFactory].register("http", PlainConnectionSocketFactory.INSTANCE).register("https", buildSSLConnectionSocketFactory).build
     val connectionManager = new PoolingHttpClientConnectionManager(reg)
@@ -197,13 +197,13 @@ object HttpClientGenerator {
       val cookieStore = new BasicCookieStore
 
       requestHeaders.cookies match {
-        case Some(cookies) =>
-          cookies.foreach(it => {
+        case Some(cookies) ⇒
+          cookies.foreach(it ⇒ {
             val cookie = new BasicClientCookie(it._1, it._2)
             cookie.setDomain(requestHeaders.domain)
             cookieStore.addCookie(cookie)
           })
-        case None => logger.debug("no cookie")
+        case None ⇒ logger.debug("no cookie")
       }
 
       httpClientBuilder.setDefaultCookieStore(cookieStore)
@@ -224,12 +224,11 @@ object CustomRedirectStrategy extends LaxRedirectStrategy {
         httpRequestWrapper.removeHeaders("Content-Length")
         return httpRequestWrapper
       } catch {
-        case e: Exception =>
+        case e: Exception ⇒
           logger.error("强转为HttpRequestWrapper出错")
       }
       new HttpPost(uri)
-    }
-    else new HttpGet(uri)
+    } else new HttpGet(uri)
   }
 }
 

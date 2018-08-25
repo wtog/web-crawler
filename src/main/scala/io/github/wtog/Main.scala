@@ -2,31 +2,42 @@ package io.github.wtog
 
 import java.util.ServiceLoader
 
+import akka.actor.ActorSystem
+import com.google.common.reflect.{ ClassPath, TypeToken }
 import io.github.wtog.processor.PageProcessor
 
 import scala.io.StdIn
 
 /**
-  * @author : tong.wang
-  * @since : 6/14/18 11:40 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 6/14/18 11:40 PM
+ * @version : 1.0.0
+ */
 object Main {
 
   def main(args: Array[String]): Unit = {
     import scala.collection.JavaConverters._
 
-    val services = ServiceLoader.load(classOf[PageProcessor]).asScala
-    val processorList = services.zip(Stream from 1)
+    val classPath = ClassPath.from(this.getClass.getClassLoader)
+
+    val classes = classPath.getTopLevelClassesRecursive("io.github.wtog.processor.impl").asScala
+    val pageProcessor = classOf[PageProcessor]
+    val processorList = classes.map(_.load()).filter { clazz ⇒
+      val types = TypeToken.of(clazz).getTypes.asScala
+      types.exists(_.getRawType == pageProcessor)
+    }.map { clazz ⇒
+      val constructor = clazz.getConstructors.head
+      constructor.newInstance().asInstanceOf[PageProcessor]
+    }.toList.zip(Stream from 1)
 
     System.getenv("PASS_PLATFORM") match {
-      case "openshift" =>
-        processorList.map(it => it._1).foreach(it => Spider(pageProcessor = it).start())
-      case _ =>
+      case "openshift" ⇒
+        processorList.map(it ⇒ it._1).foreach(it ⇒ Spider(pageProcessor = it).start())
+      case _ ⇒
         println("show page processor list: ")
-        println("  0. all")
-        for ((service, order) <- processorList) {
-          println(s"  ${order}. ${service.getClass.getSimpleName}")
+        println("\t0. all")
+        for ((service, order) ← processorList) {
+          println(s"\t${order}. ${service.getClass.getSimpleName}")
         }
 
         println("\nchoose number to execute.")
@@ -37,15 +48,14 @@ object Main {
 
         val executeProcessor = if (chosen.isEmpty || chooseNumber.contains("0")) {
           println("execute all processor")
-          processorList.map(it => it._1)
+          processorList.map(it ⇒ it._1)
         } else {
           processorList.collect {
-            case (processor, order) if chosen.contains(order.toString) => processor
+            case (processor, order) if chosen.contains(order.toString) ⇒ processor
           }
         }
 
-        executeProcessor.foreach(it => Spider(pageProcessor = it).start())
-
+        executeProcessor.foreach(it ⇒ Spider(pageProcessor = it).start())
     }
   }
 }

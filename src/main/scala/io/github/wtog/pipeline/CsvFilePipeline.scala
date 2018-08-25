@@ -9,10 +9,10 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
 /**
-  * @author : tong.wang
-  * @since : 5/20/18 11:01 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/20/18 11:01 PM
+ * @version : 1.0.0
+ */
 object CsvFilePipeline extends Pipeline {
 
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
@@ -38,33 +38,33 @@ object IOContentCache {
   }
 
   def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]], closeFile: Boolean) = {
-    val file = UrlUtils.getDomainAndURI(if (fileName.contains("/")) fileName.replace("/","_") else fileName)
+    val file = UrlUtils.getDomainAndURI(if (fileName.contains("/")) fileName.replace("/", "_") else fileName)
 
     val randomFile = if (fileIOCache.contains(file)) fileIOCache(file)
-                      else {
-                        val rf = new RandomAccessFile(s"/tmp/web-crawler-${file}.csv", "rw")
-                        fileIOCache += (file -> rf)
-                        rf
-                      }
+    else {
+      val rf = new RandomAccessFile(s"/tmp/web-crawler-${file}.csv", "rw")
+      fileIOCache += (file -> rf)
+      rf
+    }
     try {
-       randomFile.length match {
-         case fileLength if fileLength == 0 =>
-           randomFile.seek(fileLength)//指针指向文件末尾
-           val title = contentList.head.keys.mkString(",") + "\n"
-           randomFile.write((title).getBytes("UTF-8"))
-           val row = contentList.head.values.mkString(",") + "\n"
-           randomFile.write((row).getBytes("UTF-8"))
-         case fileLength if fileLength > 0 =>
-           randomFile.seek(fileLength)//指针指向文件末尾
-           contentList.foreach(map => {
-             val row = map.values.mkString(",")  + "\n"
-             randomFile.write((row).getBytes("UTF-8"))//写入数据
-           })
-       }
-     } catch {
-       case ex: Throwable => ex.printStackTrace()
-     } finally {
-       if (closeFile)
+      randomFile.length match {
+        case fileLength if fileLength == 0 ⇒
+          randomFile.seek(fileLength) //指针指向文件末尾
+          val title = contentList.head.keys.mkString(",") + "\n"
+          randomFile.write((title).getBytes("UTF-8"))
+          val row = contentList.head.values.mkString(",") + "\n"
+          randomFile.write((row).getBytes("UTF-8"))
+        case fileLength if fileLength > 0 ⇒
+          randomFile.seek(fileLength) //指针指向文件末尾
+          contentList.foreach(map ⇒ {
+            val row = map.values.mkString(",") + "\n"
+            randomFile.write((row).getBytes("UTF-8")) //写入数据
+          })
+      }
+    } catch {
+      case ex: Throwable ⇒ ex.printStackTrace()
+    } finally {
+      if (closeFile)
         randomFile.close()
     }
   }
@@ -74,25 +74,27 @@ object IOContentCache {
   val expire: Unit = {
     def removeExpire() = {
       while (true) {
-        cache.foreach {case (url, list) => {
-          list.foreach(it => {
-            val (expire, list) = it
-            if (System.currentTimeMillis() > expire) {
-              if (list.isEmpty) {
-                cache -= (url)
+        cache.foreach {
+          case (url, list) ⇒ {
+            list.foreach(it ⇒ {
+              val (expire, list) = it
+              if (System.currentTimeMillis() > expire) {
+                if (list.isEmpty) {
+                  cache -= (url)
+                } else {
+                  writeContentFile(url, list, closeFile = true)
+                  list.clear()
+                }
               } else {
-                writeContentFile(url, list, closeFile = true)
-                list.clear()
+                val listSize = list.size
+                if (listSize > 100) {
+                  writeContentFile(url, list.take(100), closeFile = false)
+                  cache += (url -> Some((expire, list.drop(100))))
+                }
               }
-            } else {
-              val listSize = list.size
-              if (listSize > 100) {
-                writeContentFile(url, list.take(100), closeFile = false)
-                cache += (url -> Some((expire, list.drop(100))))
-              }
-            }
-          })
-        }}
+            })
+          }
+        }
         TimeUnit.SECONDS.sleep(1)
       }
     }
@@ -102,7 +104,7 @@ object IOContentCache {
     Future {
       removeExpire()
     }.recover {
-      case ex =>
+      case ex ⇒
         println(ex.getLocalizedMessage)
         removeExpire()
     }

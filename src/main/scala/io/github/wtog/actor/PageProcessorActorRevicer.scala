@@ -4,22 +4,22 @@ import java.util.concurrent.LinkedBlockingQueue
 
 import akka.actor.Actor
 import io.github.wtog.Spider
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{ Logger, LoggerFactory }
 import io.github.wtog.pipeline.Pipeline
 import io.github.wtog.processor.Page
 import io.github.wtog.queue.RequestQueue
 
 /**
-  * @author : tong.wang
-  * @since : 5/16/18 11:54 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/16/18 11:54 PM
+ * @version : 1.0.0
+ */
 class PageProcessorActorRevicer extends Actor {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[PageProcessorActorRevicer])
 
   override def receive: Receive = {
-    case processorEvent: ProcessorEvent =>
+    case processorEvent: ProcessorEvent ⇒
       val page = processorEvent.page
       val spider = processorEvent.spider
 
@@ -28,15 +28,15 @@ class PageProcessorActorRevicer extends Actor {
       continueAddRequest(page.requestQueue)(spider)
       addToPipeline(page.requestGeneral.url.get, page.resultItems)(spider.pageProcessor.pipelines)
 
-    case other => logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
+    case other ⇒ logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }
 
   def addToPipeline(url: String, pageResultItems: (LinkedBlockingQueue[Map[String, Any]], Int))(pipelines: Set[Pipeline]) = {
     val (resultItems, batchPollSize) = pageResultItems
     if (!resultItems.isEmpty) {
-      (0 to batchPollSize).foreach(_ => {
+      (0 to batchPollSize).foreach(_ ⇒ {
         Option(resultItems.poll()) foreach {
-          items => ActorManager.pipelineActor ! PipelineEvent(pipelines, (url, items))
+          items ⇒ ActorManager.pipelineActor ! PipelineEvent(pipelines, (url, items))
         }
       })
     }
@@ -45,7 +45,7 @@ class PageProcessorActorRevicer extends Actor {
   def continueAddRequest(targetRequests: (RequestQueue, Int))(spider: Spider) = {
     val (requestQueue, batchPollSize) = targetRequests
     if (!requestQueue.isEmpty) {
-      (0 to batchPollSize).foreach(_ => {
+      (0 to batchPollSize).foreach(_ ⇒ {
         import scala.concurrent.ExecutionContext.Implicits.global
         import scala.concurrent.duration._
         ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond, new Runnable {

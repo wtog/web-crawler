@@ -1,14 +1,14 @@
 package io.github.wtog.actor
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ ActorSystem, Props }
 
 import scala.concurrent.ExecutionContext
 
 /**
-  * @author : tong.wang
-  * @since : 5/16/18 11:56 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/16/18 11:56 PM
+ * @version : 1.0.0
+ */
 object ActorManager {
   lazy val system = ActorSystem("web-crawler")
 
@@ -17,7 +17,7 @@ object ActorManager {
   lazy val pipelineActor = system.actorOf(Props[PipelineActorRevicer].withDispatcher("pipeline-dispatcher"), "pipeline-processor")
 }
 
-class ActorManager{}
+class ActorManager {}
 
 object ExecutionContexts {
   implicit lazy val downloadDispatcher: ExecutionContext = ActorManager.system.dispatchers.lookup("downloader-dispatcher")

@@ -1,15 +1,15 @@
 package io.github.wtog.queue
 
-import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
+import java.util.concurrent.{ BlockingQueue, LinkedBlockingQueue }
 
 import io.github.wtog.processor.RequestHeaderGeneral
-import io.github.wtog.queue.duplicate.{DuplicateRemovedStrategy, HashSetStrategy}
+import io.github.wtog.queue.duplicate.{ DuplicateRemovedStrategy, HashSetStrategy }
 
 /**
-  * @author : tong.wang
-  * @since : 5/16/18 10:12 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/16/18 10:12 PM
+ * @version : 1.0.0
+ */
 class LinkQueue(duplicateRemovedStrategy: DuplicateRemovedStrategy = HashSetStrategy) extends DuplicateRemovedQueue(duplicateRemovedStrategy) {
   private lazy val queue: BlockingQueue[RequestHeaderGeneral] = new LinkedBlockingQueue
 

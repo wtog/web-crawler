@@ -1,10 +1,10 @@
 package io.github.wtog.utils
 
 /**
-  * @author : tong.wang
-  * @since : 5/19/18 5:20 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/19/18 5:20 PM
+ * @version : 1.0.0
+ */
 object UrlUtils {
   val domainRegex = """[\w]+://""".r
   val chartsetRegex = """charset\s*=\s*['"]*([^\s;'"]*)""".r
@@ -27,7 +27,7 @@ object UrlUtils {
     chartsetRegex.findFirstIn(contentType)
   }
 
-  def getDomainAndURI(url:String): String = {
+  def getDomainAndURI(url: String): String = {
     domainRegex.replaceFirstIn(url, "").substring(0, url.indexOf("?"))
   }
 

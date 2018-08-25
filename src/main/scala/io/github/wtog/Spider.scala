@@ -2,19 +2,19 @@ package io.github.wtog
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import io.github.wtog.actor.{ActorManager, DownloadEvent}
+import io.github.wtog.actor.{ ActorManager, DownloadEvent }
 import io.github.wtog.downloader._
-import io.github.wtog.processor.{PageProcessor, RequestHeaderGeneral}
-import org.slf4j.{Logger, LoggerFactory}
+import io.github.wtog.processor.{ PageProcessor, RequestHeaderGeneral }
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
-  * @author : tong.wang
-  * @since : 4/10/18 11:34 AM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 4/10/18 11:34 AM
+ * @version : 1.0.0
+ */
 case class Spider(
-                   pageProcessor: PageProcessor,
-                   downloader: Downloader = ApacheHttpClientDownloader) {
+    pageProcessor: PageProcessor,
+    downloader:    Downloader    = ApacheHttpClientDownloader) {
 
   val logger: Logger = LoggerFactory.getLogger(Spider.getClass)
 
@@ -31,8 +31,8 @@ case class Spider(
     execute()
   }
 
-  private def execute: () => Unit = () => {
-    this.pageProcessor.targetUrls.foreach(it => {
+  private def execute: () ⇒ Unit = () ⇒ {
+    this.pageProcessor.targetUrls.foreach(it ⇒ {
       ActorManager.downloaderActor ! DownloadEvent(this, Some(RequestHeaderGeneral(url = Some(it))))
     })
   }

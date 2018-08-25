@@ -2,14 +2,14 @@ package io.github.wtog.downloader.proxy.crawler
 
 import io.github.wtog.downloader.proxy.ProxyCrawlerPipeline
 import io.github.wtog.pipeline.Pipeline
-import io.github.wtog.processor.{Page, PageProcessor, RequestHeaders}
+import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
 
 /**
-  * https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt
-  * @author : tong.wang
-  * @since : 6/3/18 12:33 AM
-  * @version : 1.0.0
-  */
+ * https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt
+ * @author : tong.wang
+ * @since : 6/3/18 12:33 AM
+ * @version : 1.0.0
+ */
 object A2UPageProcessor extends PageProcessor {
   val targetUrl = List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
 
@@ -17,7 +17,7 @@ object A2UPageProcessor extends PageProcessor {
     val document = page.jsoupParser
     val proxyIpList = document.text().split(" ")
 
-    proxyIpList.foreach(it => {
+    proxyIpList.foreach(it ⇒ {
       val ipAndPort = it.split(":")
       var proxyIP: Map[String, Any] = Map()
       proxyIP += ("host" -> ipAndPort(0))
