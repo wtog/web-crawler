@@ -76,23 +76,24 @@ object IOContentCache {
       while (true) {
         cache.foreach {
           case (url, list) ⇒ {
-            list.foreach(it ⇒ {
-              val (expire, list) = it
-              if (System.currentTimeMillis() > expire) {
-                if (list.isEmpty) {
-                  cache -= (url)
+            list.foreach {
+              case (expire, list) ⇒ {
+                if (System.currentTimeMillis() > expire) {
+                  if (list.isEmpty) {
+                    cache -= (url)
+                  } else {
+                    writeContentFile(url, list, closeFile = true)
+                    list.clear()
+                  }
                 } else {
-                  writeContentFile(url, list, closeFile = true)
-                  list.clear()
-                }
-              } else {
-                val listSize = list.size
-                if (listSize > 100) {
-                  writeContentFile(url, list.take(100), closeFile = false)
-                  cache += (url -> Some((expire, list.drop(100))))
+                  val listSize = list.size
+                  if (listSize > 100) {
+                    writeContentFile(url, list.take(100), closeFile = false)
+                    cache += (url -> Some((expire, list.drop(100))))
+                  }
                 }
               }
-            })
+            }
           }
         }
         TimeUnit.SECONDS.sleep(1)

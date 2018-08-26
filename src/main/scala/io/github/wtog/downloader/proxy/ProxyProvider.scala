@@ -34,7 +34,7 @@ object ProxyProvider {
     ActorManager.system.scheduler.schedule(15 seconds, 15 seconds, new Runnable {
       override def run(): Unit = {
         proxyList = (proxyList -- proxyList.filter(p ⇒ p.status == ProxyStatusEnums.IDEL && p.usabilityCheck() < 0.5 && p.checkTimes.get() > 6))
-        logger.info(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p ⇒ p.status == ProxyStatusEnums.USING)}")
+        logger.debug(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p ⇒ p.status == ProxyStatusEnums.USING)}")
       }
     })
   }
