@@ -54,7 +54,7 @@ lazy val derby = Seq(
   "com.google.guava" % "guava" % "23.5-jre",
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-  "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 lazy val log = Seq(

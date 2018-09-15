@@ -9,17 +9,7 @@
     </appender>
 
     <logger name="wt" additivity="false">
-        <level value="info" />
-        <appender-ref ref="stdout" />
-    </logger>
-
-    <logger name="org.apache.spark" additivity="false">
-        <level value="error" />
-        <appender-ref ref="stdout" />
-    </logger>
-
-    <logger name="org.spark_project" additivity="false">
-        <level value="error" />
+        <level value="debug" />
         <appender-ref ref="stdout" />
     </logger>
 
@@ -28,9 +18,8 @@
         <appender-ref ref="stdout" />
     </logger>
 
-
     <root>
-        <level value="info" />
+        <level value="debug" />
         <appender-ref ref="stdout" />
     </root>
 

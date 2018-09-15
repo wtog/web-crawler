@@ -12,9 +12,12 @@ import scala.concurrent.ExecutionContext
 object ActorManager {
   lazy val system = ActorSystem("web-crawler")
 
-  lazy val processorActor = system.actorOf(Props[PageProcessorActorRevicer].withDispatcher("processor-dispatcher"), "page-processor")
-  lazy val downloaderActor = system.actorOf(Props[DownloaderActorRevicer].withDispatcher("downloader-dispatcher"), "downloader-processor")
   lazy val pipelineActor = system.actorOf(Props[PipelineActorRevicer].withDispatcher("pipeline-dispatcher"), "pipeline-processor")
+
+  def createActor(dispatcher: String, actorName: String) = {
+    system.actorOf(Props[DownloaderActorRevicer].withDispatcher(dispatcher), actorName)
+  }
+
 }
 
 class ActorManager {}

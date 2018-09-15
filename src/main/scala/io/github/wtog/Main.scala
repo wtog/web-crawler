@@ -5,6 +5,7 @@ import java.util.ServiceLoader
 import akka.actor.ActorSystem
 import com.google.common.reflect.{ ClassPath, TypeToken }
 import io.github.wtog.processor.PageProcessor
+import io.github.wtog.spider.Spider
 
 import scala.io.StdIn
 
@@ -55,7 +56,9 @@ object Main {
           }
         }
 
-        executeProcessor.foreach(it ⇒ Spider(pageProcessor = it).start())
+        val spiders = executeProcessor.map(it ⇒ Spider(pageProcessor = it))
+
+        spiders.foreach(_.start())
     }
   }
 }

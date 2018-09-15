@@ -3,7 +3,6 @@ package io.github.wtog.processor
 import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 
-import us.codecraft.xsoup.Xsoup
 import io.github.wtog.pipeline.{ ConsolePipeline, Pipeline }
 import io.github.wtog.queue.{ LinkQueue, RequestQueue }
 import io.github.wtog.selector.HtmlParser
