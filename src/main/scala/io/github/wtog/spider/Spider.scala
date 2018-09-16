@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{ Cancellable, PoisonPill }
 import io.github.wtog.actor.{ ActorManager, DownloadEvent }
+import io.github.wtog.downloader.proxy.crawler.ProxyProcessorTrait
 import io.github.wtog.downloader.{ ApacheHttpClientDownloader, Downloader }
 import io.github.wtog.processor.{ PageProcessor, RequestHeaderGeneral }
 import org.slf4j.LoggerFactory
@@ -78,8 +79,8 @@ case class Spider(
     }
 
     def metricInfo() = {
-      if (downloadedPageSum + processedPageSum > 0)
-        logger.info(s"[${name}-spider] downloaded<->processed: ${downloadedPageSum}, sc: ${downloadPageSuccessNum.get()}<->${processPageSuccessNum}, fc: ${downloadPageFailedNum.get()}<->${processPageFailedNum.get()},")
+      if (downloadedPageSum + processedPageSum > 0 && !pageProcessor.isInstanceOf[ProxyProcessorTrait])
+        logger.info(s"[${name}-spider] downloaded<->processed: ${downloadedPageSum}<->${processedPageSum}, sc: ${downloadPageSuccessNum.get()}<->${processPageSuccessNum}, fc: ${downloadPageFailedNum.get()}<->${processPageFailedNum.get()},")
     }
 
   }

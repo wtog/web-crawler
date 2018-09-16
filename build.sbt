@@ -71,7 +71,7 @@ lazy val httpParser = Seq(
 )
 
 lazy val assemblyConfig = Seq(
-  assemblyJarName in assembly := s"web-crawler-${ver}.jar",
+  assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",
   mainClass in Compile := Some("io.github.wtog.Main"),
   test in assembly := {},
   assemblyMergeStrategy in assembly := {

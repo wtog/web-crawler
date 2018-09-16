@@ -13,5 +13,5 @@ RUN ln -s /usr/lib/jvm/default-jvm/bin/jstack /usr/bin/jstack
 
 RUN rm openjdk8-8.171.11-r0.apk
 
-ADD target/scala-2.12/*.jar /apps/
+ADD target/scala-2.11/web-crawler-assembly*.jar /apps/web-crawler-0.1.0.jar
 

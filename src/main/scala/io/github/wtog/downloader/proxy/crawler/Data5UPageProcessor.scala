@@ -9,7 +9,7 @@ import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
  * @since : 6/7/18 11:27 PM
  * @version : 1.0.0
  */
-object Data5UPageProcessor extends PageProcessor {
+object Data5UPageProcessor extends ProxyProcessorTrait {
 
   override def process(page: Page): Unit = {
     val document = page.jsoupParser
@@ -39,5 +39,4 @@ object Data5UPageProcessor extends PageProcessor {
       "http://www.data5u.com/free/gngn/index.shtml")
   }
 
-  override def pipelines: Set[Pipeline] = Set(ProxyCrawlerPipeline)
 }

@@ -1,8 +1,6 @@
 package io.github.wtog.downloader.proxy.crawler
 
-import io.github.wtog.downloader.proxy.ProxyCrawlerPipeline
-import io.github.wtog.pipeline.Pipeline
-import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
+import io.github.wtog.processor.{ Page, RequestHeaders }
 
 /**
  * https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt
@@ -10,7 +8,7 @@ import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
  * @since : 6/3/18 12:33 AM
  * @version : 1.0.0
  */
-object A2UPageProcessor extends PageProcessor {
+object A2UPageProcessor extends ProxyProcessorTrait {
   val targetUrl = List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
 
   override def process(page: Page): Unit = {
@@ -35,5 +33,4 @@ object A2UPageProcessor extends PageProcessor {
     List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
   }
 
-  override def pipelines: Set[Pipeline] = Set(ProxyCrawlerPipeline)
 }
