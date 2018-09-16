@@ -13,14 +13,10 @@ object SpiderPool {
   val spiders = new ConcurrentHashMap[String, Spider]()
 
   def addSpider(spider: Spider) = {
-    if (spiders.contains(spider.name))
-      throw new IllegalArgumentException(s"duplicate spider name ${spider.name}")
-    else
-      spiders.put(spider.name, spider)
-    if (spider.pageProcessor.requestHeaders.useProxy) {
-      ProxyProvider.startProxyCrawl()
-    }
+    if (spiders.contains(spider.name)) throw new IllegalArgumentException(s"duplicate spider name ${spider.name}")
 
+    spiders.put(spider.name, spider)
+    if (spider.pageProcessor.requestHeaders.useProxy) ProxyProvider.startProxyCrawl()
   }
 
   def removeSpider(spider: Spider) = {

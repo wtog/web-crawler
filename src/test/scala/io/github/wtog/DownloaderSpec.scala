@@ -10,10 +10,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 /**
-  * @author : tong.wang
-  * @since : 5/20/18 11:22 AM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/20/18 11:22 AM
+ * @version : 1.0.0
+ */
 class DownloaderSpec extends BaseTest {
 
   "apacheHttpClient" should "work well" in {

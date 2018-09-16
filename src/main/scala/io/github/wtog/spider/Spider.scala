@@ -23,12 +23,12 @@ case class Spider(
 
   lazy val logger = LoggerFactory.getLogger(classOf[Spider])
 
-  private var cancellable: Option[Cancellable] = None
+  private var metircInfoCron: Option[Cancellable] = None
   var downloaderActor = ActorManager.createActor("downloader-dispatcher", s"downloader-${name}")
 
   def start(): Unit = {
     execute()
-    cancellable = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
+    metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
     SpiderPool.addSpider(this)
   }
 
@@ -39,7 +39,7 @@ case class Spider(
 
   def stop() = {
     downloaderActor ! PoisonPill
-    cancellable.foreach { c ⇒
+    metircInfoCron.foreach { c ⇒
       c.cancel()
       this.CrawlMetric.clean()
       SpiderPool.removeSpider(this)
@@ -59,11 +59,15 @@ case class Spider(
     val processPageFailedNum = new AtomicInteger(0)
 
     def downloadedPageSum = downloadPageSuccessNum.get() + downloadPageFailedNum.get()
+
     def processedPageSum = processPageSuccessNum.get() + processPageFailedNum.get()
 
     def downloadSuccessCounter = downloadPageSuccessNum.getAndIncrement()
+
     def downloadFailedCounter = downloadPageFailedNum.getAndIncrement()
+
     def processedSuccessCounter = processPageSuccessNum.getAndIncrement()
+
     def processedFailedCounter = processPageFailedNum.getAndIncrement()
 
     def clean() = {
@@ -79,4 +83,5 @@ case class Spider(
     }
 
   }
+
 }

@@ -8,10 +8,10 @@ import io.github.wtog.processor.impl.beijinghouse.BeijingHouseProcessor
 import io.github.wtog.spider.Spider
 
 /**
-  * @author : tong.wang
-  * @since : 5/16/18 9:19 PM
-  * @version : 1.0.0
-  */
+ * @author : tong.wang
+ * @since : 5/16/18 9:19 PM
+ * @version : 1.0.0
+ */
 class SpiderSpec extends BaseTest {
 
   "spider 10s 1" should "crawl page size over 100" in {
