@@ -1,8 +1,5 @@
 package io.github.wtog
 
-import java.util.ServiceLoader
-
-import akka.actor.ActorSystem
 import com.google.common.reflect.{ ClassPath, TypeToken }
 import io.github.wtog.processor.PageProcessor
 import io.github.wtog.spider.Spider

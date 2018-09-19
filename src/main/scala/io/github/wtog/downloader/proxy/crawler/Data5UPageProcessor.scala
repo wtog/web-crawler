@@ -1,8 +1,6 @@
 package io.github.wtog.downloader.proxy.crawler
 
-import io.github.wtog.downloader.proxy.ProxyCrawlerPipeline
-import io.github.wtog.pipeline.Pipeline
-import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
+import io.github.wtog.processor.{ Page, RequestHeaders }
 
 /**
  * @author : tong.wang

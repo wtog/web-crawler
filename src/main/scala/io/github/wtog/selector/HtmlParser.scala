@@ -1,7 +1,7 @@
 package io.github.wtog.selector
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{ Document, DocumentType }
+import org.jsoup.nodes.Document
 import org.slf4j.{ Logger, LoggerFactory }
 import us.codecraft.xsoup.{ XElements, Xsoup }
 

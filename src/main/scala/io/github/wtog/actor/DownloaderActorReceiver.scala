@@ -24,7 +24,6 @@ class DownloaderActorRevicer extends Actor {
         val spider = downloadEvent.spider
 
         import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
-
         spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
           case Success(page) ⇒
             if (page.isDownloadSuccess) {
@@ -51,4 +50,4 @@ class DownloaderActorRevicer extends Actor {
   }
 }
 
-case class DownloadEvent(spider: Spider, request: Option[RequestHeaderGeneral])
+final case class DownloadEvent(spider: Spider, request: Option[RequestHeaderGeneral])

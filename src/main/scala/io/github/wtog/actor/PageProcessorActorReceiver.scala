@@ -40,7 +40,7 @@ class PageProcessorActorRevicer extends Actor {
           spider.CrawlMetric.processedFailedCounter
       }
 
-    case other ⇒ logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
+    case other ⇒ logger.warn(s"${self.path} reviced wrong msg ${other}")
   }
 
   def addToPipeline(url: String, pageResultItems: (LinkedBlockingQueue[Map[String, Any]], Int))(pipelines: Set[Pipeline]): Unit = {

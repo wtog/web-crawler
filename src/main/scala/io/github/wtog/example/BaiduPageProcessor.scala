@@ -7,7 +7,7 @@ import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
  * @since : 5/16/18 11:42 PM
  * @version : 1.0.0
  */
-case class BaiduPageProcessor() extends PageProcessor {
+final case class BaiduPageProcessor() extends PageProcessor {
 
   override def process(page: Page): Unit = {
     val document = page.jsoupParser

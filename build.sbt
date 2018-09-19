@@ -1,6 +1,7 @@
 lazy val ver = "0.1.0-SNAPSHOT"
 
 javacOptions++=Seq("-source","1.8", "-target","1.8")
+//scalacOptions ++= List("-Yrangepos", "-Ywarn-unused-import")
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -8,12 +9,19 @@ lazy val root = (project in file(".")).
     assemblyConfig,
     libraryDependencies ++= derby ++ log ++ httpUtils ++ httpParser
   )
+  .settings(
+    addCompilerPlugin(scalafixSemanticdb),
+    scalacOptions ++= List(
+      "-Yrangepos",
+      "-Ywarn-unused-import"
+    )
+)
 
 lazy val commonSettings = Seq(
   name := "web-crawler",
   organization := "io.github.wtog",
   version := ver,
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.12"
 )
 
 mappings in (Compile, packageBin) ~= { _.filter(!_._1.getName.contentEquals("log4j.xml")) }

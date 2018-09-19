@@ -70,7 +70,6 @@ object ProxyProvider {
   }
 
   def requestWithProxy[T <: Any](useProxy: Boolean, httpRequest: Option[ProxyDTO] ⇒ T): T = {
-    import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
     if (useProxy) {
       getProxy match {
         case proxy @ Some(p) ⇒
@@ -96,7 +95,7 @@ object ProxyProvider {
   }
 }
 
-case class ProxyDTO(
+final case class ProxyDTO(
     host:          String,
     port:          Int,
     username:      Option[String]   = None,

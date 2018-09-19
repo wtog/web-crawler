@@ -1,8 +1,5 @@
 package io.github.wtog.pipeline
 
-import java.util.Date
-import java.util.concurrent.atomic.AtomicInteger
-
 import org.slf4j.{ Logger, LoggerFactory }
 
 /**

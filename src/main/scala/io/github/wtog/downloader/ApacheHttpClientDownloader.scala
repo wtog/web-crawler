@@ -2,9 +2,12 @@ package io.github.wtog.downloader
 
 import java.security.cert.X509Certificate
 
+import io.github.wtog.downloader.proxy.{ ProxyDTO, ProxyProvider }
+import io.github.wtog.exceptions.NonNullArgumentsException
+import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.github.wtog.utils.UrlUtils
 import javax.net.ssl.{ SSLContext, TrustManager, X509TrustManager }
 import org.apache.http.auth.{ AuthState, ChallengeState, UsernamePasswordCredentials }
-import org.apache.http.client.CookieStore
 import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.HttpClientContext
@@ -20,10 +23,6 @@ import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ HttpHost, HttpRequest, HttpRequestInterceptor, HttpResponse }
 import org.slf4j.{ Logger, LoggerFactory }
-import io.github.wtog.downloader.proxy.{ ProxyDTO, ProxyProvider }
-import io.github.wtog.exceptions.NonNullArgumentsException
-import io.github.wtog.processor.{ Page, RequestHeaders }
-import io.github.wtog.utils.UrlUtils
 
 import scala.concurrent.Future
 
@@ -66,7 +65,7 @@ object ApacheHttpClientDownloader extends Downloader {
 }
 
 object HttpUriRequestConverter {
-  lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): (HttpUriRequest, HttpContext) = {
     val requestUrl = request.requestHeaderGeneral.get.url.get
