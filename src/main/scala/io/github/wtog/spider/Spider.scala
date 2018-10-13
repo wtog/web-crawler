@@ -85,4 +85,5 @@ case class Spider(
 
   }
 
+  override def toString: String = s"spider-${name}: ${CrawlMetric.downloadedPageSum}"
 }

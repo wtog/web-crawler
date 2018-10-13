@@ -30,7 +30,7 @@ class SpiderSpec extends BaseTest {
     spider.CrawlMetric.downloadFailedCounter
 
     println(spider.CrawlMetric.downloadedPageSum)
-    spider.CrawlMetric.metricInfo
+    spider.CrawlMetric.metricInfo()
   }
 
 }

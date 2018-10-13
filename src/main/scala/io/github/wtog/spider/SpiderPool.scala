@@ -23,8 +23,8 @@ object SpiderPool {
     spiders.remove(spider.name)
   }
 
-  def fetchAllSpiders() = {
-    spiders.values().toArray()
+  def fetchAllSpiders(): Array[Spider] = {
+    spiders.values().toArray().map(_.asInstanceOf[Spider])
   }
 
   def fetchAllUsingProxySpiders() = {

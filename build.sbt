@@ -1,7 +1,6 @@
 lazy val ver = "0.1.0-SNAPSHOT"
 
 javacOptions++=Seq("-source","1.8", "-target","1.8")
-//scalacOptions ++= List("-Yrangepos", "-Ywarn-unused-import")
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -11,10 +10,7 @@ lazy val root = (project in file(".")).
   )
   .settings(
     addCompilerPlugin(scalafixSemanticdb),
-    scalacOptions ++= List(
-      "-Yrangepos",
-      "-Ywarn-unused-import"
-    )
+    scalacOptions ++= List("-Yrangepos", "-Ywarn-unused-import")
 )
 
 lazy val commonSettings = Seq(
@@ -70,7 +66,7 @@ lazy val log = Seq(
 )
 
 lazy val httpUtils = Seq(
-  "org.asynchttpclient" % "async-http-client" % "2.4.7" excludeAll(ExclusionRule("org.reactivestreams", "reactive-streams"), ExclusionRule("io.netty", "netty-handler")) ,
+  "org.asynchttpclient" % "async-http-client" % "2.5.3" excludeAll(ExclusionRule("org.reactivestreams", "reactive-streams"), ExclusionRule("io.netty", "netty-handler")) ,
   "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 )
 
