@@ -48,10 +48,10 @@ object ApacheHttpClientDownloader extends Downloader {
       httpResponse.getStatusLine.getStatusCode match {
         case 200 ⇒
           val byteArray = EntityUtils.toByteArray(Option(httpResponse.getEntity).getOrElse(throw NonNullArgumentsException("apache downloader return empty content")))
-          Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = true, bytes = Some(byteArray))
+          Page(requestGeneral = request.requestHeaderGeneral.get, bytes = Some(byteArray))
         case other ⇒
           logger.warn(s"failed download ${request.requestHeaderGeneral.get} return code is ${other}")
-          Page(requestGeneral = request.requestHeaderGeneral.get)
+          Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = false)
       }
     }
   }

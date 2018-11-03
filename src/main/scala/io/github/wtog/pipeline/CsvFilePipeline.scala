@@ -1,7 +1,7 @@
 package io.github.wtog.pipeline
 
 import java.io.RandomAccessFile
-import java.util.concurrent.TimeUnit
+import java.util.concurrent._
 
 import io.github.wtog.utils.UrlUtils
 
@@ -17,87 +17,62 @@ object CsvFilePipeline extends Pipeline {
 
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (pageUrl, resultItems) = pageResultItem
-    IOContentCache.add(UrlUtils.getDomainAndURI(pageUrl), resultItems, 5)
+    IOContentCache.add(UrlUtils.getDomainAndURI(pageUrl), resultItems)
   }
 }
 
 object IOContentCache {
-  var cache: Map[String, Option[(Long, ListBuffer[Map[String, Any]])]] = Map()
-  var fileIOCache: Map[String, RandomAccessFile] = Map()
+  private val cache: ConcurrentHashMap[String, ListBuffer[Map[String, Any]]] = new ConcurrentHashMap[String, ListBuffer[Map[String, Any]]]()
 
-  def add(key: String, value: Map[String, Any], expire: Long) = {
-    if (cache.contains(key)) {
-      val (_, l) = cache(key).get
-      l.append(value)
-      cache += (key -> Some((TimeUnit.MINUTES.toMillis(expire) + System.currentTimeMillis(), l)))
-    } else {
-      val l = new ListBuffer[Map[String, Any]]
-      l.append(value)
-      cache += (key -> Some((TimeUnit.MINUTES.toMillis(expire) + System.currentTimeMillis(), l)))
-    }
+  def add(key: String, value: Map[String, Any]) = {
+    val listValue = cache.getOrDefault(key, ListBuffer.empty[Map[String, Any]])
+    listValue.append(value)
+    cache.put(key, listValue)
   }
 
-  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]], closeFile: Boolean) = {
-    val file = UrlUtils.getDomainAndURI(if (fileName.contains("/")) fileName.replace("/", "_") else fileName)
+  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]]) = {
+    if (contentList.nonEmpty) {
+      val file = if (fileName.contains("/")) fileName.replace("/", "_") else fileName
 
-    val randomFile = if (fileIOCache.contains(file)) fileIOCache(file)
-    else {
-      val rf = new RandomAccessFile(s"/tmp/web-crawler-${file}.csv", "rw")
-      fileIOCache += (file -> rf)
-      rf
-    }
-    try {
-      randomFile.length match {
-        case fileLength if fileLength == 0 ⇒
-          randomFile.seek(fileLength) //指针指向文件末尾
-          val title = contentList.head.keys.mkString(",") + "\n"
-          randomFile.write((title).getBytes("UTF-8"))
-          val row = contentList.head.values.mkString(",") + "\n"
-          randomFile.write((row).getBytes("UTF-8"))
-        case fileLength if fileLength > 0 ⇒
-          randomFile.seek(fileLength) //指针指向文件末尾
-          contentList.foreach(map ⇒ {
-            val row = map.values.mkString(",") + "\n"
-            randomFile.write((row).getBytes("UTF-8")) //写入数据
-          })
-      }
-    } catch {
-      case ex: Throwable ⇒ ex.printStackTrace()
-    } finally {
-      if (closeFile)
+      val randomFile = new RandomAccessFile(s"/tmp/web-crawler-${file}.csv", "rw")
+      try {
+        val fileLength = randomFile.length()
+        randomFile.seek(fileLength) //指针指向文件末尾
+        fileLength match {
+          case 0 ⇒
+            val head = contentList.head
+            val title = head.keys.mkString(",") + "\n"
+            randomFile.write((title).getBytes("UTF-8"))
+            val row = head.values.mkString(",") + "\n"
+            randomFile.write((row).getBytes("UTF-8"))
+            contentList -= head
+          case _ ⇒
+            contentList.foreach(map ⇒ {
+              val row = map.values.mkString(",") + "\n"
+              randomFile.write((row).getBytes("UTF-8")) //写入数据
+              contentList -= map
+            })
+        }
+      } catch {
+        case ex: Throwable ⇒ ex.printStackTrace()
+      } finally {
         randomFile.close()
+      }
     }
   }
 
-  def get(key: String) = cache(key)
-
-  val expire: Unit = {
+  val expire = {
     def removeExpire() = {
-      while (true) {
-        cache.foreach {
-          case (url, list) ⇒ {
-            list.foreach {
-              case (expire, list) ⇒ {
-                if (System.currentTimeMillis() > expire) {
-                  if (list.isEmpty) {
-                    cache -= (url)
-                  } else {
-                    writeContentFile(url, list, closeFile = true)
-                    list.clear()
-                  }
-                } else {
-                  val listSize = list.size
-                  if (listSize > 100) {
-                    writeContentFile(url, list.take(100), closeFile = false)
-                    cache += (url -> Some((expire, list.drop(100))))
-                  }
-                }
-              }
-            }
+      import collection.JavaConverters._
+      val schedule = Executors.newScheduledThreadPool(1)
+
+      schedule.scheduleWithFixedDelay(new Runnable {
+        override def run(): Unit = {
+          cache.asScala.foreach {
+            case (url, list) ⇒ writeContentFile(url, list)
           }
         }
-        TimeUnit.SECONDS.sleep(1)
-      }
+      }, 3, 3, TimeUnit.SECONDS)
     }
 
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -109,7 +84,6 @@ object IOContentCache {
         println(ex.getLocalizedMessage)
         removeExpire()
     }
-
   }
 
 }

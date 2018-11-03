@@ -42,13 +42,13 @@ trait PageProcessor {
 }
 
 case class Page(
-    isDownloadSuccess: Boolean              = false,
+    isDownloadSuccess: Boolean              = true,
     bytes:             Option[Array[Byte]]  = None,
     responseHeaders:   Map[String, String]  = Map("Content-Type" -> Charset.defaultCharset().toString),
     requestGeneral:    RequestHeaderGeneral) {
 
-  lazy val resultItems: (LinkedBlockingQueue[Map[String, Any]], Int) = (new LinkedBlockingQueue, 500)
-  lazy val requestQueue: (RequestQueue, Int) = (new LinkQueue(), 100)
+  lazy val resultItems: LinkedBlockingQueue[Map[String, Any]] = new LinkedBlockingQueue
+  lazy val requestQueue: RequestQueue = new LinkQueue()
 
   lazy val jsoupParser = HtmlParser(pageSource, requestGeneral.url.get).document
 
@@ -64,11 +64,11 @@ case class Page(
   }
 
   def addTargetRequest(urlAdd: String): Unit = {
-    this.requestQueue._1.push(RequestHeaderGeneral(url = Some(urlAdd)))
+    this.requestQueue.push(RequestHeaderGeneral(url = Some(urlAdd)))
   }
 
   def addPageResultItem(result: Map[String, Any]) = {
-    this.resultItems._1.add(result)
+    this.resultItems.add(result)
   }
 
   override def toString: String = {

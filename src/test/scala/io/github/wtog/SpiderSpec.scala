@@ -3,7 +3,6 @@ package io.github.wtog
 import java.util.concurrent.TimeUnit
 
 import io.github.wtog.example.BaiduPageProcessor
-import io.github.wtog.pipeline.ConsolePipeline
 import io.github.wtog.processor.impl.beijinghouse.BeijingHouseProcessor
 import io.github.wtog.spider.Spider
 
