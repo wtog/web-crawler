@@ -88,11 +88,11 @@ case class RequestHeaders(
     headers:                 Option[Map[String, String]]  = None,
     cookies:                 Option[Map[String, String]]  = None,
     charset:                 Option[String]               = Some("UTF-8"),
-    sleepTime:               Int                          = 2000,
+    sleepTime:               Int                          = 3000,
     retryTimes:              Int                          = 0,
     cycleRetryTimes:         Int                          = 0,
     retrySleepTime:          Int                          = 1000,
-    timeOut:                 Int                          = 5000,
+    timeOut:                 Int                          = 3000,
     useGzip:                 Boolean                      = true,
     disableCookieManagement: Boolean                      = false,
     useProxy:                Boolean                      = false)

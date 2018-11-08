@@ -7,5 +7,4 @@ package io.github.wtog.queue.duplicate
  */
 trait DuplicateRemovedStrategy {
   def isDuplicate(url: String): Boolean
-
 }

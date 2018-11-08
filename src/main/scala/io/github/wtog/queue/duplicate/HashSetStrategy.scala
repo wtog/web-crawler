@@ -6,15 +6,16 @@ package io.github.wtog.queue.duplicate
  * @version : 1.0.0
  */
 object HashSetStrategy extends DuplicateRemovedStrategy {
-  var urlSet: Set[String] = Set()
+  var urlSet: Set[Int] = Set()
 
   override def isDuplicate(url: String): Boolean = {
-    if (!urlSet.contains(url)) {
-      urlSet += url
-      true
-    } else {
-      false
+    val urlHashCode = url.hashCode
+    val isDuplicate = urlSet.contains(urlHashCode)
+    if (!isDuplicate) {
+      urlSet += url.hashCode
     }
+    println(urlSet.size)
+    isDuplicate
   }
 
 }

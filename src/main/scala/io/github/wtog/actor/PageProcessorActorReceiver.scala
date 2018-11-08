@@ -9,6 +9,7 @@ import io.github.wtog.processor.Page
 import io.github.wtog.queue.RequestQueue
 import io.github.wtog.spider.Spider
 
+import ExecutionContexts.processorDispatcher
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
@@ -25,8 +26,6 @@ class PageProcessorActorRevicer extends Actor {
     case processorEvent: ProcessorEvent ⇒
       val page = processorEvent.page
       val spider = processorEvent.spider
-
-      import ExecutionContexts.processorDispatcher
 
       Future {
         spider.pageProcessor.process(page)
@@ -54,10 +53,9 @@ class PageProcessorActorRevicer extends Actor {
 
   def continueAddRequest(targetRequests: RequestQueue)(spider: Spider) = {
     while (!targetRequests.isEmpty) {
-      import scala.concurrent.ExecutionContext.Implicits.global
       import scala.concurrent.duration._
-
-      ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond)(spider.downloaderActor ! DownloadEvent(spider, targetRequests.poll()))
+      val newDownloadTask = DownloadEvent(spider, targetRequests.poll())
+      ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond)(spider.downloaderActor ! newDownloadTask)
     }
   }
 }

@@ -19,10 +19,9 @@ abstract class DuplicateRemovedQueue(duplicateRemovedStrategy: DuplicateRemovedS
   private def isNotDuplicateRequest(requestHeaderGeneral: RequestHeaderGeneral): Boolean = {
     requestHeaderGeneral.method match {
       case "GET" ⇒
-        duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get)
+        !duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get)
       case "POST" ⇒
-        duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get)
-        true
+        !duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get + requestHeaderGeneral.requestBody.getOrElse(""))
       case other ⇒
         logger.warn(s"unknown request method type: ${other}")
         true

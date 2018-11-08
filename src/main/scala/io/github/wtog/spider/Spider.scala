@@ -29,8 +29,10 @@ case class Spider(
 
   def start(): Unit = {
     execute()
-    metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
     SpiderPool.addSpider(this)
+    if (logger.isDebugEnabled()) {
+      metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
+    }
   }
 
   def restart(): Unit = {
@@ -80,7 +82,7 @@ case class Spider(
 
     def metricInfo() = {
       if (downloadedPageSum + processedPageSum > 0 && !pageProcessor.isInstanceOf[ProxyProcessorTrait])
-        logger.info(s"[${name}-spider] downloaded<->processed: ${downloadedPageSum}<->${processedPageSum}, sc: ${downloadPageSuccessNum.get()}<->${processPageSuccessNum}, fc: ${downloadPageFailedNum.get()}<->${processPageFailedNum.get()},")
+        logger.debug(s"[${name}-spider] downloaded<->processed: ${downloadedPageSum}<->${processedPageSum}, sc: ${downloadPageSuccessNum.get()}<->${processPageSuccessNum}, fc: ${downloadPageFailedNum.get()}<->${processPageFailedNum.get()},")
     }
 
   }

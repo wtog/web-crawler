@@ -30,7 +30,7 @@ object Main {
 
     System.getenv("PASS_PLATFORM") match {
       case "openshift" ⇒
-        processorList.map(it ⇒ it._1).foreach(it ⇒ Spider(pageProcessor = it).start())
+        processorList.foreach { case (processor, _) ⇒ Spider(name = processor.getClass.getSimpleName, pageProcessor = processor).start() }
       case _ ⇒
         println("show page processor list: ")
         println("\t0. all")
@@ -46,14 +46,14 @@ object Main {
 
         val executeProcessor = if (chosen.isEmpty || chooseNumber.contains("0")) {
           println("execute all processor")
-          processorList.map(it ⇒ it._1)
+          processorList
         } else {
-          processorList.collect {
-            case (processor, order) if chosen.contains(order.toString) ⇒ processor
+          processorList.filter {
+            case (_, order) ⇒ chosen.contains(order.toString)
           }
         }
 
-        val spiders = executeProcessor.map(it ⇒ Spider(pageProcessor = it))
+        val spiders = executeProcessor.map { case (processor, _) ⇒ Spider(name = processor.getClass.getSimpleName, pageProcessor = processor) }
 
         spiders.foreach(_.start())
     }
