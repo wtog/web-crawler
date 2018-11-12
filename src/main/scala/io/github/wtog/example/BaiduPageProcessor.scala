@@ -20,7 +20,7 @@ final case class BaiduPageProcessor() extends PageProcessor {
   override def requestHeaders: RequestHeaders = {
     RequestHeaders(
       domain = "www.baidu.com",
-      headers = Some(Map("Content-Type" -> "text/html; charset=GB2312")), useProxy = true)
+      headers = Map("Content-Type" -> "text/html; charset=GB2312"), useProxy = true)
   }
 
   override def targetUrls: List[String] = {

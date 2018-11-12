@@ -21,11 +21,7 @@ object AsyncHttpClientDownloader extends Downloader {
     import io.netty.handler.codec.http.HttpHeaders._
 
     val httpHeaders = new DefaultHttpHeaders
-    requestHeaders.headers match {
-      case Some(headers) ⇒
-        headers.foreach { it ⇒ httpHeaders.add(it._1, it._2) }
-      case None ⇒ logger.debug("no extra headers")
-    }
+    requestHeaders.headers.foreach { it ⇒ httpHeaders.add(it._1, it._2) }
 
     httpHeaders.add(Names.USER_AGENT, requestHeaders.userAgent)
     httpHeaders.add(Names.ACCEPT_CHARSET, requestHeaders.charset.get)

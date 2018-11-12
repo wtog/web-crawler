@@ -14,7 +14,7 @@ object HashSetStrategy extends DuplicateRemovedStrategy {
     if (!isDuplicate) {
       urlSet += url.hashCode
     }
-    println(urlSet.size)
+
     isDuplicate
   }
 

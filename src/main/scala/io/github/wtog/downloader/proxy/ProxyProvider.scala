@@ -10,6 +10,7 @@ import io.github.wtog.downloader.proxy.ProxyProvider.checkUrl
 import io.github.wtog.downloader.proxy.ProxyStatusEnums.ProxyStatusEnums
 import io.github.wtog.downloader.proxy.crawler.{ A2UPageProcessor, Data5UPageProcessor }
 import io.github.wtog.spider.{ Spider, SpiderPool }
+import org.apache.http.client.methods.CloseableHttpResponse
 import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.concurrent.Future
@@ -69,7 +70,7 @@ object ProxyProvider {
     }
   }
 
-  def requestWithProxy[T <: Any](useProxy: Boolean, httpRequest: Option[ProxyDTO] ⇒ T): T = {
+  def requestWithProxy[T <: CloseableHttpResponse](useProxy: Boolean, httpRequest: Option[ProxyDTO] ⇒ T): T = {
     if (useProxy) {
       getProxy match {
         case proxy @ Some(p) ⇒

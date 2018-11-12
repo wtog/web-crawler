@@ -28,7 +28,6 @@
         <appender-ref ref="stdout" />
     </logger>
 
-
     <root>
         <level value="info" />
         <appender-ref ref="stdout" />

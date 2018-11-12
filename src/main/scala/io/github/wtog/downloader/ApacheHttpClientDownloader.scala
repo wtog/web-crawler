@@ -59,7 +59,7 @@ object ApacheHttpClientDownloader extends Downloader {
   def clientsDomain(requestHeaders: RequestHeaders): CloseableHttpClient = {
     val domain = requestHeaders.domain
 
-    clientsPool.getOrElse(domain, HttpClientGenerator.generateClient(requestHeaders))
+    clientsPool.getOrElse(domain, ApacheHttpClientGenerator.generateClient(requestHeaders))
   }
 
 }
@@ -78,9 +78,7 @@ object HttpUriRequestConverter {
       .setCookieSpec(CookieSpecs.STANDARD)
       .build)
 
-    request.headers foreach { headers ⇒
-      headers.foreach { it ⇒ requestBuilder.addHeader(it._1, it._2) }
-    }
+    request.headers.foreach { it ⇒ requestBuilder.addHeader(it._1, it._2) }
 
     val httpContext = new HttpClientContext
     proxy.foreach { p ⇒
@@ -131,7 +129,7 @@ object HttpUriRequestConverter {
 
 }
 
-object HttpClientGenerator {
+object ApacheHttpClientGenerator {
 
   private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -190,7 +188,7 @@ object HttpClientGenerator {
   }
 
   def generateCookie(httpClientBuilder: HttpClientBuilder, requestHeaders: RequestHeaders) = {
-    if (!requestHeaders.disableCookieManagement) {
+    if (requestHeaders.disableCookieManagement) {
       httpClientBuilder.disableCookieManagement
     } else {
       val cookieStore = new BasicCookieStore

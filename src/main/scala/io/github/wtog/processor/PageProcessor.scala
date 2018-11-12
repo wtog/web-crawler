@@ -17,18 +17,21 @@ trait PageProcessor {
 
   /**
    * the target urls for processor to crawl
+   *
    * @return
    */
   def targetUrls: List[String]
 
   /**
    * handle the crawled result
+   *
    * @return
    */
   def pipelines: Set[Pipeline] = Set(ConsolePipeline)
 
   /**
    * parse the html source code
+   *
    * @param page
    */
   def process(page: Page)
@@ -36,6 +39,7 @@ trait PageProcessor {
   /**
    * set RequestHeaders For processor
    * ps: RequestHeaders(domain = "www.baidu.com")
+   *
    * @return
    */
   def requestHeaders: RequestHeaders
@@ -50,18 +54,15 @@ case class Page(
   lazy val resultItems: LinkedBlockingQueue[Map[String, Any]] = new LinkedBlockingQueue
   lazy val requestQueue: RequestQueue = new LinkQueue()
 
-  lazy val jsoupParser = HtmlParser(pageSource, requestGeneral.url.get).document
+  lazy val jsoupParser = HtmlParser(pageSourceExtract, requestGeneral.url.get).document
+  lazy val json = HtmlParser(pageSourceExtract, requestGeneral.url.get).json
 
-  def pageSource: Option[String] = {
-    bytes match {
-      case Some(b) ⇒
-        CharsetUtils.detectCharset(Some(responseHeaders("Content-Type")), b) match {
-          case (_, c @ Some(_))      ⇒ c
-          case (actualCharset, None) ⇒ Option(new String(b, actualCharset))
-        }
-      case None ⇒ None
-    }
+  private def pageSourceExtract = pageSource match {
+    case Some(source) ⇒ source
+    case None         ⇒ throw new IllegalArgumentException("htmlSouce cant be none")
   }
+
+  def pageSource: Option[String] = bytes.map(b ⇒ CharsetUtils.getHtmlSourceWithCharset(Some(responseHeaders("Content-Type")), b))
 
   def addTargetRequest(urlAdd: String): Unit = {
     this.requestQueue.push(RequestHeaderGeneral(url = Some(urlAdd)))
@@ -85,7 +86,7 @@ case class RequestHeaders(
     domain:                  String,
     requestHeaderGeneral:    Option[RequestHeaderGeneral] = None,
     userAgent:               String                       = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36",
-    headers:                 Option[Map[String, String]]  = None,
+    headers:                 Map[String, String]          = Map.empty[String, String],
     cookies:                 Option[Map[String, String]]  = None,
     charset:                 Option[String]               = Some("UTF-8"),
     sleepTime:               Int                          = 3000,

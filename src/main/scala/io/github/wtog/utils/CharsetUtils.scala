@@ -11,11 +11,11 @@ import org.jsoup.select.Elements
  * @version : 1.0.0
  */
 object CharsetUtils {
-  def detectCharset(contentType: Option[String], contentBytes: Array[Byte]): (String, Option[String]) = {
+  def getHtmlSourceWithCharset(contentType: Option[String], contentBytes: Array[Byte]): String = {
     val charset = UrlUtils.getCharset(contentType.getOrElse(""))
-
     charset match {
-      case Some(c) ⇒ (c, None)
+      case Some(c) ⇒
+        new String(contentBytes, c)
       case None ⇒
         val defaultCharset = Charset.defaultCharset()
         val content = new String(contentBytes, defaultCharset)
@@ -30,9 +30,9 @@ object CharsetUtils {
         }
 
         if (actualCharset.isEmpty || actualCharset.toUpperCase.equals(defaultCharset.toString.toUpperCase)) {
-          (defaultCharset.toString, Some(content))
+          content
         } else {
-          (actualCharset, None)
+          new String(contentBytes, actualCharset)
         }
     }
   }
