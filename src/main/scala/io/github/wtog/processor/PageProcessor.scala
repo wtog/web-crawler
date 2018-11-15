@@ -104,6 +104,6 @@ case class RequestHeaders(
     useProxy:                Boolean                      = false) {
 
   val headers = this.requestHeaderGeneral.foldLeft(this.commonHeaders) {
-    (commonHeaders, HeaderGeneral) ⇒ commonHeaders ++ HeaderGeneral.headers.getOrElse(Map.empty[String, String])
+    (commonHeaders, HeaderGeneral) ⇒ commonHeaders ++ HeaderGeneral.headers.get
   }
 }

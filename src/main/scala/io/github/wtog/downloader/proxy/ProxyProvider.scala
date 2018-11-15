@@ -33,8 +33,8 @@ object ProxyProvider {
   var proxyList: Set[ProxyDTO] = Set()
 
   val proxyCrawlerList = List(
-    (Spider(name = "proxy-a2u", pageProcessor = A2UPageProcessor), 30 seconds),
-    (Spider(name = "proxy-data5", pageProcessor = Data5UPageProcessor), 30 seconds))
+    (Spider(name = "proxy-a2u", pageProcessor = A2UPageProcessor), 10 seconds),
+    (Spider(name = "proxy-data5", pageProcessor = Data5UPageProcessor), 10 seconds))
 
   val listProxyStatus = ActorManager.system.scheduler.schedule(5 seconds, 15 seconds)({
     proxyList = (proxyList -- proxyList.filter(p ⇒ p.status == ProxyStatusEnums.IDEL && p.usabilityCheck() < 0.5 && p.checkTimes.get() > 6))
