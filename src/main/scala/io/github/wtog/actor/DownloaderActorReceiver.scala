@@ -26,6 +26,7 @@ class DownloaderActorRevicer extends Actor {
         import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
         spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
           case Success(page) ⇒
+            logger.debug(s"downloaded: ${page.requestGeneral.url.get}")
             if (page.isDownloadSuccess) {
               spider.CrawlMetric.downloadSuccessCounter
               processorActor ! ProcessorEvent(downloadEvent.spider, page)

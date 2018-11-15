@@ -16,3 +16,11 @@ trait Downloader {
   def download(request: RequestHeaders): Future[Page]
 }
 
+object Downloader {
+  object ContentType {
+    lazy val FORM_URLENCODED = Map("Content-Type" -> "application/x-www-form-urlencoded")
+    lazy val TEXT_PLAIN = Map("Content-Type" -> "text/plain")
+    lazy val TEXT_JSON = Map("Content-Type" -> "application/json")
+  }
+}
+

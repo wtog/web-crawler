@@ -78,11 +78,11 @@ object HttpUriRequestConverter {
       .setCookieSpec(CookieSpecs.STANDARD)
       .build)
 
-    request.headers.foreach { it ⇒ requestBuilder.addHeader(it._1, it._2) }
+    request.headers.foreach { case (key, value) ⇒ requestBuilder.addHeader(key, value) }
 
     val httpContext = new HttpClientContext
     proxy.foreach { p ⇒
-      logger.info(s"use proxy ${request.domain}")
+      logger.info(s"use proxy ${request.domain} => ${p.host}:${p.port}")
       requestConfig.setProxy(new HttpHost(p.host, p.port))
       val authState = new AuthState
       authState.update(new BasicScheme(ChallengeState.PROXY), new UsernamePasswordCredentials(p.username.getOrElse(""), p.password.getOrElse("")))

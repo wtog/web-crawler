@@ -64,8 +64,12 @@ case class Page(
 
   def pageSource: Option[String] = bytes.map(b ⇒ CharsetUtils.getHtmlSourceWithCharset(Some(responseHeaders("Content-Type")), b))
 
-  def addTargetRequest(urlAdd: String): Unit = {
-    this.requestQueue.push(RequestHeaderGeneral(url = Some(urlAdd)))
+  def addTargetRequest(urlAdd: String, requestBody: Option[String] = None): Unit = {
+    this.requestQueue.push(RequestHeaderGeneral(url = Some(urlAdd), requestBody = requestBody))
+  }
+
+  def addTargetRequest(requestHeaderGeneral: RequestHeaderGeneral): Unit = {
+    this.requestQueue.push(requestHeaderGeneral)
   }
 
   def addPageResultItem(result: Map[String, Any]) = {
@@ -78,15 +82,16 @@ case class Page(
 }
 
 case class RequestHeaderGeneral(
-    method:      String         = "GET",
+    method:      String                      = "GET",
     url:         Option[String],
-    requestBody: Option[String] = None)
+    requestBody: Option[String]              = None,
+    headers:     Option[Map[String, String]] = None)
 
 case class RequestHeaders(
     domain:                  String,
     requestHeaderGeneral:    Option[RequestHeaderGeneral] = None,
     userAgent:               String                       = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36",
-    headers:                 Map[String, String]          = Map.empty[String, String],
+    commonHeaders:           Map[String, String]          = Map.empty[String, String],
     cookies:                 Option[Map[String, String]]  = None,
     charset:                 Option[String]               = Some("UTF-8"),
     sleepTime:               Int                          = 3000,
@@ -96,4 +101,9 @@ case class RequestHeaders(
     timeOut:                 Int                          = 3000,
     useGzip:                 Boolean                      = true,
     disableCookieManagement: Boolean                      = false,
-    useProxy:                Boolean                      = false)
+    useProxy:                Boolean                      = false) {
+
+  val headers = this.requestHeaderGeneral.foldLeft(this.commonHeaders) {
+    (commonHeaders, HeaderGeneral) ⇒ commonHeaders ++ HeaderGeneral.headers.getOrElse(Map.empty[String, String])
+  }
+}
