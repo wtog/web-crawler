@@ -8,8 +8,8 @@
         </layout>
     </appender>
 
-    <logger name="io.github.wtog" additivity="false">
-        <level value="info" />
+    <logger name="io.github.wtog.actor.DownloaderActorRevicer" additivity="false">
+        <level value="debug" />
         <appender-ref ref="stdout" />
     </logger>
 

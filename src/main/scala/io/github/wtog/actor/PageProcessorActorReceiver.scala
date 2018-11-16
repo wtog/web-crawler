@@ -35,7 +35,7 @@ class PageProcessorActorRevicer extends Actor {
           addToPipeline(page.requestGeneral.url.get, page.resultItems)(spider.pageProcessor.pipelines)
           spider.CrawlMetric.processedSuccessCounter
         case Failure(value) ⇒
-          logger.error(s"failed to process page, cause ${value.getLocalizedMessage}")
+          logger.error(s"failed to process page, cause", value)
           spider.CrawlMetric.processedFailedCounter
       }
 

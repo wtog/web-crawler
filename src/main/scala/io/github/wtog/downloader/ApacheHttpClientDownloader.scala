@@ -7,7 +7,7 @@ import io.github.wtog.exceptions.NonNullArgumentsException
 import io.github.wtog.processor.{ Page, RequestHeaders }
 import io.github.wtog.utils.UrlUtils
 import javax.net.ssl.{ SSLContext, TrustManager, X509TrustManager }
-import org.apache.http.auth.{ AuthState, ChallengeState, UsernamePasswordCredentials }
+import org.apache.http.auth.{ AuthState, UsernamePasswordCredentials }
 import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.HttpClientContext
