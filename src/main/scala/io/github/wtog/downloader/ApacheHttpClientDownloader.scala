@@ -65,29 +65,28 @@ object ApacheHttpClientDownloader extends Downloader {
 }
 
 object HttpUriRequestConverter {
-  private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
   def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): (HttpUriRequest, HttpContext) = {
     val requestUrl = request.requestHeaderGeneral.get.url.get
-    val requestBuilder = selectRequestMethod(request).setUri(UrlUtils.fixIllegalCharacterInUrl(requestUrl))
+
     val requestConfig = RequestConfig.custom
-    requestBuilder.setConfig(requestConfig
-      .setConnectionRequestTimeout(request.timeOut)
-      .setSocketTimeout(request.timeOut)
-      .setConnectTimeout(request.timeOut)
-      .setCookieSpec(CookieSpecs.STANDARD)
-      .build)
-
-    request.headers.foreach { case (key, value) ⇒ requestBuilder.addHeader(key, value) }
-
     val httpContext = new HttpClientContext
     proxy.foreach { p ⇒
-      logger.info(s"use proxy ${request.domain} => ${p.host}:${p.port}")
       requestConfig.setProxy(new HttpHost(p.host, p.port))
       val authState = new AuthState
-      authState.update(new BasicScheme(ChallengeState.PROXY), new UsernamePasswordCredentials(p.username.getOrElse(""), p.password.getOrElse("")))
+      authState.update(new BasicScheme(), new UsernamePasswordCredentials(p.username.getOrElse(""), p.password.getOrElse("")))
       httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, authState)
     }
+
+    val requestBuilder = selectRequestMethod(request).setUri(UrlUtils.fixIllegalCharacterInUrl(requestUrl)).setHeader("Host", request.domain)
+    requestBuilder.setConfig(
+      requestConfig
+        .setConnectionRequestTimeout(request.timeOut)
+        .setSocketTimeout(request.timeOut)
+        .setConnectTimeout(request.timeOut)
+        .setCookieSpec(CookieSpecs.STANDARD)
+        .build)
+
+    request.headers.foreach { case (key, value) ⇒ requestBuilder.addHeader(key, value) }
 
     request.cookies foreach { cookie ⇒
       val cookieStore = new BasicCookieStore
@@ -118,10 +117,8 @@ object HttpUriRequestConverter {
   private def addFormParams(requestBuilder: RequestBuilder, request: RequestHeaders) = {
     val requestHeaderGeneral = request.requestHeaderGeneral
 
-    requestHeaderGeneral match {
-      case Some(general) ⇒
-        requestBuilder.setEntity(new StringEntity(general.requestBody.get))
-      case None ⇒
+    requestHeaderGeneral map { general ⇒
+      requestBuilder.setEntity(new StringEntity(general.requestBody.get))
     }
 
     requestBuilder
@@ -192,7 +189,6 @@ object ApacheHttpClientGenerator {
       httpClientBuilder.disableCookieManagement
     } else {
       val cookieStore = new BasicCookieStore
-
       requestHeaders.cookies match {
         case Some(cookies) ⇒
           cookies.foreach(it ⇒ {

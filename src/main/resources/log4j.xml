@@ -8,8 +8,8 @@
         </layout>
     </appender>
 
-    <logger name="wt" additivity="false">
-        <level value="debug" />
+    <logger name="io.github.wtog" additivity="false">
+        <level value="info" />
         <appender-ref ref="stdout" />
     </logger>
 
@@ -18,8 +18,13 @@
         <appender-ref ref="stdout" />
     </logger>
 
+    <logger name="org.apache.http" additivity="false">
+        <level value="warn" />
+        <appender-ref ref="stdout" />
+    </logger>
+
     <logger name="org.apache.http.wire" additivity="false">
-        <level value="info" />
+        <level value="error" />
         <appender-ref ref="stdout" />
     </logger>
 

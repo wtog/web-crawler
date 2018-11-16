@@ -28,7 +28,7 @@ object Data5UPageProcessor extends ProxyProcessorTrait {
   }
 
   override def requestHeaders: RequestHeaders = {
-    RequestHeaders(domain = "www.data5u.com")
+    RequestHeaders(domain = "www.data5u.com", sleepTime = 1000)
   }
 
   override def targetUrls: List[String] = {

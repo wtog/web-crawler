@@ -13,6 +13,7 @@ import io.github.wtog.spider.{ Spider, SpiderPool }
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.slf4j.{ Logger, LoggerFactory }
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Try
@@ -27,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object ProxyProvider {
   private lazy val logger: Logger = LoggerFactory.getLogger(ProxyProvider.getClass)
 
-  private var crawlProxyCronJob: Option[Cancellable] = None
+  private var crawlProxyCronJob: ListBuffer[Cancellable] = ListBuffer.empty[Cancellable]
   val checkUrl: URL = Try(new URL("http://www.baidu.com")).get
   val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
   var proxyList: Set[ProxyDTO] = Set()
@@ -36,9 +37,11 @@ object ProxyProvider {
     (Spider(name = "proxy-a2u", pageProcessor = A2UPageProcessor), 10 seconds),
     (Spider(name = "proxy-data5", pageProcessor = Data5UPageProcessor), 10 seconds))
 
-  val listProxyStatus = ActorManager.system.scheduler.schedule(5 seconds, 15 seconds)({
-    proxyList = (proxyList -- proxyList.filter(p ⇒ p.status == ProxyStatusEnums.IDEL && p.usabilityCheck() < 0.5 && p.checkTimes.get() > 6))
-    logger.debug(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p ⇒ p.status == ProxyStatusEnums.USING)}")
+  lazy val listProxyStatus = ActorManager.system.scheduler.schedule(5 seconds, 15 seconds)({
+    proxyList --= proxyList.filter(p ⇒ p.status == ProxyStatusEnums.IDEL && p.usabilityCheck() < 0.5 && p.checkTimes.get() > 6)
+    if (logger.isDebugEnabled()) {
+      logger.debug(s"proxy sum: ${proxyList.size}, using: ${proxyList.count(p ⇒ p.status == ProxyStatusEnums.USING)}")
+    }
 
     if (SpiderPool.fetchAllUsingProxySpiders().length == 0) {
       proxyCrawlerList.foreach { case (spider, _) ⇒ spider.stop() }
@@ -50,7 +53,7 @@ object ProxyProvider {
     if (!proxySpiderCrawling.getAndSet(true)) {
       proxyCrawlerList.foreach {
         case (spider, scheduleTime) ⇒
-          crawlProxyCronJob = Option(ActorManager.system.scheduler.schedule(0 seconds, scheduleTime)(spider.start()))
+          crawlProxyCronJob.append(ActorManager.system.scheduler.schedule(0 seconds, scheduleTime)(spider.start()))
       }
       listProxyStatus
     }
@@ -61,7 +64,8 @@ object ProxyProvider {
       proxyList.filter(_.status == ProxyStatusEnums.IDEL).find(it ⇒ {
         val usability = it.usabilityCheck() > 0.5
 
-        if (it.checkTimes.get() > 10 && !usability) proxyList -= it
+        if (it.checkTimes.get() > 10 && !usability)
+          proxyList -= it
 
         usability
       })
@@ -108,7 +112,7 @@ final case class ProxyDTO(
   val successTimes: AtomicInteger = new AtomicInteger(0)
 
   def usabilityCheck(): Float = {
-    usability = Try {
+    Try {
       import java.net.Proxy
       val proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
       val connection = checkUrl.openConnection(proxy).asInstanceOf[HttpURLConnection]
@@ -126,8 +130,6 @@ final case class ProxyDTO(
       case NonFatal(_) ⇒
         successTimes.get() / checkTimes.incrementAndGet()
     }.get
-
-    usability
   }
 
   override def hashCode(): Int = Objects.hash(this.host.asInstanceOf[Object], this.port.asInstanceOf[Object])
