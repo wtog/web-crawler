@@ -1,8 +1,8 @@
 package io.github.wtog
 
-import com.google.common.reflect.{ ClassPath, TypeToken }
 import io.github.wtog.processor.PageProcessor
 import io.github.wtog.spider.Spider
+import io.github.wtog.utils.ClassUtils
 
 import scala.io.StdIn
 
@@ -14,19 +14,9 @@ import scala.io.StdIn
 object Main {
 
   def main(args: Array[String]): Unit = {
-    import scala.collection.JavaConverters._
 
-    val classPath = ClassPath.from(this.getClass.getClassLoader)
-
-    val classes = classPath.getTopLevelClassesRecursive("io.github.wtog.processor.impl").asScala
-    val pageProcessor = classOf[PageProcessor]
-    val processorList = classes.map(_.load()).filter { clazz ⇒
-      val types = TypeToken.of(clazz).getTypes.asScala
-      types.exists(_.getRawType == pageProcessor)
-    }.map { clazz ⇒
-      val constructor = clazz.getConstructors.head
-      constructor.newInstance().asInstanceOf[PageProcessor]
-    }.toList.zip(Stream from 1)
+    val processorList = ClassUtils.loadClasses("io.github.wtog.processor.impl", classOf[PageProcessor])
+      .toList.zip(Stream from 1)
 
     System.getenv("PASS_PLATFORM") match {
       case "openshift" ⇒

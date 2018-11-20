@@ -8,7 +8,7 @@ import io.github.wtog.processor.{ Page, RequestHeaders }
  * @since : 6/3/18 12:33 AM
  * @version : 1.0.0
  */
-object A2UPageProcessor extends ProxyProcessorTrait {
+class A2UPageProcessor extends ProxyProcessorTrait {
   val targetUrl = List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
 
   override def process(page: Page): Unit = {
@@ -26,7 +26,7 @@ object A2UPageProcessor extends ProxyProcessorTrait {
   }
 
   override def requestHeaders: RequestHeaders = {
-    RequestHeaders(domain = "raw.githubusercontent.com")
+    RequestHeaders(domain = "raw.githubusercontent.com", sleepTime = 5000)
   }
 
   override def targetUrls: List[String] = {

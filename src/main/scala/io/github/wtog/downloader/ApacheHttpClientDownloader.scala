@@ -50,7 +50,7 @@ object ApacheHttpClientDownloader extends Downloader {
           val byteArray = EntityUtils.toByteArray(Option(httpResponse.getEntity).getOrElse(throw NonNullArgumentsException("apache downloader return empty content")))
           Page(requestGeneral = request.requestHeaderGeneral.get, bytes = Some(byteArray))
         case other ⇒
-          logger.warn(s"failed download ${request.requestHeaderGeneral.get} return code is ${other}")
+          logger.warn(s"failed download ${request.requestHeaderGeneral.get} ${other}")
           Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = false)
       }
     }
@@ -218,7 +218,7 @@ object CustomRedirectStrategy extends LaxRedirectStrategy {
         return httpRequestWrapper
       } catch {
         case e: Exception ⇒
-          logger.error("强转为HttpRequestWrapper出错")
+          logger.error("强转为HttpRequestWrapper出错", e)
       }
       new HttpPost(uri)
     } else new HttpGet(uri)

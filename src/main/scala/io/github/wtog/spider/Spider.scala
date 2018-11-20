@@ -1,6 +1,6 @@
 package io.github.wtog.spider
 
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger }
 
 import akka.actor.{ Cancellable, PoisonPill }
 import io.github.wtog.actor.{ ActorManager, DownloadEvent }
@@ -24,12 +24,14 @@ case class Spider(
 
   lazy val logger = LoggerFactory.getLogger(classOf[Spider])
 
+  val running: AtomicBoolean = new AtomicBoolean(false)
   private var metircInfoCron: Option[Cancellable] = None
   var downloaderActor = ActorManager.createActor("downloader-dispatcher", s"downloader-${name}")
 
   def start(): Unit = {
     execute()
     SpiderPool.addSpider(this)
+    running.set(true)
     if (logger.isDebugEnabled()) {
       metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
     }
@@ -42,14 +44,13 @@ case class Spider(
 
   def stop() = {
     downloaderActor ! PoisonPill
-    metircInfoCron.foreach { c ⇒
-      c.cancel()
-      this.CrawlMetric.clean()
-      SpiderPool.removeSpider(this)
-    }
+    running.set(false)
+    SpiderPool.removeSpider(this)
+    this.CrawlMetric.clean()
+    metircInfoCron.foreach { _.cancel() }
   }
 
-  private def execute: () ⇒ Unit = () ⇒ {
+  private def execute(): Unit = {
     this.pageProcessor.targetUrls.foreach(it ⇒ {
       downloaderActor ! DownloadEvent(this, Some(RequestHeaderGeneral(url = Some(it))))
     })

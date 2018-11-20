@@ -28,6 +28,6 @@ object SpiderPool {
   }
 
   def fetchAllUsingProxySpiders() = {
-    fetchAllSpiders().filter(_.asInstanceOf[Spider].pageProcessor.requestHeaders.useProxy)
+    fetchAllSpiders().filter(_.pageProcessor.requestHeaders.useProxy)
   }
 }

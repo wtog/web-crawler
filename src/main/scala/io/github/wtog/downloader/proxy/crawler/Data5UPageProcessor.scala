@@ -7,7 +7,7 @@ import io.github.wtog.processor.{ Page, RequestHeaders }
  * @since : 6/7/18 11:27 PM
  * @version : 1.0.0
  */
-object Data5UPageProcessor extends ProxyProcessorTrait {
+class Data5UPageProcessor extends ProxyProcessorTrait {
 
   override def process(page: Page): Unit = {
     val document = page.jsoupParser
@@ -27,9 +27,7 @@ object Data5UPageProcessor extends ProxyProcessorTrait {
 
   }
 
-  override def requestHeaders: RequestHeaders = {
-    RequestHeaders(domain = "www.data5u.com", sleepTime = 1000)
-  }
+  override def requestHeaders: RequestHeaders = RequestHeaders(domain = "www.data5u.com")
 
   override def targetUrls: List[String] = {
     List(

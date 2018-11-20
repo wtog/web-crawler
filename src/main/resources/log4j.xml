@@ -13,6 +13,11 @@
         <appender-ref ref="stdout" />
     </logger>
 
+    <logger name="io.github.wtog.downloader.proxy" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="stdout" />
+    </logger>
+
     <logger name="org.apache" additivity="false">
         <level value="info" />
         <appender-ref ref="stdout" />
