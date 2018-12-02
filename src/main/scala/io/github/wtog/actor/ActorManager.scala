@@ -12,15 +12,16 @@ import scala.concurrent.ExecutionContext
 object ActorManager {
   lazy val system = ActorSystem("web-crawler")
 
-  lazy val pipelineActor = system.actorOf(Props[PipelineActorRevicer].withDispatcher("pipeline-dispatcher"), "pipeline-processor")
+  lazy val pipelineActor = getNewSystemActor("pipeline-dispatcher", "pipeline-processor", Props[PipelineActorRevicer])
 
-  def createActor(dispatcher: String, actorName: String) = {
-    system.actorOf(Props[DownloaderActorRevicer].withDispatcher(dispatcher), actorName)
+  def getNewSystemActor(dispatcher: String, actorName: String, props: Props) = {
+    system.actorOf(props.withDispatcher(dispatcher), actorName)
   }
 
+  def getExistedAcotr(path: String) = {
+    system.actorSelection(path)
+  }
 }
-
-class ActorManager {}
 
 object ExecutionContexts {
   implicit lazy val downloadDispatcher: ExecutionContext = ActorManager.system.dispatchers.lookup("downloader-dispatcher")

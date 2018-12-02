@@ -41,7 +41,8 @@ class DownloaderActorRevicer extends Actor {
             throw e
         }
       })
-    case other ⇒ logger.warn(s"${self.path} reviced wrong msg ${other}")
+    case other ⇒
+      logger.warn(s"${self.path} reviced wrong msg ${other}")
   }
 
   override def postStop(): Unit = {
@@ -49,7 +50,7 @@ class DownloaderActorRevicer extends Actor {
   }
 
   override def postRestart(reason: Throwable): Unit = {
-    if (logger.isWarnEnabled()) logger.warn("downloader-processor restart!")
+    if (logger.isWarnEnabled()) logger.warn(s"downloader-processor restart! ${reason.getLocalizedMessage}")
   }
 }
 

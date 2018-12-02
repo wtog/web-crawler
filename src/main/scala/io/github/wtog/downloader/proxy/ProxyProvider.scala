@@ -29,49 +29,55 @@ object ProxyProvider {
   private lazy val logger: Logger = LoggerFactory.getLogger(ProxyProvider.getClass)
 
   val checkUrl: URL = Try(new URL("http://www.baidu.com")).get
-  val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
   val proxyList: ArrayBlockingQueue[ProxyDTO] = new ArrayBlockingQueue[ProxyDTO](100)
-  val checkThread = Executors.newFixedThreadPool(5)
+  private val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
+  private val checkThread = Executors.newFixedThreadPool(5)
+  private val monitorProxyStatus = new AtomicBoolean(false)
 
   private lazy val proxyCrawlerList = ClassUtils.loadClasses("io.github.wtog.downloader.proxy.crawler", classOf[PageProcessor]).toList.map { proxy ⇒
     (Spider(name = s"proxy-${proxy.getClass.getSimpleName}", pageProcessor = proxy))
   }
 
-  val listProxyStatus = ActorManager.system.scheduler.schedule(5 seconds, 2 seconds)({
-    if (logger.isDebugEnabled()) {
-      logger.debug(s"proxy sum: ${proxyList.size}")
-    }
+  def listProxyStatus() = {
+    if (!monitorProxyStatus.getAndSet(true)) {
+      ActorManager.system.scheduler.schedule(5 seconds, 2 seconds)({
+        if (logger.isDebugEnabled()) {
+          logger.debug(s"proxy sum: ${proxyList.size}")
+        }
 
-    if (proxyList.size > 50 || SpiderPool.fetchAllUsingProxySpiders().length == 0) {
-      proxyCrawlerList.foreach { _.stop() }
-      proxySpiderCrawling.set(false)
-    }
+        if (proxyList.size > 50 || SpiderPool.fetchAllUsingProxySpiders().length == 0) {
+          proxyCrawlerList.foreach { _.stop() }
+          proxySpiderCrawling.set(false)
+        }
 
-    if (proxyList.size < 25 && proxyCrawlerList.forall(!_.running.get())) {
-      startProxyCrawl(restart = true)
+        if (proxyList.size < 25 && proxyCrawlerList.forall(!_.running.get())) {
+          startProxyCrawl(restart = true)
+        }
+      })
     }
-  })
+  }
 
   private def crawlCronJob(restart: Boolean = false) = {
     proxyCrawlerList.foreach { spider ⇒
-      if (restart) spider.restart() else spider.start()
+      if (restart)
+        spider.restart()
+      else {
+        spider.start()
+      }
     }
 
     Option(ActorManager.system.scheduler.schedule(0 seconds, 2 seconds)({
       for (_ ← 1 to 5) {
         checkThread.execute(new Runnable {
           override def run(): Unit = {
-            Option(proxyList.poll()).foreach { headProxy ⇒
+            Option(proxyList.poll()) foreach { headProxy ⇒
               headProxy.usabilityCheck()
-              if (headProxy.usability > 0.5 && headProxy.successTimes.get() < 2) {
+              if (headProxy.usability > 0.5 && headProxy.successTimes.get() < 2)
                 proxyList.put(headProxy)
-              }
             }
-
           }
         })
       }
-
     }))
   }
 
@@ -96,7 +102,9 @@ object ProxyProvider {
           } catch {
             case NonFatal(e) ⇒
               logger.warn(s"failed to execute request using proxy: ${e.getLocalizedMessage}")
-              Future { p.usabilityCheck() }
+              Future {
+                p.usabilityCheck()
+              }
               httpRequest(None)
           } finally {
             p.status = ProxyStatusEnums.IDEL
@@ -128,7 +136,6 @@ final case class ProxyDTO(
       val connection = checkUrl.openConnection(proxy).asInstanceOf[HttpURLConnection]
       connection.setConnectTimeout(2000)
       connection.setReadTimeout(2000)
-      connection.setDoOutput(true)
 
       val checkTimeValue = checkTimes.incrementAndGet()
       connection.getResponseCode match {

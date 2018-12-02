@@ -16,7 +16,10 @@ object SpiderPool {
     if (spiders.contains(spider.name)) throw new IllegalArgumentException(s"duplicate spider name ${spider.name}")
 
     spiders.put(spider.name, spider)
-    if (spider.pageProcessor.requestHeaders.useProxy) ProxyProvider.startProxyCrawl()
+    if (spider.pageProcessor.requestHeaders.useProxy) {
+      ProxyProvider.startProxyCrawl()
+      ProxyProvider.listProxyStatus()
+    }
   }
 
   def removeSpider(spider: Spider) = {

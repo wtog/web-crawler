@@ -74,7 +74,10 @@ lazy val httpParser = Seq(
   "us.codecraft" % "xsoup" % "0.3.1"
 )
 
-lazy val json = Seq("org.json4s" %% "json4s-native" % "3.3.0")
+lazy val json = Seq(
+  "org.json4s" %% "json4s-native" % "3.3.0",
+  "org.json4s" %% "json4s-jackson" % "3.3.0"
+)
 
 lazy val assemblyConfig = Seq(
   assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",

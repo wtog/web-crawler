@@ -2,14 +2,14 @@ package io.github.wtog.actor
 
 import java.util.concurrent.LinkedBlockingQueue
 
-import akka.actor.Actor
+import akka.actor.{ Actor, ActorRef }
 import org.slf4j.{ Logger, LoggerFactory }
 import io.github.wtog.pipeline.Pipeline
 import io.github.wtog.processor.Page
 import io.github.wtog.queue.RequestQueue
 import io.github.wtog.spider.Spider
-
 import ExecutionContexts.processorDispatcher
+
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
@@ -24,6 +24,7 @@ class PageProcessorActorRevicer extends Actor {
 
   override def receive: Receive = {
     case processorEvent: ProcessorEvent ⇒
+      val downloadSender = sender()
       val page = processorEvent.page
       val spider = processorEvent.spider
 
@@ -31,7 +32,7 @@ class PageProcessorActorRevicer extends Actor {
         spider.pageProcessor.process(page)
       } onComplete {
         case Success(_) ⇒
-          continueAddRequest(page.requestQueue)(spider)
+          continueAddRequest(page.requestQueue)(spider)(downloadSender)
           addToPipeline(page.requestGeneral.url.get, page.resultItems)(spider.pageProcessor.pipelines)
           spider.CrawlMetric.processedSuccessCounter
         case Failure(value) ⇒
@@ -51,11 +52,11 @@ class PageProcessorActorRevicer extends Actor {
     }
   }
 
-  def continueAddRequest(targetRequests: RequestQueue)(spider: Spider) = {
+  def continueAddRequest(targetRequests: RequestQueue)(spider: Spider)(downloadSender: ActorRef) = {
     while (!targetRequests.isEmpty) {
       import scala.concurrent.duration._
       val newDownloadTask = DownloadEvent(spider, targetRequests.poll())
-      ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond)(spider.downloaderActor ! newDownloadTask)
+      ActorManager.system.scheduler.scheduleOnce(spider.pageProcessor.requestHeaders.sleepTime millisecond)(downloadSender ! newDownloadTask)
     }
   }
 }

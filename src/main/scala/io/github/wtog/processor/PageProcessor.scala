@@ -72,13 +72,11 @@ case class Page(
     this.requestQueue.push(requestHeaderGeneral)
   }
 
-  def addPageResultItem(result: Map[String, Any]) = {
+  def addPageResultItem(result: Map[String, Any]): Unit = {
     this.resultItems.add(result)
   }
 
-  override def toString: String = {
-    s"${requestGeneral.url.get} downloaded ${isDownloadSuccess}"
-  }
+  override def toString: String = s"${requestGeneral.url.get} downloaded ${isDownloadSuccess}"
 }
 
 case class RequestHeaderGeneral(

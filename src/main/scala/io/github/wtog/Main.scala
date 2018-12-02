@@ -13,6 +13,8 @@ import scala.io.StdIn
  */
 object Main {
 
+  val startTime = System.currentTimeMillis()
+
   def main(args: Array[String]): Unit = {
 
     val processorList = ClassUtils.loadClasses("io.github.wtog.processor.impl", classOf[PageProcessor])

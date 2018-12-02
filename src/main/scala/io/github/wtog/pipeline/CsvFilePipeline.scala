@@ -3,7 +3,7 @@ package io.github.wtog.pipeline
 import java.io.RandomAccessFile
 import java.util.concurrent._
 
-import io.github.wtog.utils.UrlUtils
+import io.github.wtog.Main
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -13,11 +13,11 @@ import scala.concurrent.Future
  * @since : 5/20/18 11:01 PM
  * @version : 1.0.0
  */
-object CsvFilePipeline extends Pipeline {
+case class CsvFilePipeline(fileName: Option[String]) extends Pipeline {
 
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (pageUrl, resultItems) = pageResultItem
-    IOContentCache.add(UrlUtils.getDomainAndURI(pageUrl), resultItems)
+    IOContentCache.add(fileName.getOrElse(pageUrl), resultItems)
   }
 }
 
@@ -34,7 +34,7 @@ object IOContentCache {
     if (contentList.nonEmpty) {
       val file = if (fileName.contains("/")) fileName.replace("/", "_") else fileName
 
-      val randomFile = new RandomAccessFile(s"/tmp/web-crawler-${file}.csv", "rw")
+      val randomFile = new RandomAccessFile(s"/tmp/web-crawler-${file}-${Main.startTime}.csv", "rw")
       try {
         val fileLength = randomFile.length()
         randomFile.seek(fileLength) //指针指向文件末尾

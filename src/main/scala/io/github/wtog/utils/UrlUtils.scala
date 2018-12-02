@@ -28,7 +28,11 @@ object UrlUtils {
   }
 
   def getDomainAndURI(url: String): String = {
-    domainRegex.replaceFirstIn(url, "").substring(0, url.indexOf("?"))
+    val queryBeginIndex = url.indexOf("?")
+    if (queryBeginIndex != -1)
+      domainRegex.replaceFirstIn(url, "").substring(0, url.indexOf("?"))
+    else
+      domainRegex.replaceFirstIn(url, "")
   }
 
   def removePort(url: String) = {

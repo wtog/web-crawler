@@ -20,6 +20,6 @@ object ProxyCrawlerPipeline extends Pipeline {
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (_, result) = pageResultItem
 
-    ProxyProvider.proxyList.put(result)
+    ProxyProvider.proxyList.offer(result)
   }
 }

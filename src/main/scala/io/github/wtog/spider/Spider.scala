@@ -2,8 +2,8 @@ package io.github.wtog.spider
 
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger }
 
-import akka.actor.{ Cancellable, PoisonPill }
-import io.github.wtog.actor.{ ActorManager, DownloadEvent }
+import akka.actor.{ ActorRef, Cancellable, PoisonPill, Props }
+import io.github.wtog.actor.{ ActorManager, DownloadEvent, DownloaderActorRevicer }
 import io.github.wtog.downloader.proxy.crawler.ProxyProcessorTrait
 import io.github.wtog.downloader.{ ApacheHttpClientDownloader, Downloader }
 import io.github.wtog.processor.{ PageProcessor, RequestHeaderGeneral }
@@ -22,35 +22,39 @@ case class Spider(
     pageProcessor: PageProcessor,
     downloader:    Downloader    = ApacheHttpClientDownloader) {
 
-  lazy val logger = LoggerFactory.getLogger(classOf[Spider])
+  private lazy val logger = LoggerFactory.getLogger(classOf[Spider])
 
   val running: AtomicBoolean = new AtomicBoolean(false)
   private var metircInfoCron: Option[Cancellable] = None
-  var downloaderActor = ActorManager.createActor("downloader-dispatcher", s"downloader-${name}")
+  private var downloaderActorPath = ""
 
   def start(): Unit = {
-    execute()
-    SpiderPool.addSpider(this)
-    running.set(true)
-    if (logger.isDebugEnabled()) {
-      metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
+    if (!running.getAndSet(true)) {
+      downloaderActorPath = s"downloader-${name}-${System.currentTimeMillis()}"
+      val downloaderActor = ActorManager.getNewSystemActor("downloader-dispatcher", downloaderActorPath, props = Props[DownloaderActorRevicer])
+      execute(downloaderActor)
+      SpiderPool.addSpider(this)
+
+      if (logger.isDebugEnabled()) {
+        metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
+      }
     }
   }
 
   def restart(): Unit = {
-    downloaderActor = ActorManager.createActor("downloader-dispatcher", s"downloader-${name}-${System.currentTimeMillis()}")
     start()
   }
 
-  def stop() = {
-    downloaderActor ! PoisonPill
-    running.set(false)
-    SpiderPool.removeSpider(this)
-    this.CrawlMetric.clean()
-    metircInfoCron.foreach { _.cancel() }
+  def stop(): Unit = {
+    if (running.getAndSet(false)) {
+      ActorManager.getExistedAcotr(downloaderActorPath) ! PoisonPill
+      SpiderPool.removeSpider(this)
+      this.CrawlMetric.clean()
+      metircInfoCron.foreach { _.cancel() }
+    }
   }
 
-  private def execute(): Unit = {
+  private def execute(downloaderActor: ActorRef): Unit = {
     this.pageProcessor.targetUrls.foreach(it ⇒ {
       downloaderActor ! DownloadEvent(this, Some(RequestHeaderGeneral(url = Some(it))))
     })
