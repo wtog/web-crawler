@@ -43,7 +43,7 @@ object ScheduleJobs {
 
 }
 
-case class SpiderJob() extends Job {
+class SpiderJob() extends Job {
   override def execute(jobExecutionContext: JobExecutionContext): Unit = {
     SpiderPool.getSpiderByName(jobExecutionContext.getJobDetail.getKey.getName).foreach(_.restart())
   }
