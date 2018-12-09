@@ -17,8 +17,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val processorList = ClassUtils.loadClasses("io.github.wtog.processor.impl", classOf[PageProcessor])
-      .toList.zip(Stream from 1)
+    val processorList = ClassUtils.loadClasses(classOf[PageProcessor], "io.github.wtog.processor.impl", "io.github.wtog.example").zip(Stream from 1)
 
     System.getenv("PASS_PLATFORM") match {
       case "openshift" ⇒

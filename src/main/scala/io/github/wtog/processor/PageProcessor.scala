@@ -43,6 +43,12 @@ trait PageProcessor {
    * @return
    */
   def requestHeaders: RequestHeaders
+
+  /**
+   * schedule cron job expression
+   * @return
+   */
+  def cronExpression: Option[String] = None
 }
 
 case class Page(

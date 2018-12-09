@@ -42,6 +42,10 @@ case class Spider(
   }
 
   def restart(): Unit = {
+    if (running.get()) {
+      this.stop()
+    }
+
     start()
   }
 

@@ -34,7 +34,7 @@ object ProxyProvider {
   private val checkThread = Executors.newFixedThreadPool(5)
   private val monitorProxyStatus = new AtomicBoolean(false)
 
-  private lazy val proxyCrawlerList = ClassUtils.loadClasses("io.github.wtog.downloader.proxy.crawler", classOf[PageProcessor]).toList.map { proxy ⇒
+  private lazy val proxyCrawlerList = ClassUtils.loadClasses(classOf[PageProcessor], "io.github.wtog.downloader.proxy.crawler").toList.map { proxy ⇒
     (Spider(name = s"proxy-${proxy.getClass.getSimpleName}", pageProcessor = proxy))
   }
 

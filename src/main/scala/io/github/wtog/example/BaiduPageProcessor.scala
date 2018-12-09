@@ -24,7 +24,8 @@ final case class BaiduPageProcessor() extends PageProcessor {
       commonHeaders = Map("Content-Type" -> "text/html; charset=GB2312"), useProxy = true)
   }
 
-  override def targetUrls: List[String] = {
-    List("http://www.baidu.com")
-  }
+  override def targetUrls: List[String] = List("http://www.baidu.com")
+
+  override def cronExpression: Option[String] = Some("*/30 * * ? * *")
 }
+

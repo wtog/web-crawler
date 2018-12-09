@@ -34,7 +34,12 @@
     </logger>
 
     <logger name="akka" additivity="false">
-        <level value="info" />
+        <level value="warn" />
+        <appender-ref ref="stdout" />
+    </logger>
+
+    <logger name="org.quartz.core.QuartzScheduler" additivity="false">
+        <level value="warn" />
         <appender-ref ref="stdout" />
     </logger>
 
