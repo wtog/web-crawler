@@ -19,9 +19,11 @@ object Main {
 
     val processorList = ClassUtils.loadClasses(classOf[PageProcessor], "io.github.wtog.processor.impl", "io.github.wtog.example").zip(Stream from 1)
 
-    System.getenv("PASS_PLATFORM") match {
-      case "openshift" ⇒
-        processorList.foreach { case (processor, _) ⇒ Spider(name = processor.getClass.getSimpleName, pageProcessor = processor).start() }
+    val env = args.headOption
+
+    val execProcessors = env match {
+      case Some("openshift") ⇒
+        processorList
       case _ ⇒
         println("show page processor list: ")
         println("\t0. all")
@@ -44,9 +46,13 @@ object Main {
           }
         }
 
-        val spiders = executeProcessor.map { case (processor, _) ⇒ Spider(name = processor.getClass.getSimpleName, pageProcessor = processor) }
-
-        spiders.foreach(_.start())
+        executeProcessor
     }
+
+    startSpiders(execProcessors)
+  }
+
+  def startSpiders(processorList: Seq[(PageProcessor, Int)]): Unit = {
+    processorList.foreach { case (processor, _) ⇒ Spider(name = processor.getClass.getSimpleName, pageProcessor = processor).start() }
   }
 }

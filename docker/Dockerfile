@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:latest
 
 MAINTAINER wangtong
 USER root
@@ -11,7 +11,7 @@ RUN ln -s /usr/lib/jvm/default-jvm/bin/jstat /usr/local/bin/jstat
 RUN ln -s /usr/lib/jvm/default-jvm/bin/jcmd /usr/bin/jcmd
 RUN ln -s /usr/lib/jvm/default-jvm/bin/jstack /usr/bin/jstack
 
-RUN rm openjdk8-8.171.11-r0.apk
+RUN rm /openjdk8*
 
-ADD target/scala-2.11/web-crawler-assembly*.jar /apps/web-crawler-0.1.0.jar
+ADD target/scala-2.12/web-crawler-assembly*.jar /apps/web-crawler-0.1.0.jar
 
