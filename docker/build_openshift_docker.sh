@@ -12,4 +12,4 @@ export KUBECONFIG=~/.kube/config_openshift
 oc rollout latest dc/web-crawler-openshift
 oc logs -f dc/web-crawler-openshift
 
-docker_clean_images
+docker images -a | awk '/none/ {print $3}' | xargs docker rmi --force

@@ -1,7 +1,4 @@
-FROM wtnull/web-crawler:0.1.0
-
-# docker tag web-crawler-openshift:0.1.0 wtnull/wt:0.1.0
-# docker push wtnull/wt:0.1.0
+FROM wtnull/web-crawler:latest
 
 CMD ["java", "-jar", "/apps/web-crawler-0.1.0.jar", "openshift"]
 

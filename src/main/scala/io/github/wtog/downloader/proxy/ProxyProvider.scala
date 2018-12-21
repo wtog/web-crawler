@@ -2,8 +2,8 @@ package io.github.wtog.downloader.proxy
 
 import java.net.{ HttpURLConnection, InetSocketAddress, URL }
 import java.util.Objects
-import java.util.concurrent.{ ArrayBlockingQueue, Executors }
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger }
+import java.util.concurrent.{ ArrayBlockingQueue, Executors }
 
 import io.github.wtog.actor.ActorManager
 import io.github.wtog.downloader.proxy.ProxyProvider.checkUrl
@@ -11,7 +11,6 @@ import io.github.wtog.downloader.proxy.ProxyStatusEnums.ProxyStatusEnums
 import io.github.wtog.processor.PageProcessor
 import io.github.wtog.spider.{ Spider, SpiderPool }
 import io.github.wtog.utils.ClassUtils
-import org.apache.http.client.methods.CloseableHttpResponse
 import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -91,26 +90,24 @@ object ProxyProvider {
     Option(proxyList.peek()).filter(_.usability > 0.5)
   }
 
-  def requestWithProxy[T <: CloseableHttpResponse](useProxy: Boolean, httpRequest: Option[ProxyDTO] ⇒ T): T = {
+  def requestWithProxy[httpResponse](useProxy: Boolean, httpRequest: (Option[ProxyDTO]) ⇒ httpResponse): httpResponse = {
     if (useProxy) {
-      getProxy match {
-        case proxy @ Some(p) ⇒
+      getProxy.fold(httpRequest(None)) {
+        proxy ⇒
           try {
-            p.status = ProxyStatusEnums.USING
-            logger.info(s"using proxy ${p}")
-            httpRequest(proxy)
+            proxy.status = ProxyStatusEnums.USING
+            logger.info(s"using proxy ${proxy}")
+            httpRequest(Some(proxy))
           } catch {
             case NonFatal(e) ⇒
               logger.warn(s"failed to execute request using proxy: ${e.getLocalizedMessage}")
               Future {
-                p.usabilityCheck()
+                proxy.usabilityCheck()
               }
               httpRequest(None)
           } finally {
-            p.status = ProxyStatusEnums.IDEL
+            proxy.status = ProxyStatusEnums.IDEL
           }
-        case None ⇒
-          httpRequest(None)
       }
     } else {
       httpRequest(None)

@@ -1,7 +1,8 @@
 package io.github.wtog.downloader
 
-import org.slf4j.{ Logger, LoggerFactory }
+import io.github.wtog.downloader.proxy.{ ProxyDTO, ProxyProvider }
 import io.github.wtog.processor.{ Page, RequestHeaders }
+import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.concurrent.Future
 
@@ -14,6 +15,10 @@ trait Downloader {
   protected lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def download(request: RequestHeaders): Future[Page]
+
+  protected def getResponseWithProxyOrNot[HttpResponse](requestHeaders: RequestHeaders, httpRequestWithProxy: (Option[ProxyDTO]) ⇒ HttpResponse): HttpResponse = {
+    ProxyProvider.requestWithProxy[HttpResponse](requestHeaders.useProxy, httpRequestWithProxy)
+  }
 }
 
 object Downloader {

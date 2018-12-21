@@ -2,7 +2,7 @@ package io.github.wtog.downloader
 
 import java.security.cert.X509Certificate
 
-import io.github.wtog.downloader.proxy.{ ProxyDTO, ProxyProvider }
+import io.github.wtog.downloader.proxy.ProxyDTO
 import io.github.wtog.exceptions.NonNullArgumentsException
 import io.github.wtog.processor.{ Page, RequestHeaders }
 import io.github.wtog.utils.UrlUtils
@@ -43,7 +43,7 @@ object ApacheHttpClientDownloader extends Downloader {
         clientsDomain(request).execute(httpUriRequest, httpClientContext)
       }
 
-      val httpResponse = ProxyProvider.requestWithProxy[CloseableHttpResponse](request.useProxy, getResponse)
+      val httpResponse = getResponseWithProxyOrNot(request, getResponse)
 
       httpResponse.getStatusLine.getStatusCode match {
         case 200 ⇒
