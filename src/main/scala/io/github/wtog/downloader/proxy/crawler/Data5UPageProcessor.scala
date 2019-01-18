@@ -10,9 +10,7 @@ import io.github.wtog.processor.{ Page, RequestHeaders }
 class Data5UPageProcessor extends ProxyProcessorTrait {
 
   override def process(page: Page): Unit = {
-    val document = page.jsoupParser
-
-    val ipRow = document.select(".wlist > ul > li:nth-child(2) .l2")
+    val ipRow = page.dom(".wlist > ul > li:nth-child(2) .l2")
     val ipSize = ipRow.size()
 
     (0 until ipSize).foreach(i ⇒ {

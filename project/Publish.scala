@@ -10,37 +10,37 @@ object Publish extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-  credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
-  
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else Some("releases" at nexus + "service/local/staging/deploy/maven2/")
-  },
+    credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
 
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
-  pomIncludeRepository := { _ => true },
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2/")
+    },
 
-  pomExtra in Global := {
-    <url>https://github.com/wtog/web-crawler</url>
-      <licenses>
-        <license>
-          <name>Apache 2</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:wtog/web-crawler.git</url>
-        <connection>scm:git:git@github.com:wtog/web-crawler.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>wangtong</id>
-          <name>wangtong</name>
-          <url>https://github.com/wtog/</url>
-        </developer>
-      </developers>
-  }
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ => true },
+
+    pomExtra in Global := {
+      <url>https://github.com/wtog/web-crawler</url>
+        <licenses>
+          <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:wtog/web-crawler.git</url>
+          <connection>scm:git:git@github.com:wtog/web-crawler.git</connection>
+        </scm>
+        <developers>
+          <developer>
+            <id>wangtong</id>
+            <name>wangtong</name>
+            <url>https://github.com/wtog/</url>
+          </developer>
+        </developers>
+    }
   )
 }

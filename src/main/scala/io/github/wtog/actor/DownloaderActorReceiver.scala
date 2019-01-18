@@ -33,7 +33,7 @@ class DownloaderActorRevicer extends Actor {
               spider.CrawlMetric.downloadSuccessCounter
               processorActor ! ProcessorEvent(downloadEvent.spider, page)
             } else {
-              logger.warn("failed to download")
+              logger.warn(s"failed to download ${page.requestGeneral.url.get}")
               spider.CrawlMetric.downloadFailedCounter
             }
           case Failure(e) ⇒

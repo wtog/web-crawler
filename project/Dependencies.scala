@@ -15,9 +15,11 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % "3.0.1" % "test"
   )
 
+  val log4j2 = "2.11.0"
   lazy val log = Seq(
-    "org.slf4j" % "slf4j-log4j12" % "1.7.25"
-  )
+    "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2,
+    "org.apache.logging.log4j" % "log4j-api" % log4j2,
+    "org.apache.logging.log4j" % "log4j-core" % log4j2)
 
   lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.0"
   

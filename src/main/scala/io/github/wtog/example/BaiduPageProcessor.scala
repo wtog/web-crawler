@@ -10,10 +10,8 @@ import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
 final case class BaiduPageProcessor() extends PageProcessor {
 
   override def process(page: Page): Unit = {
-    val document = page.jsoupParser
-
     // 处理爬去结果
-    page.addPageResultItem(Map("title" -> document.title()))
+    page.addPageResultItem(Map("title" -> page.title))
     // 添加新的爬去连接
     //    page.addTargetRequest("http://www.baidu.com")
   }

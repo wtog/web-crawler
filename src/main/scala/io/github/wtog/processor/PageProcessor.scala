@@ -1,5 +1,6 @@
 package io.github.wtog.processor
 
+import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -8,12 +9,14 @@ import io.github.wtog.queue.{ LinkQueue, RequestQueue }
 import io.github.wtog.selector.HtmlParser
 import io.github.wtog.utils.CharsetUtils
 
+import scala.util.Try
+
 /**
  * @author : tong.wang
  * @since : 5/16/18 9:48 PM
  * @version : 1.0.0
  */
-trait PageProcessor {
+trait PageProcessor extends HtmlParser {
 
   /**
    * the target urls for processor to crawl
@@ -60,22 +63,24 @@ case class Page(
   lazy val resultItems: LinkedBlockingQueue[Map[String, Any]] = new LinkedBlockingQueue
   lazy val requestQueue: RequestQueue = new LinkQueue()
 
-  lazy val jsoupParser = HtmlParser(pageSourceExtract, requestGeneral.url.get).document
-  lazy val json = HtmlParser(pageSourceExtract, requestGeneral.url.get).json
+  val url = requestGeneral.url.get
 
-  private def pageSourceExtract = pageSource match {
-    case Some(source) ⇒ source
-    case None         ⇒ throw new IllegalArgumentException("htmlSouce cant be none")
+  def source: String = bytes match {
+    case Some(byte) ⇒
+      CharsetUtils.getHtmlSourceWithCharset(Some(responseHeaders("Content-Type")), byte)
+    case None ⇒
+      throw new IllegalStateException("no page source text found ")
   }
 
-  def pageSource: Option[String] = bytes.map(b ⇒ CharsetUtils.getHtmlSourceWithCharset(Some(responseHeaders("Content-Type")), b))
-
-  def addTargetRequest(urlAdd: String, requestBody: Option[String] = None): Unit = {
-    this.requestQueue.push(RequestHeaderGeneral(url = Some(urlAdd), requestBody = requestBody))
+  def addTargetRequest(urlAdd: String): Unit = {
+    addTargetRequest(RequestHeaderGeneral(url = Some(urlAdd)))
   }
 
-  def addTargetRequest(requestHeaderGeneral: RequestHeaderGeneral): Unit = {
-    this.requestQueue.push(requestHeaderGeneral)
+  def addTargetRequest(requestHeaderGeneral: RequestHeaderGeneral, requestBody: Option[String] = None): Unit = {
+    val url = requestHeaderGeneral.url.get
+
+    if (Try(new URL(url)).isSuccess)
+      this.requestQueue.push(RequestHeaderGeneral(url = Some(url), requestBody = requestBody))
   }
 
   def addPageResultItem(result: Map[String, Any]): Unit = {

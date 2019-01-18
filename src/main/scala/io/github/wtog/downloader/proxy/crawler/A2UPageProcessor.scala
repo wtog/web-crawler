@@ -12,8 +12,7 @@ class A2UPageProcessor extends ProxyProcessorTrait {
   val targetUrl = List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")
 
   override def process(page: Page): Unit = {
-    val document = page.jsoupParser
-    val proxyIpList = document.text().split(" ")
+    val proxyIpList = page.body.text().split(" ")
 
     proxyIpList.foreach(it ⇒ {
       val ipAndPort = it.split(":")

@@ -127,9 +127,6 @@ object HttpUriRequestConverter {
 }
 
 object ApacheHttpClientGenerator {
-
-  private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
   val connectionManager: PoolingHttpClientConnectionManager = {
     def buildSSLConnectionSocketFactory: SSLConnectionSocketFactory = {
       def createIgnoreVerifySSL: SSLContext = {
@@ -189,14 +186,12 @@ object ApacheHttpClientGenerator {
       httpClientBuilder.disableCookieManagement
     } else {
       val cookieStore = new BasicCookieStore
-      requestHeaders.cookies match {
-        case Some(cookies) ⇒
-          cookies.foreach(it ⇒ {
-            val cookie = new BasicClientCookie(it._1, it._2)
-            cookie.setDomain(requestHeaders.domain)
-            cookieStore.addCookie(cookie)
-          })
-        case None ⇒ logger.debug("no cookie")
+      requestHeaders.cookies foreach { cookies ⇒
+        cookies.foreach(it ⇒ {
+          val cookie = new BasicClientCookie(it._1, it._2)
+          cookie.setDomain(requestHeaders.domain)
+          cookieStore.addCookie(cookie)
+        })
       }
 
       httpClientBuilder.setDefaultCookieStore(cookieStore)

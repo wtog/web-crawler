@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration monitorInterval="30" status="warn" packages="org.apache.logging.log4j.core">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%level] from %logger in %thread - %message%n%xException"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</configuration>
