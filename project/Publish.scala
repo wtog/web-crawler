@@ -13,6 +13,9 @@ object Publish extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     useGpg := false,
+    usePgpKeyHex("124EC2FFE16C56ACF83A311C7A0A07E2FDA7A346"),
+    pgpPublicRing := baseDirectory.value / "project" / ".gnupg" / "pubring.gpg",
+    pgpSecretRing := baseDirectory.value / "project" / ".gnupg" / "secring.gpg",
     
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
     publishTo := {
