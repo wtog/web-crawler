@@ -12,7 +12,7 @@ object Publish extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    usePgpKeyHex("7A0A07E2FDA7A346"),
+    useGpg := false,
     
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
     publishTo := {
