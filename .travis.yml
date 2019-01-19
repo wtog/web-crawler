@@ -10,9 +10,8 @@ cache:
 language: scala
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION compile publish
+  - sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))' ++$TRAVIS_SCALA_VERSION compile publish
 
-  # Trick to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
 
 scala:
