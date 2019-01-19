@@ -12,8 +12,9 @@ object Publish extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
+    usePgpKeyHex("7A0A07E2FDA7A346"),
+    
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
-
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
