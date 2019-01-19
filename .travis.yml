@@ -11,7 +11,7 @@ language: scala
 
 script:
   - sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))'
-    'set pgpSigningKey := Some(PGP_SIGNING_KEY)'
+    'set pgpSigningKey := Some("PGP_SIGNING_KEY".toLong)'
     'set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char])'
     ++$TRAVIS_SCALA_VERSION compile publishSigned
 
