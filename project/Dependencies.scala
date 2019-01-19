@@ -38,5 +38,5 @@ object Dependencies {
   )
   
   lazy val dependencies = derby ++ log ++ httpParser ++ httpUtils ++ json :+ quartz
-  val crossVersion = Seq("2.12.7", "2.11.12")
+  val crossVersion = Seq("2.12.8", "2.11.12")
 }

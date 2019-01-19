@@ -1,7 +1,7 @@
 import Dependencies.dependencies
 import Dependencies.crossVersion
 
-lazy val ver = "0.1.1-SNAPSHOT"
+lazy val ver = "0.1.1"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
