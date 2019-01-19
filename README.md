@@ -1,4 +1,6 @@
-# web-crawler
+# web-crawler    
+[![Build Status](https://travis-ci.org/wtog/web-crawler.svg?branch=master)](https://travis-ci.org/wtog/web-crawler.svg?branch=master)
+
 
 #### 项目介绍
 参考 webmagic [http://webmagic.io](http://webmagic.io) 撸的 [scala + akka] 爬虫
