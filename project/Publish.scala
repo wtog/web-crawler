@@ -1,6 +1,6 @@
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.SbtPgp.autoImportImpl.useGpg
+import com.typesafe.sbt.SbtPgp.autoImportImpl._
 
 
 /**
@@ -12,15 +12,14 @@ object Publish extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    useGpg := false,
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials-center"),
 
-  publishTo := {
+    publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
       else Some("releases" at nexus + "service/local/staging/deploy/maven2/")
     },
-    
+
     publishMavenStyle := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => true },
