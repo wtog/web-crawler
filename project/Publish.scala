@@ -26,7 +26,7 @@ object Publish extends AutoPlugin {
 
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    pomIncludeRepository := { _ => true },
+    pomIncludeRepository := { _ => false },
 
     pomExtra in Global := {
       <url>https://github.com/wtog/web-crawler</url>
