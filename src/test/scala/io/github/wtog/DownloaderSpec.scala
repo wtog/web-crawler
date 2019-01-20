@@ -21,6 +21,6 @@ class DownloaderSpec extends BaseTest {
       domain = "www.baidu.com", requestHeaderGeneral = Some(RequestHeaderGeneral(url = Some("http://top.baidu.com/buzz?b=1&c=513&fr=topbuzz_b344_c513")))))
 
     val r = Await.result(response, Duration(15, TimeUnit.SECONDS))
-    println(r.pageSource.get)
+    println(r.source)
   }
 }

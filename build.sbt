@@ -1,7 +1,7 @@
 import Dependencies.dependencies
 import Dependencies.crossVersion
 
-lazy val ver = "0.1.1"
+lazy val ver = "0.1.2-SNAPSHOT"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
@@ -28,6 +28,8 @@ lazy val commonSettings = Seq(
 mappings in(Compile, packageBin) ~= {
   _.filter(!_._1.getName.contentEquals("log4j2.xml"))
 }
+
+javaOptions += "-Dlog4j.configurationFile=log4j2.xml"
 
 lazy val assemblyConfig = Seq(
   assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",
