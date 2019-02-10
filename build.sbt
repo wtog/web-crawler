@@ -10,8 +10,9 @@ crossScalaVersions := crossVersion
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    assemblyConfig,
-    libraryDependencies ++= dependencies
+    libraryDependencies ++= dependencies).
+  settings(
+    assemblyConfig
   )
   .settings(
     addCompilerPlugin(scalafixSemanticdb),
@@ -22,14 +23,15 @@ lazy val commonSettings = Seq(
   name := "web-crawler",
   organization := "io.github.wtog",
   version := ver,
-  scalaVersion := crossVersion.head
+  scalaVersion := crossVersion.head,
+  fork := true
 )
 
 mappings in(Compile, packageBin) ~= {
   _.filter(!_._1.getName.contentEquals("log4j2.xml"))
 }
 
-javaOptions += "-Dlog4j.configurationFile=log4j2.xml"
+javaOptions += "-Dlog4j.resources=log4j2.xml"
 
 lazy val assemblyConfig = Seq(
   assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",

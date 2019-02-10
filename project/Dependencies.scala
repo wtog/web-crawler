@@ -8,8 +8,7 @@ import sbt._
 object Dependencies {
   lazy val akkaVersion = "2.5.12"
   lazy val derby = Seq(
-    "org.mindrot" % "jbcrypt" % "0.3m",
-    "com.google.guava" % "guava" % "23.5-jre",
+    "com.google.guava" % "guava" % "27.0.1-jre",
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "org.scalatest" %% "scalatest" % "3.0.1" % "test")
@@ -23,7 +22,7 @@ object Dependencies {
   lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.0"
 
   lazy val httpUtils = Seq(
-    "org.asynchttpclient" % "async-http-client" % "2.5.3" excludeAll (ExclusionRule("org.reactivestreams", "reactive-streams"), ExclusionRule("io.netty", "netty-handler")),
+    "org.asynchttpclient" % "async-http-client" % "2.7.0",
     "org.apache.httpcomponents" % "httpclient" % "4.5.2")
 
   lazy val httpParser = Seq(

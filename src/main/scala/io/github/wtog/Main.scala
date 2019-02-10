@@ -5,6 +5,7 @@ import io.github.wtog.spider.Spider
 import io.github.wtog.utils.ClassUtils
 
 import scala.io.StdIn
+import scala.util.Try
 
 /**
  * @author : tong.wang
@@ -13,19 +14,27 @@ import scala.io.StdIn
  */
 object Main {
 
-  val startTime = System.currentTimeMillis()
+  lazy val startTime = System.currentTimeMillis()
 
   def main(args: Array[String]): Unit = {
 
-    val processorList = ClassUtils.loadClasses(classOf[PageProcessor], "io.github.wtog.processor.impl", "io.github.wtog.example").zip(Stream from 1)
+    val processorList = ClassUtils.loadClasses(classOf[PageProcessor], "io.github.wtog.processor.impl", "io.github.wtog.example")
+      .sortWith(_.getClass.getSimpleName < _.getClass.getSimpleName)
+      .zip(Stream from 1)
 
-    val env = args.headOption
-
-    val execProcessors = env match {
-      case Some("openshift") ⇒
+    val execProcessors = args match {
+      case args: Array[String] if args.contains("0") ⇒
+        println("executing all processors")
         processorList
+      case args: Array[String] if (args.nonEmpty && args.toSeq.forall(arg ⇒ Try(arg.toInt).isSuccess)) ⇒
+        val processors = processorList.filter {
+          case (_, order) ⇒
+            args.contains(order.toString)
+        }
+        println(s"executing ${processors}")
+        processors
       case _ ⇒
-        println("show page processor list: ")
+        println("\nshow page processor list: ")
         println("\t0. all")
         for ((service, order) ← processorList) {
           println(s"\t${order}. ${service.getClass.getSimpleName}")

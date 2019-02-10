@@ -1,11 +1,13 @@
 package io.github.wtog.downloader
 
+import java.util.concurrent.ConcurrentHashMap
+
 import io.github.wtog.downloader.proxy.ProxyDTO
-import io.netty.handler.codec.http.DefaultHttpHeaders
-import org.asynchttpclient.Dsl.asyncHttpClient
-import org.asynchttpclient._
 import io.github.wtog.exceptions.{ IllegalArgumentsException, NonNullArgumentsException }
 import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.netty.handler.codec.http.{ DefaultHttpHeaders, HttpHeaderNames }
+import org.asynchttpclient.Dsl.asyncHttpClient
+import org.asynchttpclient._
 import org.asynchttpclient.proxy.ProxyServer
 
 import scala.concurrent.{ Future, Promise }
@@ -17,16 +19,15 @@ import scala.concurrent.{ Future, Promise }
  */
 object AsyncHttpClientDownloader extends Downloader {
 
-  var clientsPool: Map[String, AsyncHttpClient] = Map()
+  val clientsPool = new ConcurrentHashMap[String, AsyncHttpClient]
 
-  def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestHeaders): BoundRequestBuilder = {
-    import io.netty.handler.codec.http.HttpHeaders._
+  private[this] def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestHeaders): BoundRequestBuilder = {
 
     val httpHeaders = new DefaultHttpHeaders
-    requestHeaders.headers.foreach { it ⇒ httpHeaders.add(it._1, it._2) }
+    requestHeaders.headers.foreach { case (k, v) ⇒ httpHeaders.add(k, v) }
 
-    httpHeaders.add(Names.USER_AGENT, requestHeaders.userAgent)
-    httpHeaders.add(Names.ACCEPT_CHARSET, requestHeaders.charset.get)
+    httpHeaders.add(HttpHeaderNames.USER_AGENT, requestHeaders.userAgent)
+    httpHeaders.add(HttpHeaderNames.ACCEPT_CHARSET, requestHeaders.charset.get)
     requestBuilder.setHeaders(httpHeaders)
     requestBuilder
   }
@@ -36,11 +37,12 @@ object AsyncHttpClientDownloader extends Downloader {
       val requestGeneral = request.requestHeaderGeneral.getOrElse(throw NonNullArgumentsException("requestGeneral"))
       val domain = request.domain
 
+      val downclients = downloadClients(domain, Some(request))
       val requestBuilder: BoundRequestBuilder = requestGeneral.method.toUpperCase match {
         case "GET" ⇒
-          downloadClients(domain).prepareGet(requestGeneral.url.get)
+          downclients.prepareGet(requestGeneral.url.get)
         case "POST" ⇒
-          downloadClients(domain).preparePost(requestGeneral.url.get)
+          downclients.preparePost(requestGeneral.url.get)
         case other ⇒
           logger.warn(s"unknown httpmethod ${other}")
           throw IllegalArgumentsException(other)
@@ -49,17 +51,17 @@ object AsyncHttpClientDownloader extends Downloader {
       p foreach { proxy ⇒ requestBuilder.setProxyServer(new ProxyServer.Builder(proxy.host, proxy.port).build()) }
 
       val promise = Promise[Response]
-      clientPrepare(requestBuilder, request)
-        .execute(new AsyncCompletionHandler[Response]() {
-          override def onCompleted(response: Response): Response = {
-            promise.success(response)
-            response
-          }
 
-          override def onThrowable(t: Throwable): Unit = {
-            logger.error("http download failed ", t.getMessage)
-          }
-        })
+      clientPrepare(requestBuilder, request).execute(new AsyncCompletionHandler[Response]() {
+        override def onCompleted(response: Response): Response = {
+          promise.success(response)
+          response
+        }
+
+        override def onThrowable(t: Throwable): Unit = {
+          logger.error("http download failed ", t.getMessage)
+        }
+      })
 
       promise.future
     }
@@ -71,15 +73,28 @@ object AsyncHttpClientDownloader extends Downloader {
       case response ⇒
         logger.warn(s"failed download ${request.requestHeaderGeneral.get} ${response.getStatusCode}")
         Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = false)
-
     }
 
   }
 
-  def downloadClients(domain: String): AsyncHttpClient = {
-    if (!clientsPool.contains(domain)) {
-      clientsPool += (domain -> asyncHttpClient())
+  def downloadClients(domain: String, requestConfig: Option[RequestHeaders] = None): AsyncHttpClient = {
+    val clientCache = Option(clientsPool.get(domain))
+
+    clientCache getOrElse {
+      val client = requestConfig.fold(asyncHttpClient()) { config ⇒
+        val builder = new DefaultAsyncHttpClientConfig.Builder()
+        builder.setRequestTimeout(config.timeOut)
+          .setConnectTimeout(config.timeOut)
+          .setFollowRedirect(true)
+          .setKeepAlive(true)
+          .setConnectionPoolCleanerPeriod(5)
+          .build()
+
+        asyncHttpClient(builder)
+      }
+
+      clientsPool.put(domain, client)
+      client
     }
-    clientsPool(domain)
   }
 }

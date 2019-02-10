@@ -1,4 +1,0 @@
-FROM wtnull/web-crawler:latest
-
-CMD ["java", "-jar", "/apps/web-crawler-0.1.0.jar", "openshift"]
-
