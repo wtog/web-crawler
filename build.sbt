@@ -31,8 +31,6 @@ mappings in(Compile, packageBin) ~= {
   _.filter(!_._1.getName.contentEquals("log4j2.xml"))
 }
 
-javaOptions += "-Dlog4j.resources=log4j2.xml"
-
 lazy val assemblyConfig = Seq(
   assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",
   mainClass in Compile := Some("io.github.wtog.Main"),
@@ -54,4 +52,10 @@ lazy val assemblyConfig = Seq(
       }
     case x => MergeStrategy.first
   }
+)
+
+javaOptions := Seq(
+  "-Dlog4j.resources=log4j2.xml", 
+  "-Xmx512m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", 
+  s"-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/web-crawler-${System.currentTimeMillis()}.jfr"
 )
