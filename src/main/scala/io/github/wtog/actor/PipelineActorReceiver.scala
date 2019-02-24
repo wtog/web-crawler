@@ -1,7 +1,7 @@
 package io.github.wtog.actor
 
 import akka.actor.Actor
-import io.github.wtog.pipeline.Pipeline
+import io.github.wtog.pipeline.{ ConsolePipeline, Pipeline }
 import org.slf4j.{ Logger, LoggerFactory }
 
 /**
@@ -15,7 +15,13 @@ class PipelineActorRevicer extends Actor {
 
   override def receive: Receive = {
     case pipelineEvent: PipelineEvent ⇒
-      pipelineEvent.pipelineList.foreach(_.process(pipelineEvent.pageResultItems))
+      val pipelineList = if (logger.isDebugEnabled) {
+        pipelineEvent.pipelineList + ConsolePipeline
+      } else {
+        pipelineEvent.pipelineList
+      }
+
+      pipelineList.foreach(_.process(pipelineEvent.pageResultItems))
     case other ⇒
       logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }

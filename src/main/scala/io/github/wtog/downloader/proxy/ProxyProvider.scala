@@ -27,7 +27,7 @@ import scala.util.control.NonFatal
 object ProxyProvider {
   private lazy val logger: Logger = LoggerFactory.getLogger(ProxyProvider.getClass)
 
-  val checkUrl: URL = Try(new URL("http://www.baidu.com")).get
+  val checkUrl: URL = new URL("http://www.baidu.com")
   val proxyList: ArrayBlockingQueue[ProxyDTO] = new ArrayBlockingQueue[ProxyDTO](100)
   private val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
   private val checkThread = Executors.newFixedThreadPool(5)

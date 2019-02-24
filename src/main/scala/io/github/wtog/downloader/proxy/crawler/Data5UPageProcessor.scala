@@ -1,6 +1,6 @@
 package io.github.wtog.downloader.proxy.crawler
 
-import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.github.wtog.processor.{ Page, RequestSetting }
 
 /**
  * @author : tong.wang
@@ -25,7 +25,7 @@ class Data5UPageProcessor extends ProxyProcessorTrait {
 
   }
 
-  override def requestHeaders: RequestHeaders = RequestHeaders(domain = "www.data5u.com")
+  override def requestSetting: RequestSetting = RequestSetting(domain = "www.data5u.com")
 
   override def targetUrls: List[String] = {
     List(

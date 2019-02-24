@@ -6,7 +6,7 @@ import akka.actor.{ ActorRef, Cancellable, PoisonPill, Props }
 import io.github.wtog.actor.{ ActorManager, DownloadEvent, DownloaderActorRevicer }
 import io.github.wtog.downloader.proxy.crawler.ProxyProcessorTrait
 import io.github.wtog.downloader.{ ApacheHttpClientDownloader, Downloader }
-import io.github.wtog.processor.{ PageProcessor, RequestHeaderGeneral }
+import io.github.wtog.processor.PageProcessor
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -36,7 +36,7 @@ case class Spider(
       SpiderPool.addSpider(this)
 
       if (logger.isDebugEnabled()) {
-        metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 1 seconds)(CrawlMetric.metricInfo()))
+        metircInfoCron = Option(ActorManager.system.scheduler.schedule(2 seconds, 10 seconds)(CrawlMetric.metricInfo()))
       }
     }
   }
@@ -59,8 +59,8 @@ case class Spider(
   }
 
   private def execute(downloaderActor: ActorRef): Unit = {
-    this.pageProcessor.targetUrls.foreach(it ⇒ {
-      downloaderActor ! DownloadEvent(this, Some(RequestHeaderGeneral(url = Some(it))))
+    this.pageProcessor.targetUrls.foreach(url ⇒ {
+      downloaderActor ! DownloadEvent(this, request = pageProcessor.requestSetting.withUrl(url))
     })
   }
 

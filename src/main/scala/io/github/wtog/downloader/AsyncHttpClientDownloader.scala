@@ -3,8 +3,8 @@ package io.github.wtog.downloader
 import java.util.concurrent.ConcurrentHashMap
 
 import io.github.wtog.downloader.proxy.ProxyDTO
-import io.github.wtog.exceptions.{ IllegalArgumentsException, NonNullArgumentsException }
-import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.github.wtog.exceptions.IllegalArgumentsException
+import io.github.wtog.processor.{ Page, RequestSetting }
 import io.netty.handler.codec.http.{ DefaultHttpHeaders, HttpHeaderNames }
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient._
@@ -21,7 +21,7 @@ object AsyncHttpClientDownloader extends Downloader {
 
   val clientsPool = new ConcurrentHashMap[String, AsyncHttpClient]
 
-  private[this] def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestHeaders): BoundRequestBuilder = {
+  private[this] def clientPrepare(requestBuilder: BoundRequestBuilder, requestHeaders: RequestSetting): BoundRequestBuilder = {
 
     val httpHeaders = new DefaultHttpHeaders
     requestHeaders.headers.foreach { case (k, v) ⇒ httpHeaders.add(k, v) }
@@ -32,17 +32,16 @@ object AsyncHttpClientDownloader extends Downloader {
     requestBuilder
   }
 
-  override def download(request: RequestHeaders): Future[Page] = {
+  override def download(request: RequestSetting): Future[Page] = {
     def getResponse(p: Option[ProxyDTO]): Future[Response] = {
-      val requestGeneral = request.requestHeaderGeneral.getOrElse(throw NonNullArgumentsException("requestGeneral"))
       val domain = request.domain
 
       val downclients = downloadClients(domain, Some(request))
-      val requestBuilder: BoundRequestBuilder = requestGeneral.method.toUpperCase match {
+      val requestBuilder: BoundRequestBuilder = request.method.toUpperCase match {
         case "GET" ⇒
-          downclients.prepareGet(requestGeneral.url.get)
+          downclients.prepareGet(request.url.get)
         case "POST" ⇒
-          downclients.preparePost(requestGeneral.url.get)
+          downclients.preparePost(request.url.get)
         case other ⇒
           logger.warn(s"unknown httpmethod ${other}")
           throw IllegalArgumentsException(other)
@@ -69,15 +68,15 @@ object AsyncHttpClientDownloader extends Downloader {
     import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
     getResponseWithProxyOrNot[Future[Response]](request, getResponse).map {
       case response if response.getStatusCode == 200 ⇒
-        Page(requestGeneral = request.requestHeaderGeneral.get, bytes = Some(response.getResponseBodyAsBytes))
+        Page(requestSetting = request, bytes = Some(response.getResponseBodyAsBytes))
       case response ⇒
-        logger.warn(s"failed download ${request.requestHeaderGeneral.get} ${response.getStatusCode}")
-        Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = false)
+        logger.warn(s"failed download ${request.url.get} ${response.getStatusCode}")
+        Page(requestSetting = request, isDownloadSuccess = false)
     }
 
   }
 
-  def downloadClients(domain: String, requestConfig: Option[RequestHeaders] = None): AsyncHttpClient = {
+  def downloadClients(domain: String, requestConfig: Option[RequestSetting] = None): AsyncHttpClient = {
     val clientCache = Option(clientsPool.get(domain))
 
     clientCache getOrElse {

@@ -16,6 +16,6 @@ trait Pipeline {
 object ConsolePipeline extends Pipeline {
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {
     val (url, result) = pageResultItem
-    logger.info(s"crawl result: ${url} - ${result}")
+    logger.debug(s"crawl result: ${url} - ${result}")
   }
 }

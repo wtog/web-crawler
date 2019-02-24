@@ -1,7 +1,7 @@
 package io.github.wtog.queue
 
+import io.github.wtog.processor.RequestSetting
 import org.slf4j.{ Logger, LoggerFactory }
-import io.github.wtog.processor.RequestHeaderGeneral
 
 /**
  * @author : tong.wang
@@ -11,9 +11,13 @@ import io.github.wtog.processor.RequestHeaderGeneral
 trait RequestQueue {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def push(request: RequestHeaderGeneral)
+  def push(request: RequestSetting)
 
-  def poll(): Option[RequestHeaderGeneral]
+  def poll(): Option[RequestSetting]
+
+  def take(): Option[RequestSetting]
 
   def isEmpty: Boolean
+
+  def nonEmpty: Boolean = !isEmpty
 }

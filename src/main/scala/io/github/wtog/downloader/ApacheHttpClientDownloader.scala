@@ -4,7 +4,7 @@ import java.security.cert.X509Certificate
 
 import io.github.wtog.downloader.proxy.ProxyDTO
 import io.github.wtog.exceptions.NonNullArgumentsException
-import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.github.wtog.processor.{ Page, RequestSetting }
 import io.github.wtog.utils.UrlUtils
 import javax.net.ssl.{ SSLContext, TrustManager, X509TrustManager }
 import org.apache.http.auth.{ AuthState, UsernamePasswordCredentials }
@@ -34,7 +34,7 @@ import scala.concurrent.Future
 object ApacheHttpClientDownloader extends Downloader {
   var clientsPool: Map[String, CloseableHttpClient] = Map()
 
-  override def download(request: RequestHeaders): Future[Page] = {
+  override def download(request: RequestSetting): Future[Page] = {
     import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
 
     Future {
@@ -48,25 +48,25 @@ object ApacheHttpClientDownloader extends Downloader {
       httpResponse.getStatusLine.getStatusCode match {
         case 200 ⇒
           val byteArray = EntityUtils.toByteArray(Option(httpResponse.getEntity).getOrElse(throw NonNullArgumentsException("apache downloader return empty content")))
-          Page(requestGeneral = request.requestHeaderGeneral.get, bytes = Some(byteArray))
+          Page(requestSetting = request, bytes = Some(byteArray))
         case other ⇒
-          logger.warn(s"failed download ${request.requestHeaderGeneral.get} ${other}")
-          Page(requestGeneral = request.requestHeaderGeneral.get, isDownloadSuccess = false)
+          logger.warn(s"failed download ${request.url.get} ${other}")
+          Page(requestSetting = request, isDownloadSuccess = false)
       }
     }
   }
 
-  def clientsDomain(requestHeaders: RequestHeaders): CloseableHttpClient = {
-    val domain = requestHeaders.domain
+  def clientsDomain(requestSetting: RequestSetting): CloseableHttpClient = {
+    val domain = requestSetting.domain
 
-    clientsPool.getOrElse(domain, ApacheHttpClientGenerator.generateClient(requestHeaders))
+    clientsPool.getOrElse(domain, ApacheHttpClientGenerator.generateClient(requestSetting))
   }
-
 }
 
 object HttpUriRequestConverter {
-  def convert(request: RequestHeaders, proxy: Option[ProxyDTO]): (HttpUriRequest, HttpContext) = {
-    val requestUrl = request.requestHeaderGeneral.get.url.get
+
+  def convert(request: RequestSetting, proxy: Option[ProxyDTO]): (HttpUriRequest, HttpContext) = {
+    val requestUrl = request.url.get
 
     val requestConfig = RequestConfig.custom
     val httpContext = new HttpClientContext
@@ -103,8 +103,8 @@ object HttpUriRequestConverter {
     (requestBuilder.build, httpContext)
   }
 
-  private def selectRequestMethod(request: RequestHeaders): RequestBuilder = {
-    request.requestHeaderGeneral.get.method.toUpperCase match {
+  private def selectRequestMethod(request: RequestSetting): RequestBuilder = {
+    request.method.toUpperCase match {
       case "POST"   ⇒ addFormParams(RequestBuilder.post, request)
       case "HEAD"   ⇒ RequestBuilder.head
       case "OPTION" ⇒ RequestBuilder.options
@@ -114,13 +114,8 @@ object HttpUriRequestConverter {
     }
   }
 
-  private def addFormParams(requestBuilder: RequestBuilder, request: RequestHeaders) = {
-    val requestHeaderGeneral = request.requestHeaderGeneral
-
-    requestHeaderGeneral map { general ⇒
-      requestBuilder.setEntity(new StringEntity(general.requestBody.get))
-    }
-
+  private def addFormParams(requestBuilder: RequestBuilder, request: RequestSetting) = {
+    requestBuilder.setEntity(new StringEntity(request.requestBody.get))
     requestBuilder
   }
 
@@ -152,7 +147,7 @@ object ApacheHttpClientGenerator {
     connectionManager
   }
 
-  def generateClient(requestHeaders: RequestHeaders): CloseableHttpClient = {
+  def generateClient(requestHeaders: RequestSetting): CloseableHttpClient = {
     val httpClientBuilder = HttpClients.custom
 
     httpClientBuilder.setConnectionManager(connectionManager)
@@ -181,7 +176,7 @@ object ApacheHttpClientGenerator {
     httpClientBuilder.build()
   }
 
-  def generateCookie(httpClientBuilder: HttpClientBuilder, requestHeaders: RequestHeaders) = {
+  def generateCookie(httpClientBuilder: HttpClientBuilder, requestHeaders: RequestSetting) = {
     if (requestHeaders.disableCookieManagement) {
       httpClientBuilder.disableCookieManagement
     } else {

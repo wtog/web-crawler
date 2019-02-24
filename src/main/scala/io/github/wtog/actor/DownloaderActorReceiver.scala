@@ -1,7 +1,7 @@
 package io.github.wtog.actor
 
 import akka.actor.{ Actor, Props }
-import io.github.wtog.processor.RequestHeaderGeneral
+import io.github.wtog.processor.RequestSetting
 import io.github.wtog.spider.Spider
 import org.slf4j.{ Logger, LoggerFactory }
 
@@ -20,27 +20,26 @@ class DownloaderActorRevicer extends Actor {
 
   override def receive: Receive = {
     case downloadEvent: DownloadEvent ⇒
-      downloadEvent.request.foreach(request ⇒ {
-        val spider = downloadEvent.spider
+      val spider = downloadEvent.spider
 
-        import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
-        spider.downloader.download(spider.pageProcessor.requestHeaders.copy(requestHeaderGeneral = Some(request))) onComplete {
-          case Success(page) ⇒
-            if (logger.isDebugEnabled())
-              logger.debug(s"downloaded: ${page.requestGeneral.url.get}")
+      import io.github.wtog.actor.ExecutionContexts.downloadDispatcher
+      spider.downloader.download(downloadEvent.request) onComplete {
+        case Success(page) ⇒
+          if (logger.isDebugEnabled())
+            logger.debug(s"downloaded: ${page.requestSetting.url.get}")
 
-            if (page.isDownloadSuccess) {
-              spider.CrawlMetric.downloadSuccessCounter
-              processorActor ! ProcessorEvent(downloadEvent.spider, page)
-            } else {
-              logger.warn(s"failed to download ${page.requestGeneral.url.get}")
-              spider.CrawlMetric.downloadFailedCounter
-            }
-          case Failure(e) ⇒
+          if (page.isDownloadSuccess) {
+            spider.CrawlMetric.downloadSuccessCounter
+            processorActor ! ProcessorEvent(downloadEvent.spider, page)
+          } else {
+            logger.warn(s"failed to download ${page.requestSetting.url.get}")
             spider.CrawlMetric.downloadFailedCounter
-            throw e
-        }
-      })
+          }
+        case Failure(e) ⇒
+          spider.CrawlMetric.downloadFailedCounter
+          throw e
+      }
+
     case other ⇒
       logger.warn(s"${self.path} reviced wrong msg ${other}")
   }
@@ -54,4 +53,4 @@ class DownloaderActorRevicer extends Actor {
   }
 }
 
-final case class DownloadEvent(spider: Spider, request: Option[RequestHeaderGeneral])
+final case class DownloadEvent(spider: Spider, request: RequestSetting)

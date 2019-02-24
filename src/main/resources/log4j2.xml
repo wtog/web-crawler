@@ -7,6 +7,10 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="io.github.wtog" level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
         <Root level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Root>

@@ -40,9 +40,9 @@ lazy val assemblyConfig = Seq(
       (xs map {
         _.toLowerCase
       }) match {
-        case "maven" :: xs =>
+        case "maven" :: _ =>
           MergeStrategy.discard
-        case "services" :: xs =>
+        case "services" :: _ =>
           MergeStrategy.first
         case ("manifest.mf" :: Nil) =>
           MergeStrategy.discard
@@ -50,12 +50,12 @@ lazy val assemblyConfig = Seq(
           MergeStrategy.filterDistinctLines
         case _ => MergeStrategy.discard
       }
-    case x => MergeStrategy.first
+    case _ => MergeStrategy.first
   }
 )
 
 javaOptions := Seq(
-  "-Dlog4j.resources=log4j2.xml", 
+  "-Dlog4j.configurationFile=log4j2.xml", 
   "-Xmx512m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", 
   s"-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/web-crawler-${System.currentTimeMillis()}.jfr"
 )

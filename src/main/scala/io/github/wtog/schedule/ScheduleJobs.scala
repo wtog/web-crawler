@@ -27,11 +27,12 @@ object ScheduleJobs {
   }
 
   def addSpiderScheduleJob(spider: Spider) = {
+
     if (!getScheduledJobs.contains(spider.name)) {
       spider.pageProcessor.cronExpression.foreach { cronExpression ⇒
         val job = JobBuilder.newJob(classOf[SpiderJob]).withIdentity(spider.name).build
         val trigger = TriggerBuilder.newTrigger()
-          .withIdentity(spider.pageProcessor.requestHeaders.domain)
+          .withIdentity(spider.pageProcessor.requestSetting.domain)
           .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
           .build()
 
@@ -39,6 +40,7 @@ object ScheduleJobs {
         scheduler.start()
       }
     }
+
   }
 
 }

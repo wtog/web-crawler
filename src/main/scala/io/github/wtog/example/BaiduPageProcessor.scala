@@ -1,6 +1,6 @@
 package io.github.wtog.example
 
-import io.github.wtog.processor.{ Page, PageProcessor, RequestHeaders }
+import io.github.wtog.processor.{ Page, PageProcessor, RequestSetting }
 
 /**
  * @author : tong.wang
@@ -16,10 +16,10 @@ final case class BaiduPageProcessor() extends PageProcessor {
     //    page.addTargetRequest("http://www.baidu.com")
   }
 
-  override def requestHeaders: RequestHeaders = {
-    RequestHeaders(
+  override def requestSetting: RequestSetting = {
+    RequestSetting(
       domain = "www.baidu.com",
-      commonHeaders = Map("Content-Type" -> "text/html; charset=GB2312"), useProxy = true)
+      headers = Map("Content-Type" -> "text/html; charset=GB2312"), useProxy = true)
   }
 
   override def targetUrls: List[String] = List("http://www.baidu.com")

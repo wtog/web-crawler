@@ -1,6 +1,6 @@
 package io.github.wtog.queue
 
-import io.github.wtog.processor.RequestHeaderGeneral
+import io.github.wtog.processor.RequestSetting
 import io.github.wtog.queue.duplicate.DuplicateRemovedStrategy
 
 /**
@@ -10,13 +10,13 @@ import io.github.wtog.queue.duplicate.DuplicateRemovedStrategy
  */
 abstract class DuplicateRemovedQueue(duplicateRemovedStrategy: DuplicateRemovedStrategy) extends RequestQueue {
 
-  override def push(request: RequestHeaderGeneral): Unit = {
+  override def push(request: RequestSetting): Unit = {
     if (isNotDuplicateRequest(request)) {
       pushWhenNoDuplicate(request)
     }
   }
 
-  private def isNotDuplicateRequest(requestHeaderGeneral: RequestHeaderGeneral): Boolean = {
+  private def isNotDuplicateRequest(requestHeaderGeneral: RequestSetting): Boolean = {
     requestHeaderGeneral.method match {
       case "GET" ⇒
         !duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get)
@@ -28,5 +28,5 @@ abstract class DuplicateRemovedQueue(duplicateRemovedStrategy: DuplicateRemovedS
     }
   }
 
-  protected def pushWhenNoDuplicate(request: RequestHeaderGeneral)
+  protected def pushWhenNoDuplicate(request: RequestSetting)
 }

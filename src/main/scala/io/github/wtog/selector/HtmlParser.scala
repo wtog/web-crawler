@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 trait HtmlParser {
 
   implicit class PageWrapper(page: Page) {
-    val document = Jsoup.parse(page.source, page.requestGeneral.url.getOrElse(""))
+    val document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
 
     val title = document.title()
     val body = document.body()

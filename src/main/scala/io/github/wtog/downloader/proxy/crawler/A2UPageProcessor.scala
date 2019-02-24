@@ -1,6 +1,7 @@
 package io.github.wtog.downloader.proxy.crawler
 
-import io.github.wtog.processor.{ Page, RequestHeaders }
+import io.github.wtog.processor.{ Page, RequestSetting }
+import scala.concurrent.duration._
 
 /**
  * https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt
@@ -24,8 +25,8 @@ class A2UPageProcessor extends ProxyProcessorTrait {
     })
   }
 
-  override def requestHeaders: RequestHeaders = {
-    RequestHeaders(domain = "raw.githubusercontent.com", sleepTime = 5000)
+  override def requestSetting: RequestSetting = {
+    RequestSetting(domain = "raw.githubusercontent.com", sleepTime = 5 seconds)
   }
 
   override def targetUrls: List[String] = {

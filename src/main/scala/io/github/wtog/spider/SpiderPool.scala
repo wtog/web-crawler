@@ -1,9 +1,7 @@
 package io.github.wtog.spider
 
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 
-import io.github.wtog.actor.ActorManager
 import io.github.wtog.downloader.proxy.ProxyProvider
 import io.github.wtog.schedule.ScheduleJobs
 
@@ -15,17 +13,14 @@ import io.github.wtog.schedule.ScheduleJobs
 object SpiderPool {
   val spiders = new ConcurrentHashMap[String, Spider]()
 
-  val spiderScheduleTaskRunning = new AtomicBoolean(false)
-
   def addSpider(spider: Spider) = {
-    if (spiders.contains(spider.name)) throw new IllegalArgumentException(s"duplicate spider name ${spider.name}")
+    spiders.putIfAbsent(spider.name, spider)
 
-    spiders.put(spider.name, spider)
-    if (!spiderScheduleTaskRunning.getAndSet(true)) {
-      runScheduleTask()
+    spider.pageProcessor.cronExpression.foreach { _ ⇒
+      ScheduleJobs.addSpiderScheduleJob(spider)
     }
 
-    if (spider.pageProcessor.requestHeaders.useProxy) {
+    if (spider.pageProcessor.requestSetting.useProxy) {
       ProxyProvider.startProxyCrawl()
       ProxyProvider.listProxyStatus()
     }
@@ -44,14 +39,7 @@ object SpiderPool {
   }
 
   def fetchAllUsingProxySpiders() = {
-    fetchAllSpiders().filter(_.pageProcessor.requestHeaders.useProxy)
+    fetchAllSpiders().filter(_.pageProcessor.requestSetting.useProxy)
   }
 
-  def runScheduleTask(): Unit = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    import scala.concurrent.duration._
-    ActorManager.system.scheduler.schedule(1 minutes, 1 minutes)({
-      fetchAllSpiders().foreach(ScheduleJobs.addSpiderScheduleJob)
-    })
-  }
 }
