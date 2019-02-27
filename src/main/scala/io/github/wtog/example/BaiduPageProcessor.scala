@@ -1,6 +1,7 @@
 package io.github.wtog.example
 
 import io.github.wtog.processor.{ Page, PageProcessor, RequestSetting }
+import scala.concurrent.duration._
 
 /**
  * @author : tong.wang
@@ -19,7 +20,9 @@ final case class BaiduPageProcessor() extends PageProcessor {
   override def requestSetting: RequestSetting = {
     RequestSetting(
       domain = "www.baidu.com",
-      headers = Map("Content-Type" -> "text/html; charset=GB2312"), useProxy = true)
+      headers = Map("Content-Type" -> "text/html; charset=GB2312"),
+      sleepTime = 3 seconds,
+      useProxy = true)
   }
 
   override def targetUrls: List[String] = List("http://www.baidu.com")

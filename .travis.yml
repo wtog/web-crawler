@@ -10,6 +10,7 @@ cache:
 language: scala
 
 script:
+  - sbt clean coverage test coverageReport
   - sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))'
     'set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char])'
     ++$TRAVIS_SCALA_VERSION compile publish
@@ -23,3 +24,6 @@ scala:
 jdk:
   - oraclejdk8
   - openjdk8
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t System.getenv("CODECOV_TOKEN")
