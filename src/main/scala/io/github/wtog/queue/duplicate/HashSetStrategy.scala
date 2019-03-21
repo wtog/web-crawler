@@ -1,10 +1,10 @@
 package io.github.wtog.queue.duplicate
 
 /**
- * @author : tong.wang
- * @since : 6/1/18 11:59 PM
- * @version : 1.0.0
- */
+  * @author : tong.wang
+  * @since : 6/1/18 11:59 PM
+  * @version : 1.0.0
+  */
 object HashSetStrategy extends DuplicateRemovedStrategy {
   var urlSet: Set[Int] = Set()
 

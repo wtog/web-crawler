@@ -11,6 +11,14 @@
             <appender-ref ref="STDOUT"/>
         </Logger>
 
+        <Logger name="org.quartz.core.QuartzScheduler" level="warn" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="org.quartz.impl.StdSchedulerFactory" level="warn" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
         <Root level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Root>
