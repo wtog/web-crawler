@@ -17,7 +17,7 @@ RUN ln -s /usr/lib/jvm/default-jvm/bin/jstack /usr/bin/jstack
 
 RUN rm -rf /openjdk8*
 
-ADD target/scala-2.12/web-crawler-assembly*.jar /apps/web-crawler.jar
+ADD target/scala-2.12/web-crawler-assembly.jar /apps/web-crawler.jar
 
 CMD ["java", "-jar", "/apps/web-crawler.jar"]
 

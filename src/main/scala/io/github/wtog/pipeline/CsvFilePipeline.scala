@@ -9,15 +9,15 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
 /**
- * @author : tong.wang
- * @since : 5/20/18 11:01 PM
- * @version : 1.0.0
- */
+  * @author : tong.wang
+  * @since : 5/20/18 11:01 PM
+  * @version : 1.0.0
+  */
 case class CsvFilePipeline(fileName: Option[String]) extends Pipeline {
 
-  override def process(pageResultItem: (String, Map[String, Any])): Unit = {
+  override def process[R](pageResultItem: (String, R)): Unit = {
     val (pageUrl, resultItems) = pageResultItem
-    IOContentCache.add(fileName.getOrElse(pageUrl), resultItems)
+    IOContentCache.add(fileName.getOrElse(pageUrl), resultItems.asInstanceOf[Map[String, Any]])
   }
 }
 
@@ -30,17 +30,20 @@ object IOContentCache {
     cache.put(key, listValue)
   }
 
-  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]]) = {
+  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]]) =
     if (contentList.nonEmpty) {
       val file = if (fileName.contains("/")) fileName.replace("/", "_") else fileName
 
-      val randomFile = new RandomAccessFile(s"/tmp/web-crawler-${file}-${Main.startTime}.csv", "rw")
+      val randomFile = new RandomAccessFile(
+        s"/tmp/web-crawler-${file}-${Main.startTime}.csv",
+        "rw"
+      )
       try {
         val fileLength = randomFile.length()
         randomFile.seek(fileLength) //指针指向文件末尾
         fileLength match {
           case 0 ⇒
-            val head = contentList.head
+            val head  = contentList.head
             val title = head.keys.mkString(",") + "\n"
             randomFile.write((title).getBytes("UTF-8"))
             val row = head.values.mkString(",") + "\n"
@@ -59,7 +62,6 @@ object IOContentCache {
         randomFile.close()
       }
     }
-  }
 
   val expire = {
     def removeExpire() = {
@@ -67,11 +69,10 @@ object IOContentCache {
       val schedule = Executors.newScheduledThreadPool(1)
 
       schedule.scheduleWithFixedDelay(new Runnable {
-        override def run(): Unit = {
+        override def run(): Unit =
           cache.asScala.foreach {
             case (url, list) ⇒ writeContentFile(url, list)
           }
-        }
       }, 3, 3, TimeUnit.SECONDS)
     }
 

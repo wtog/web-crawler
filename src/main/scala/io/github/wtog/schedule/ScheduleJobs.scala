@@ -1,52 +1,29 @@
 package io.github.wtog.schedule
 
-import io.github.wtog.spider.{ Spider, SpiderPool }
-import org.quartz._
 import org.quartz.impl.StdSchedulerFactory
-import org.quartz.JobBuilder
-import org.quartz.impl.matchers.GroupMatcher
+import org.quartz.{ JobBuilder, _ }
 
 /**
- * @author : tong.wang
- * @since : 2018-12-08 23:48
- * @version : 1.0.0
- */
+  * @author : tong.wang
+  * @since : 2018-12-08 23:48
+  * @version : 1.0.0
+  */
 object ScheduleJobs {
-  private val scheduler = new StdSchedulerFactory().getScheduler()
+  private lazy val scheduler = new StdSchedulerFactory().getScheduler()
 
-  def getScheduledJobs = {
-    import collection.JavaConverters._
+  def addJob[C <: Job](scheduleJob: ScheduleJob[C]): Unit =
+    if (!scheduler.checkExists(scheduleJob.jobKey)) {
+      val trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(scheduleJob.cronExpression)).build()
+      val job     = JobBuilder.newJob(scheduleJob.task).withIdentity(scheduleJob.jobKey).build
 
-    val groupNames = scheduler.getJobGroupNames.asScala
-
-    groupNames.flatMap { gn ⇒
-      val jobKey = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(gn)).asScala
-
-      jobKey.map(_.getName)
-    }
-  }
-
-  def addSpiderScheduleJob(spider: Spider) = {
-
-    if (!getScheduledJobs.contains(spider.name)) {
-      spider.pageProcessor.cronExpression.foreach { cronExpression ⇒
-        val job = JobBuilder.newJob(classOf[SpiderJob]).withIdentity(spider.name).build
-        val trigger = TriggerBuilder.newTrigger()
-          .withIdentity(spider.pageProcessor.requestSetting.domain)
-          .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-          .build()
-
-        scheduler.scheduleJob(job, trigger)
-        scheduler.start()
-      }
+      scheduler.scheduleJob(job, trigger)
+      scheduler.startDelayed(1)
     }
 
-  }
-
+  def shutdown() = scheduler.shutdown(true)
 }
 
-class SpiderJob() extends Job {
-  override def execute(jobExecutionContext: JobExecutionContext): Unit = {
-    SpiderPool.getSpiderByName(jobExecutionContext.getJobDetail.getKey.getName).foreach(_.restart())
-  }
+case class ScheduleJob[C <: Job](jobName: String, cronExpression: String, task: Class[C], groupName: Option[String] = None) {
+  val group  = groupName.getOrElse(jobName)
+  val jobKey = new JobKey(jobName, group)
 }

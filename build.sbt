@@ -13,11 +13,17 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= dependencies).
   settings(
     assemblyConfig
-  )
-  .settings(
+  ).
+  settings(
     addCompilerPlugin(scalafixSemanticdb),
     scalacOptions ++= List("-Yrangepos", "-Ywarn-unused-import")
-  )
+  ).
+  settings(
+    sourceDirectory in Jmh := (sourceDirectory in Test).value,
+    classDirectory in Jmh := (classDirectory in Test).value,
+    dependencyClasspath in Jmh := (dependencyClasspath in Test).value
+  ).
+  enablePlugins(JmhPlugin)
 
 lazy val commonSettings = Seq(
   name := "web-crawler",
@@ -32,7 +38,7 @@ mappings in(Compile, packageBin) ~= {
 }
 
 lazy val assemblyConfig = Seq(
-  assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",
+  assemblyJarName in assembly := s"web-crawler-assembly.jar",
   mainClass in Compile := Some("io.github.wtog.Main"),
   test in assembly := {},
   assemblyMergeStrategy in assembly := {
@@ -56,6 +62,5 @@ lazy val assemblyConfig = Seq(
 
 javaOptions := Seq(
   "-Dlog4j.configurationFile=log4j2.xml", 
-  "-Xmx512m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", 
-  s"-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/web-crawler-${System.currentTimeMillis()}.jfr"
+  "-Xms512m", "-Xmx512m"
 )

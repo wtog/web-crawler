@@ -7,7 +7,23 @@
     </Appenders>
 
     <Loggers>
-        <Root level="INFO" additivity="false">
+        <Logger name="io.github.wtog" level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="io.netty" level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="org.asynchttpclient" level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="org.quartz" level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
+        <Root level="debug" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Root>
     </Loggers>

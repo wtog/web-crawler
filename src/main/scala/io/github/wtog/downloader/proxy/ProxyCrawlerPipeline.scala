@@ -3,23 +3,27 @@ package io.github.wtog.downloader.proxy
 import io.github.wtog.pipeline.Pipeline
 
 /**
- * @author : tong.wang
- * @since : 6/2/18 11:57 PM
- * @version : 1.0.0
- */
+  * @author : tong.wang
+  * @since : 6/2/18 11:57 PM
+  * @version : 1.0.0
+  */
 object ProxyCrawlerPipeline extends Pipeline {
 
-  implicit def MapToProxyDTO(map: Map[String, Any]): ProxyDTO = {
+  implicit def MapToProxyDTO(map: Map[String, String]): ProxyDTO =
     ProxyDTO(
-      map("host").asInstanceOf[String],
-      Integer.valueOf(map.getOrElse("port", "80").toString),
-      Some(map.getOrElse("username", "").asInstanceOf[String]),
-      Some(map.getOrElse("password", "").asInstanceOf[String]))
-  }
+      map("host"),
+      map.getOrElse("port", "80").toInt,
+      map.get("username"),
+      map.get("password")
+    )
 
-  override def process(pageResultItem: (String, Map[String, Any])): Unit = {
-    val (_, result) = pageResultItem
+  override def process[R](pageResultItem: (String, R)): Unit = {
+    val (url, result) = pageResultItem
 
-    ProxyProvider.proxyList.offer(result)
+    val resultMap = result.asInstanceOf[Map[String, String]]
+    if (logger.isDebugEnabled) {
+      logger.debug(s"${url} => ${resultMap.slice(0, 3)}")
+    }
+    ProxyProvider.proxyList.offer(resultMap)
   }
 }

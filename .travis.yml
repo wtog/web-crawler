@@ -1,6 +1,11 @@
 # use Docker-based container (instead of OpenVZ)
 sudo: false
 
+branches:
+  only:
+    - master
+    - dev
+
 cache:
   directories:
     - $HOME/.m2/repository
@@ -10,11 +15,7 @@ cache:
 language: scala
 
 script:
-  - sbt clean coverage test coverageReport
-  - sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))'
-    'set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char])'
-    ++$TRAVIS_SCALA_VERSION compile publish
-
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
   - find $HOME/.sbt -name "*.lock" | xargs rm
 
 scala:
@@ -23,7 +24,19 @@ scala:
 
 jdk:
   - oraclejdk8
-  - openjdk8
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -t System.getenv("CODECOV_TOKEN")
+  - bash <(curl -s https://codecov.io/bash)
+  - git config user.email wtgeeker@163.com
+  - git config user.name wtog
+  - current=`git log | head -n 1 | awk '{print $2}'`
+  - if [ "$TRAVIS_BRANCH" = 'dev' ]; then \
+      git pull origin master:master \
+      git checkout master \
+      git merge $current \
+      git push \
+    else
+      sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))' \
+      'set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char])' \
+      ++$TRAVIS_SCALA_VERSION clean publish \
+    fi
