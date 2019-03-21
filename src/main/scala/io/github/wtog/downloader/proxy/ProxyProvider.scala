@@ -90,7 +90,7 @@ object ProxyProvider {
     Option(proxyList.peek()).filter(_.usability > 0.5)
   }
 
-  def requestWithProxy[httpResponse](useProxy: Boolean, httpRequest: (Option[ProxyDTO]) ⇒ httpResponse): httpResponse = {
+  def requestWithProxy[HttpResponse](useProxy: Boolean, httpRequest: (Option[ProxyDTO]) ⇒ HttpResponse): HttpResponse = {
     if (useProxy) {
       getProxy.fold(httpRequest(None)) {
         proxy ⇒

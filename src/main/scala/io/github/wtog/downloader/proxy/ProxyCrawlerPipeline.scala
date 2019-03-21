@@ -12,9 +12,9 @@ object ProxyCrawlerPipeline extends Pipeline {
   implicit def MapToProxyDTO(map: Map[String, Any]): ProxyDTO = {
     ProxyDTO(
       map("host").asInstanceOf[String],
-      Integer.valueOf(map.getOrElse("port", "80").toString),
-      Some(map.getOrElse("username", "").asInstanceOf[String]),
-      Some(map.getOrElse("password", "").asInstanceOf[String]))
+      map.getOrElse("port", "80").toString.toInt,
+      map.get("username").map(_.asInstanceOf[String]),
+      map.get("password").map(_.asInstanceOf[String]))
   }
 
   override def process(pageResultItem: (String, Map[String, Any])): Unit = {

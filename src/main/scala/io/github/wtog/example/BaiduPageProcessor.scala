@@ -8,13 +8,17 @@ import scala.concurrent.duration._
  * @since : 5/16/18 11:42 PM
  * @version : 1.0.0
  */
-final case class BaiduPageProcessor() extends PageProcessor {
+class BaiduPageProcessor() extends PageProcessor {
 
   override def process(page: Page): Unit = {
-    // 处理爬去结果
-    page.addPageResultItem(Map("title" -> page.title))
-    // 添加新的爬去连接
-    //    page.addTargetRequest("http://www.baidu.com")
+    val hotSearched = page.div("#content_right .opr-toplist1-table tr")
+
+    val href = hotSearched.select("td a").attr("href")
+    val content = hotSearched.select("td a").text()
+    val hot = hotSearched.select("td").last().text()
+
+    page.addPageResultItem(Map("href" -> href, "content" -> content, "hot" -> hot))
+
   }
 
   override def requestSetting: RequestSetting = {
@@ -25,7 +29,7 @@ final case class BaiduPageProcessor() extends PageProcessor {
       useProxy = true)
   }
 
-  override def targetUrls: List[String] = List("http://www.baidu.com")
+  override def targetUrls: List[String] = List("https://www.baidu.com/s?wd=web-crawler")
 
   override def cronExpression: Option[String] = Some("*/30 * * ? * *")
 }

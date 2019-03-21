@@ -25,9 +25,7 @@ class A2UPageProcessor extends ProxyProcessorTrait {
     })
   }
 
-  override def requestSetting: RequestSetting = {
-    RequestSetting(domain = "raw.githubusercontent.com", sleepTime = 5 seconds)
-  }
+  override def requestSetting: RequestSetting = RequestSetting(domain = "raw.githubusercontent.com", sleepTime = 3 seconds)
 
   override def targetUrls: List[String] = {
     List("https://raw.githubusercontent.com/a2u/free-proxy-list/master/free-proxy-list.txt")

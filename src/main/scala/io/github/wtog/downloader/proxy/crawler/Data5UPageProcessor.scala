@@ -1,6 +1,7 @@
 package io.github.wtog.downloader.proxy.crawler
 
 import io.github.wtog.processor.{ Page, RequestSetting }
+import scala.concurrent.duration._
 
 /**
  * @author : tong.wang
@@ -25,7 +26,9 @@ class Data5UPageProcessor extends ProxyProcessorTrait {
 
   }
 
-  override def requestSetting: RequestSetting = RequestSetting(domain = "www.data5u.com")
+  override def requestSetting: RequestSetting = RequestSetting(
+    domain = "www.data5u.com",
+    sleepTime = 2 second)
 
   override def targetUrls: List[String] = {
     List(

@@ -17,8 +17,8 @@ import scala.concurrent.{ Await, Future }
  */
 class DownloaderSpec extends BaseTest {
 
-  "http client" should "comparison" in {
-    val processor = BaiduPageProcessor().requestSetting.copy(domain = "top.baidu.com", url = Some("http://top.baidu.com/buzz?b=1&c=513&fr=topbuzz_b344_c513"))
+  test("apache httpclient and async httpclient comparison") {
+    val processor = new BaiduPageProcessor().requestSetting.copy(domain = "top.baidu.com", url = Some("http://top.baidu.com/buzz?b=1&c=513&fr=topbuzz_b344_c513"))
 
     val requestTimes = 60
     lazy val apacheJob = () ⇒ ApacheHttpClientDownloader.download(processor)

@@ -32,7 +32,7 @@ mappings in(Compile, packageBin) ~= {
 }
 
 lazy val assemblyConfig = Seq(
-  assemblyJarName in assembly := s"web-crawler-assembly-${ver}.jar",
+  assemblyJarName in assembly := s"web-crawler-assembly.jar",
   mainClass in Compile := Some("io.github.wtog.Main"),
   test in assembly := {},
   assemblyMergeStrategy in assembly := {
