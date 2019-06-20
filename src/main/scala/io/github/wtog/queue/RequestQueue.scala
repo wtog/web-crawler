@@ -1,7 +1,9 @@
 package io.github.wtog.queue
 
+import java.util.concurrent.TimeUnit
+
 import io.github.wtog.processor.RequestSetting
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * @author : tong.wang
@@ -13,9 +15,14 @@ trait RequestQueue {
 
   def push(request: RequestSetting)
 
-  def poll(): Option[RequestSetting]
+  def poll(): Option[RequestSetting] = {
+    doPoll().map { r =>
+      TimeUnit.MILLISECONDS.sleep(r.sleepTime.toMillis)
+      r
+    }
+  }
 
-  def take(): Option[RequestSetting]
+  protected def doPoll(): Option[RequestSetting]
 
   def isEmpty: Boolean
 
