@@ -30,4 +30,4 @@ after_success:
   - git config user.email wtgeeker@163.com
   - git config user.name wtog
   - current=`git log | head -n 1 | awk '{print $2}'`
-  - git fetch origin master:master; git checkout master; git merge $current -s recursive -X theirs; git push --set-upstream origin master;'
+  - git fetch origin master:master; git checkout master; git merge $current -s recursive -X theirs; git push --set-upstream origin master;

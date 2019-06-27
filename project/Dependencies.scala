@@ -8,9 +8,9 @@ import sbt._
 object Dependencies {
   
   object Versions {
-    lazy val akkaVersion = "2.5.22"
+    lazy val akkaVersion = "2.5.23"
     lazy val log4j2 = "2.11.0" 
-    lazy val json4s ="3.6.1" 
+    lazy val json4s ="3.6.6"
   }
   
   import Versions._
@@ -37,7 +37,7 @@ object Dependencies {
   
   lazy val test = Seq(
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
-    "org.scalatest" %% "scalatest" % "3.0.1" % Test)
+    "org.scalatest" %% "scalatest" % "3.0.8" % Test)
   
   val crossVersion = Seq("2.12.8", "2.11.12")
 
