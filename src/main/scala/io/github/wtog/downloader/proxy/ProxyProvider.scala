@@ -24,6 +24,8 @@ import scala.util.Try
 object ProxyProvider {
   lazy val logger: Logger = LoggerFactory.getLogger(ProxyProvider.getClass)
 
+  val checkThread = Executors.newFixedThreadPool(5)
+
   val proxyList: ArrayBlockingQueue[ProxyDTO] = new ArrayBlockingQueue[ProxyDTO](100)
 
   val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
@@ -54,7 +56,6 @@ object ProxyProvider {
 }
 
 class ProxyCheckScheduleJob extends Job {
-  private val checkThread = Executors.newFixedThreadPool(5)
 
   override def execute(context: JobExecutionContext): Unit = {
     def checkProxy() = Option(proxyList.poll()).foreach { proxy ⇒
