@@ -14,20 +14,20 @@ cache:
 language: scala
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+  - wget -q https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/chromedriver_linux64.zip
+  - unzip -x chromedriver_linux64.zip -d /opt
+  - sbt ';+clean ;+coverage ;+test ;+coverageReport'
   - find $HOME/.sbt -name "*.lock" | xargs rm
 
-scala:
-  - 2.12.8
-  - 2.11.12
-
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS"))' 'set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char])' ++$TRAVIS_SCALA_VERSION clean publish;
-  - git config user.email wtgeeker@163.com
-  - git config user.name wtog
+  - sbt ';set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("NEXUS_USER"), System.getenv("NEXUS_PASS")); set pgpPassphrase := Some("PGP_PASSPHRASE".toArray[Char]); +clean; +publish';
+  - git config --global user.email wtgeeker@163.com
+  - git config --global user.name wtog
   - current=`git log | head -n 1 | awk '{print $2}'`
-  - git fetch origin master:master; git checkout master; git merge $current -s recursive -X theirs; git push --set-upstream origin master;
+  - git fetch origin master:master; git checkout master; git merge $current -s recursive -X theirs --no-commit;
+  - git commit -m `git log $current --oneline | head -n 1 | awk '{print $2}'`
+  - git push --force --quiet "https://${GITHUB_TOKEN}@github.com/wtog/web-crawler.git" master:master

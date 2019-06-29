@@ -3,7 +3,7 @@ package io.github.wtog.test.proxy
 import java.util.concurrent.TimeUnit
 
 import io.github.wtog.downloader.proxy.ProxyProvider
-import io.github.wtog.downloader.proxy.crawler.{A2UPageProcessor, Data5UPageProcessor}
+import io.github.wtog.downloader.proxy.crawler.{A2UPageProcessor, Data5UPageProcessor, IP89Processor}
 import io.github.wtog.spider.Spider
 import io.github.wtog.test.BaseTest
 
@@ -33,4 +33,8 @@ class ProxyProviderTest extends BaseTest {
     TimeUnit.SECONDS.sleep(10)
   }
 
+  test("ip89 proxy") {
+    Spider(name = "89ip-proxy", pageProcessor = IP89Processor()).start()
+    TimeUnit.SECONDS.sleep(10)
+  }
 }

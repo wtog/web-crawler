@@ -3,42 +3,42 @@ package io.github.wtog.spider
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger }
 
-import akka.actor.{ ActorRef, Cancellable, PoisonPill, Props }
+import akka.actor.{ ActorRef, PoisonPill, Props }
 import io.github.wtog.actor.ActorManager
-import io.github.wtog.downloader.proxy.crawler.ProxyProcessorTrait
-import io.github.wtog.downloader.{ AsyncHttpClientDownloader, Downloader, DownloaderActorReceiver }
+import io.github.wtog.downloader.{ AsyncHttpClientDownloader, ChromeHeadlessConfig, ChromeHeadlessDownloader, Downloader, DownloaderActorReceiver }
 import io.github.wtog.dto.DownloadEvent
 import io.github.wtog.processor.PageProcessor
+import io.github.wtog.rest.Server
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import scala.concurrent.duration._
 
 /**
   * @author : tong.wang
   * @since : 4/10/18 11:34 AM
   * @version : 1.0.0
   */
-case class Spider(name: String = Thread.currentThread().getName, pageProcessor: PageProcessor, downloader: Downloader = AsyncHttpClientDownloader) {
+case class Spider(name: String = Thread.currentThread().getName, pageProcessor: PageProcessor, downloader: Downloader[_] = AsyncHttpClientDownloader) {
 
   private lazy val logger = LoggerFactory.getLogger(classOf[Spider])
 
-  val running: AtomicBoolean                      = new AtomicBoolean(false)
-  private var metircInfoCron: Option[Cancellable] = None
-  private var downloaderActorPath                 = ""
+  val running: AtomicBoolean      = new AtomicBoolean(false)
+  private var downloaderActorPath = ""
 
   def start(): Unit =
     if (!running.getAndSet(true)) {
+      if (downloader.isInstanceOf[ChromeHeadlessDownloader.type] && ChromeHeadlessConfig.chromeDriverNotExecutable) {
+        throw new IllegalStateException("""
+            |cant find chrome driver to execute.
+            |choose one chrome driver from https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/ to download and install into your system
+          """.stripMargin)
+      }
+
       val downloaderActor: ActorRef = getDownloadActor
       execute(downloaderActor)
       SpiderPool.addSpider(this)
-
-      if (logger.isDebugEnabled()) {
-        metircInfoCron = Option(
-          ActorManager.system.scheduler.schedule(2 seconds, 10 seconds)(CrawlMetric.metricInfo())
-        )
-      }
+      Server.start()
     }
 
   private def getDownloadActor: ActorRef = {
@@ -64,26 +64,23 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
       ActorManager.getExistedAcotr(downloaderActorPath) ! PoisonPill
       SpiderPool.removeSpider(this)
       this.CrawlMetric.clean()
-      metircInfoCron.foreach {
-        _.cancel()
-      }
     }
 
   private def execute(downloaderActor: ActorRef): Future[Unit] =
     Future {
-      this.pageProcessor.targetUrls.foreach(url ⇒ {
+      this.pageProcessor.targetUrls.foreach { url ⇒
         downloaderActor ! DownloadEvent(
-          this,
+          spider = this,
           request = pageProcessor.requestSetting.withUrl(url)
         )
         TimeUnit.MILLISECONDS.sleep(this.pageProcessor.requestSetting.sleepTime.toMillis)
-      })
+      }
     }
 
   object CrawlMetric {
-    val downloadPageSuccessNum = new AtomicInteger(0)
-    val downloadPageFailedNum  = new AtomicInteger(0)
-    val processPageSuccessNum  = new AtomicInteger(0)
+    private val downloadPageSuccessNum = new AtomicInteger(0)
+    private val downloadPageFailedNum  = new AtomicInteger(0)
+    private val processPageSuccessNum  = new AtomicInteger(0)
 
     def downloadedPageSum = downloadPageSuccessNum.get() + downloadPageFailedNum.get()
 
@@ -106,11 +103,12 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
       else downloadFailedCounter
     }
 
-    def metricInfo() =
-      if (downloadedPageSum > 0 && !pageProcessor.isInstanceOf[ProxyProcessorTrait])
-        logger.debug(
-          s"[${name}-spider] downloaded[${downloadedPageSum}] -> downloadSuccessed[${downloadPageSuccessNum}] -> processed[$processPageSuccessNum]"
-        )
+    def metricInfo() = Map(
+      "spider" -> name,
+      "total" -> downloadedPageSum,
+      "downloaded" -> downloadSuccessCounter,
+      "processed" -> processPageSuccessNum.get()
+    )
 
   }
 

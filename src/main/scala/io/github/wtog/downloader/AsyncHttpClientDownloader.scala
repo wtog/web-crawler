@@ -1,7 +1,5 @@
 package io.github.wtog.downloader
 
-import java.util.concurrent.ConcurrentHashMap
-
 import io.github.wtog.downloader.proxy.ProxyDTO
 import io.github.wtog.exceptions.IllegalArgumentsException
 import io.github.wtog.processor.{ Page, RequestSetting }
@@ -17,93 +15,76 @@ import scala.concurrent.{ Future, Promise, TimeoutException }
   * @since : 5/16/18 11:13 PM
   * @version : 1.0.0
   */
-object AsyncHttpClientDownloader extends Downloader {
+object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
 
-  private[this] val clientsPool = new ConcurrentHashMap[String, AsyncHttpClient]
-
-  private[this] def buildRequest(request: RequestSetting, proxyOpt: Option[ProxyDTO] = None): BoundRequestBuilder = {
-    val downclients = downloadClients(request)
-
-    val builder = request.method.toUpperCase match {
-      case "GET" ⇒
-        downclients.prepareGet(request.url.get)
-      case "POST" ⇒
-        downclients.preparePost(request.url.get)
-      case other ⇒
-        logger.warn(s"unknown httpmethod ${other}")
-        throw IllegalArgumentsException(other)
-    }
-
+  private[this] def buildRequest(driver: AsyncHttpClient, request: RequestSetting, proxyOpt: Option[ProxyDTO] = None): BoundRequestBuilder = {
     proxyOpt.foreach { proxy =>
-      buildProxy(proxy) { _ =>
-        new ProxyServer.Builder(proxy.host, proxy.port).build()
-      }
+      buildProxy(proxy)(p => new ProxyServer.Builder(p.host, p.port).build())
     }
+
+    val builder = builderMethod(driver, request.url.get, request.method)
 
     val httpHeaders = new DefaultHttpHeaders
     request.headers.foreach { case (k, v) ⇒ httpHeaders.add(k, v) }
     httpHeaders.add(HttpHeaderNames.USER_AGENT, request.userAgent)
     httpHeaders.add(HttpHeaderNames.ACCEPT_CHARSET, request.charset)
     builder.setHeaders(httpHeaders)
+
   }
 
-  private[this] def downloadClients(requestConfig: RequestSetting): AsyncHttpClient = {
-    val clientCache = Option(clientsPool.get(requestConfig.domain))
-
-    val domain = requestConfig.domain
-
-    clientCache.getOrElse {
-      val client = asyncHttpClient(
-        new DefaultAsyncHttpClientConfig.Builder()
-          .setRequestTimeout(requestConfig.timeOut)
-          .setConnectTimeout(requestConfig.timeOut)
-          .setFollowRedirect(true)
-          .setConnectionPoolCleanerPeriod(5)
-          .build()
-      )
-
-      clientsPool.put(domain, client)
-      client
+  def builderMethod(driver: AsyncHttpClient, url: String, method: String) =
+    method.toUpperCase match {
+      case "GET" ⇒
+        driver.prepareGet(url)
+      case "POST" ⇒
+        driver.preparePost(url)
+      case other ⇒
+        logger.warn(s"unknown httpmethod ${other}")
+        throw IllegalArgumentsException(other)
     }
-  }
 
   override def doDownload(request: RequestSetting): Future[Page] = {
     val response = executeRequest(request) { proxyOpt =>
       val promise = Promise[Response]
 
-      buildRequest(request, proxyOpt).execute(
-        new AsyncCompletionHandler[Response]() {
-          override def onCompleted(response: Response): Response = {
-            promise.success(response)
-            response
-          }
-
-          override def onThrowable(t: Throwable): Unit = {
-            if (t.isInstanceOf[TimeoutException]) {
-              logger.error("download error ", t)
-            }
-            promise.failure(t)
-          }
+      val client = getOrCreateClient(request)
+      buildRequest(client.driver, request, proxyOpt).execute(new AsyncCompletionHandler[Response]() {
+        override def onCompleted(response: Response): Response = {
+          promise.success(response)
+          client.decrement()
+          response
         }
-      )
+
+        override def onThrowable(t: Throwable): Unit = {
+          if (t.isInstanceOf[TimeoutException]) {
+            logger.error("download error ", t)
+          }
+          client.decrement()
+          promise.failure(t)
+        }
+      })
 
       promise.future
     }
 
-    response.map {
-      case response if response.getStatusCode == 200 ⇒
-        Page(
-          requestSetting = request,
-          bytes = Some(response.getResponseBodyAsBytes)
-        )
-      case response ⇒
-        if (logger.isDebugEnabled()) {
-          logger.debug(s"download return ${response.getStatusCode} with ${request}")
-        } else {
-          logger.warn(s"failed download ${request.url.get} ${response.getStatusCode}")
-        }
-        Page(requestSetting = request, isDownloadSuccess = false)
+    response.map { r =>
+      pageResult(request, Some(r.getResponseBodyAsBytes), r.getStatusCode == 200, Some(s"return ${r.getStatusCode}"))
     }(io.github.wtog.actor.ExecutionContexts.downloadDispatcher)
-
   }
+
+  def closeClient(): Unit = closeDownloaderClient { client =>
+    client.close()
+  }
+
+  override protected def getOrCreateClient(requestSetting: RequestSetting) =
+    getDownloaderClient(requestSetting.domain) {
+      asyncHttpClient(
+        new DefaultAsyncHttpClientConfig.Builder()
+          .setRequestTimeout(requestSetting.timeOut)
+          .setConnectTimeout(requestSetting.timeOut)
+          .setFollowRedirect(true)
+          .setConnectionPoolCleanerPeriod(5)
+          .build()
+      )
+    }
 }

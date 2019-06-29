@@ -2,28 +2,28 @@
 <configuration monitorInterval="30" status="warn" packages="org.apache.logging.log4j.core">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%level] from %logger in %thread - %message%n%xException"/>
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} [%level] %logger %thread - %message%n%xException"/>
         </Console>
     </Appenders>
 
     <Loggers>
-        <Logger name="io.github.wtog" level="info" additivity="false">
+        <Logger name="io.github.wtog" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Logger name="io.netty" level="info" additivity="false">
+        <Logger name="io.netty" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Logger name="org.asynchttpclient" level="info" additivity="false">
+        <Logger name="org.asynchttpclient" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Logger name="org.quartz" level="info" additivity="false">
+        <Logger name="org.quartz" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Root level="debug" additivity="false">
+        <Root level="info" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Root>
     </Loggers>

@@ -3,6 +3,7 @@ package io.github.wtog.selector
 import io.github.wtog.processor.Page
 import org.json4s.native.Serialization
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
 import scala.collection.mutable.ListBuffer
@@ -21,11 +22,25 @@ trait HtmlParser {
     val document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
 
     val title = document.title()
-    val body  = document.body()
+
+    val body = document.body()
+
+    implicit def elementsAsScala(elements: Elements): Seq[Element] = {
+      val buffer = new ListBuffer[Element]
+
+      val size = elements.size()
+      for (i <- 0 until size) {
+        buffer.append(elements.get(i))
+      }
+
+      buffer
+    }
 
     def div(element: String): Elements = document.select(element)
 
     def dom(query: String): Elements = document.select(query)
+
+    def table(query: String): Seq[Element] = document.select(s"table ${query}")
 
     def hrefs: Seq[String] = {
       val hrefs            = new ListBuffer[String]
@@ -51,6 +66,7 @@ trait HtmlParser {
 object HtmlParser {
 
   import org.json4s._
+  import org.json4s.jackson.Serialization.write
   import org.json4s.native.JsonMethods._
 
   implicit val serialize = Serialization.formats(NoTypeHints)
@@ -71,5 +87,9 @@ object HtmlParser {
   }
 
   def toMap(obj: Any) = Extraction.decompose(obj).extract[Map[String, Any]]
+
+  def toJson(map: Map[String, String]): String = write(map)
+
+  def toJson(list: List[Map[String, Any]]): String = write(list)
 
 }

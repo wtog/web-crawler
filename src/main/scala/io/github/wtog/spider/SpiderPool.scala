@@ -26,8 +26,7 @@ object SpiderPool {
     }
   }
 
-  def removeSpider(spider: Spider) =
-    spiders.remove(spider.name)
+  def removeSpider(spider: Spider) = spiders.remove(spider.name)
 
   def getSpiderByName(name: String): Option[Spider] = Option(spiders.get(name))
 

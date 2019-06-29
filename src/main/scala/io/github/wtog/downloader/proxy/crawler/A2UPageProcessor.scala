@@ -1,6 +1,8 @@
 package io.github.wtog.downloader.proxy.crawler
 
+import io.github.wtog.downloader.proxy.ProxyDTO
 import io.github.wtog.processor.{ Page, RequestSetting }
+
 import scala.concurrent.duration._
 
 /**
@@ -14,12 +16,9 @@ case class A2UPageProcessor() extends ProxyProcessorTrait {
     val proxyIpList = page.body.text().split(" ")
 
     proxyIpList.foreach(it ⇒ {
-      val ipAndPort                 = it.split(":")
-      var proxyIP: Map[String, Any] = Map()
-      proxyIP += ("host" -> ipAndPort(0))
-      proxyIP += ("port" -> ipAndPort(1))
-
-      page.addPageResultItem(proxyIP)
+      val ipAndPort = it.split(":")
+      val proxy     = ProxyDTO(ipAndPort.head, ipAndPort.last.toInt)
+      page.addPageResultItem(proxy)
     })
   }
 

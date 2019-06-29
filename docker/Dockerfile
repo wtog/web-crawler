@@ -14,8 +14,10 @@ RUN apk add openjdk8
 RUN ln -s /usr/lib/jvm/default-jvm/bin/jstat /usr/local/bin/jstat
 RUN ln -s /usr/lib/jvm/default-jvm/bin/jcmd /usr/bin/jcmd
 RUN ln -s /usr/lib/jvm/default-jvm/bin/jstack /usr/bin/jstack
-
 RUN rm -rf /openjdk8*
+
+RUN wget https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/chromedriver_linux64.zip
+RUN unzip -x chromedriver_linux64.zip -d /opt
 
 ADD target/scala-2.12/web-crawler-assembly.jar /apps/web-crawler.jar
 

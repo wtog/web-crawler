@@ -1,6 +1,8 @@
 package io.github.wtog.downloader.proxy.crawler
 
+import io.github.wtog.downloader.proxy.ProxyDTO
 import io.github.wtog.processor.{ Page, RequestSetting }
+
 import scala.concurrent.duration._
 
 /**
@@ -18,7 +20,8 @@ case class Data5UPageProcessor() extends ProxyProcessorTrait {
       val ip   = ipRow.get(i).select("span:nth-child(1)").text()
       val port = ipRow.get(i).select("span:nth-child(2)").text()
 
-      page.addPageResultItem(Map("host" -> ip, "port" -> port))
+      val proxy = ProxyDTO(ip, port.toInt)
+      page.addPageResultItem(proxy)
     })
 
   }

@@ -4,6 +4,7 @@ import java.io.RandomAccessFile
 import java.util.concurrent._
 
 import io.github.wtog.Main
+import org.apache.logging.log4j.scala.Logging
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -21,7 +22,7 @@ case class CsvFilePipeline(fileName: Option[String]) extends Pipeline {
   }
 }
 
-object IOContentCache {
+object IOContentCache extends Logging {
   private val cache: ConcurrentHashMap[String, ListBuffer[Map[String, Any]]] = new ConcurrentHashMap[String, ListBuffer[Map[String, Any]]]()
 
   def add(key: String, value: Map[String, Any]) = {
@@ -82,7 +83,7 @@ object IOContentCache {
       removeExpire()
     }.recover {
       case ex ⇒
-        println(ex.getLocalizedMessage)
+        logger.error(ex.getLocalizedMessage)
         removeExpire()
     }
   }

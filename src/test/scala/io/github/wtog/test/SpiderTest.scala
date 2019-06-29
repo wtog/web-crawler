@@ -1,6 +1,9 @@
 package io.github.wtog.test
 
-import io.github.wtog.example.BaiduPageProcessor
+import java.util.concurrent.TimeUnit
+
+import io.github.wtog.downloader.ChromeHeadlessDownloader
+import io.github.wtog.example.{BaiduPageProcessor, ZhihuAnswerPageProcessor}
 import io.github.wtog.pipeline.Pipeline
 import io.github.wtog.spider.Spider
 
@@ -23,4 +26,8 @@ class SpiderTest extends BaseTest {
     Spider(name = "baidu", pageProcessor = BaiduPageSpecProcessor).start()
   }
 
+  test("crawl with chrome headless") {
+    Spider(name = "zhihu", pageProcessor = ZhihuAnswerPageProcessor(), downloader = ChromeHeadlessDownloader).start()
+    TimeUnit.SECONDS.sleep(15)
+  }
 }

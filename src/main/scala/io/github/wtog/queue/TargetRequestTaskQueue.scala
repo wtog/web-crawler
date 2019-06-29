@@ -3,7 +3,7 @@ package io.github.wtog.queue
 import java.util.concurrent.LinkedBlockingQueue
 
 import io.github.wtog.processor.RequestSetting
-import io.github.wtog.queue.duplicate.{DuplicateRemovedStrategy, HashSetStrategy}
+import io.github.wtog.queue.duplicate.{ DuplicateRemovedStrategy, HashSetStrategy }
 
 /**
   * @author : tong.wang

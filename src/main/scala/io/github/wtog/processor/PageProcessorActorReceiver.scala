@@ -2,15 +2,15 @@ package io.github.wtog.processor
 
 import java.util.concurrent.LinkedBlockingQueue
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ Actor, ActorRef, Props }
 import io.github.wtog.actor.ExecutionContexts.processorDispatcher
-import io.github.wtog.dto.{DownloadEvent, PipelineEvent, ProcessorEvent}
-import io.github.wtog.pipeline.{Pipeline, PipelineActorReceiver}
+import io.github.wtog.dto.{ DownloadEvent, PipelineEvent, ProcessorEvent }
+import io.github.wtog.pipeline.{ Pipeline, PipelineActorReceiver }
 import io.github.wtog.queue.RequestQueue
 import io.github.wtog.spider.Spider
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{ Logger, LoggerFactory }
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 /**
   * @author : tong.wang

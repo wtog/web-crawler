@@ -5,8 +5,6 @@ lazy val ver = "0.1.2-SNAPSHOT"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
-crossScalaVersions := crossVersion
-
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
@@ -30,7 +28,8 @@ lazy val commonSettings = Seq(
   organization := "io.github.wtog",
   version := ver,
   scalaVersion := crossVersion.head,
-  fork := true
+  fork := true,
+  crossScalaVersions := crossVersion
 )
 
 mappings in(Compile, packageBin) ~= {
@@ -60,7 +59,16 @@ lazy val assemblyConfig = Seq(
   }
 )
 
-javaOptions := Seq(
-  "-Dlog4j.configurationFile=log4j2.xml", 
+parallelExecution in Test := true
+
+testOptions in Test += Tests.Argument(s"-P${java.lang.Runtime.getRuntime.availableProcessors()}")
+
+javaOptions in test := Seq(
+  "-Dlog4j.configurationFile=log4j2-test.xml",
+  "-Xms512m", "-Xmx512m"
+)
+
+javaOptions in run := Seq(
+  "-Dlog4j.configurationFile=log4j2.xml",
   "-Xms512m", "-Xmx512m"
 )
