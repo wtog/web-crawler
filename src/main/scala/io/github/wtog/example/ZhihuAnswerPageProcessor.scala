@@ -12,7 +12,7 @@ case class ZhihuAnswerPageProcessor() extends PageProcessor {
   override def doProcess(page: Page): Unit = {
     val content = page.div("pre")
 
-    val result = page.json(Some(content.text())).asInstanceOf[Map[String, Any]]
+    val result = page.json[Map[String, Any]](Some(content.text()))
 
     result.get("data").foreach { answers =>
       answers.asInstanceOf[List[Map[String, Any]]].foreach { answer =>

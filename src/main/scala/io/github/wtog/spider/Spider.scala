@@ -104,10 +104,10 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
     }
 
     def metricInfo() = Map(
-      "spider" -> name,
-      "total" -> downloadedPageSum,
+      "spider"     -> name,
+      "total"      -> downloadedPageSum,
       "downloaded" -> downloadSuccessCounter,
-      "processed" -> processPageSuccessNum.get()
+      "processed"  -> processPageSuccessNum.get()
     )
 
   }

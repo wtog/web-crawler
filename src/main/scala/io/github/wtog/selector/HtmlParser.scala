@@ -1,7 +1,7 @@
 package io.github.wtog.selector
 
 import io.github.wtog.processor.Page
-import org.json4s.native.Serialization
+import io.github.wtog.utils.JsonUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -57,7 +57,7 @@ trait HtmlParser {
       hrefs
     }
 
-    def json(text: Option[String] = None) = parseJson(text.getOrElse(page.source))
+    def json[T: Manifest](text: Option[String] = None) = parseJson[T](text.getOrElse(page.source))
 
   }
 
@@ -65,31 +65,8 @@ trait HtmlParser {
 
 object HtmlParser {
 
-  import org.json4s._
-  import org.json4s.jackson.Serialization.write
-  import org.json4s.native.JsonMethods._
+  def parseJson(json: String, key: String): Option[Any] = JsonUtils.parseFrom[Map[String, Any]](json).get(key)
 
-  implicit val serialize = Serialization.formats(NoTypeHints)
-  implicit val formats   = DefaultFormats
-
-  def parseJson(json: String, key: String) = parse(json) \\ key match {
-    case JInt(num) ⇒ num.intValue()
-    case other     ⇒ other
-  }
-
-  def parseJson(json: String) = parse(json) match {
-    case result: JArray =>
-      result.extract[List[Map[String, Any]]]
-    case result: JValue =>
-      result.extract[Map[String, Any]]
-    case other =>
-      throw new IllegalArgumentException(s"unknown json type ${other}")
-  }
-
-  def toMap(obj: Any) = Extraction.decompose(obj).extract[Map[String, Any]]
-
-  def toJson(map: Map[String, String]): String = write(map)
-
-  def toJson(list: List[Map[String, Any]]): String = write(list)
+  def parseJson[T: Manifest](json: String) = JsonUtils.parseFrom[T](json)
 
 }

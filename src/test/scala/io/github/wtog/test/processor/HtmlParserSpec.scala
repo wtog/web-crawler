@@ -20,7 +20,7 @@ class HtmlParserSpec extends BaseTest with HtmlParser {
         |}
       """.stripMargin
 
-    val pageJson = Page(bytes = Some(pageJsonObj.getBytes()), requestSetting = RequestSetting()).json().asInstanceOf[Map[String, Any]]
+    val pageJson = Page(bytes = Some(pageJsonObj.getBytes()), requestSetting = RequestSetting()).json[Map[String, Any]]()
 
     assert(pageJson("id") == 1)
     assert(pageJson("name") == "test")
@@ -35,7 +35,7 @@ class HtmlParserSpec extends BaseTest with HtmlParser {
         |]
       """.stripMargin
 
-    val pageJsonList = Page(bytes = Some(pageListJson.getBytes()), requestSetting = RequestSetting()).json().asInstanceOf[List[Map[String, Any]]]
+    val pageJsonList = Page(bytes = Some(pageListJson.getBytes()), requestSetting = RequestSetting()).json[List[Map[String, Any]]]()
 
     assert(pageJsonList.head("id") == 1)
     assert(pageJsonList.head("name") == "test")

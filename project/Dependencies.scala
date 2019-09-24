@@ -13,6 +13,7 @@ object Dependencies {
     val json4s ="3.6.6"
     val seleniumhq ="4.0.0-alpha-2"
     val httpClient = "2.10.1"
+    val jackson = "2.9.10"
   }
   
   import Versions._
@@ -38,9 +39,7 @@ object Dependencies {
     "org.seleniumhq.selenium" % "selenium-chrome-driver" % seleniumhq
   )
   
-  lazy val json = Seq(
-    "org.json4s" %% "json4s-native" % json4s,
-    "org.json4s" %% "json4s-jackson" % json4s)
+  lazy val json = Seq("com.fasterxml.jackson.module" %% "jackson-module-scala" % jackson)
   
   lazy val test = Seq(
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,

@@ -27,7 +27,8 @@ class DownloaderActorReceiver extends Actor {
       spider.downloader.download(spider, downloadEvent.request).foreach {
         case page if page.isDownloadSuccess ⇒
           processorActor ! ProcessorEvent(spider, page)
-        case _ =>
+        case page =>
+          logger.warn(s"page failed to download cause ${page.source}")
       }
     case other ⇒
       logger.warn(s"${self.path} reviced wrong msg ${other}")
