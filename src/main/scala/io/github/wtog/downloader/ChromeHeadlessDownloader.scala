@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.{ ChromeDriver, ChromeOptions }
 import org.openqa.selenium.remote.UnreachableBrowserException
 
 import scala.concurrent.Future
+import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -26,7 +27,8 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
       try {
         val driver = client.driver
         driver.get(requestSetting.url.get)
-        val pageSource = driver.getPageSource
+        //fix
+        val pageSource = Try(driver.findElementByTagName("pre").getText).getOrElse(driver.getPageSource)
         pageResult(requestSetting = requestSetting, results = Some(pageSource.getBytes))
       } catch {
         case NonFatal(exception) =>
@@ -41,6 +43,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     System.setProperty("webdriver.chrome.driver", chromeDriverPath)
     System.setProperty("webdriver.chrome.logfile", chromeDriverLog)
     val options = new ChromeOptions()
+
     options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200", "--ignore-certificate-errors")
 
     new ChromeDriver(options)
@@ -62,7 +65,7 @@ object ChromeHeadlessConfig {
   lazy val chromeDriverPath = ConfigUtils.getStringOpt("web-crawler.chrome.driver").getOrElse("/opt/chromedriver")
   lazy val chromeDriverLog  = ConfigUtils.getStringOpt("web-crawler.chrome.log").getOrElse("/tmp/chromedriver.log")
 
-  def chromeDriverNotExecutable = {
+  def chromeDriverNotExecutable: Boolean = {
     val file       = new File(chromeDriverPath)
     val canExecute = file.exists() && file.canExecute
     !canExecute

@@ -8,7 +8,6 @@ import io.github.wtog.actor.ActorManager
 import io.github.wtog.downloader.{ AsyncHttpClientDownloader, ChromeHeadlessConfig, ChromeHeadlessDownloader, Downloader, DownloaderActorReceiver }
 import io.github.wtog.dto.DownloadEvent
 import io.github.wtog.processor.PageProcessor
-import io.github.wtog.rest.Server
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -38,7 +37,6 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
       val downloaderActor: ActorRef = getDownloadActor
       execute(downloaderActor)
       SpiderPool.addSpider(this)
-      Server.start()
     }
 
   private def getDownloadActor: ActorRef = {
@@ -104,10 +102,10 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
     }
 
     def metricInfo() = Map(
-      "spider" -> name,
-      "total" -> downloadedPageSum,
+      "spider"     -> name,
+      "total"      -> downloadedPageSum,
       "downloaded" -> downloadSuccessCounter,
-      "processed" -> processPageSuccessNum.get()
+      "processed"  -> processPageSuccessNum.get()
     )
 
   }

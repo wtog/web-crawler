@@ -11,6 +11,10 @@
             <appender-ref ref="STDOUT"/>
         </Logger>
 
+        <Logger name="org.openqa.selenimu" level="debug" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
         <Logger name="io.netty" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>

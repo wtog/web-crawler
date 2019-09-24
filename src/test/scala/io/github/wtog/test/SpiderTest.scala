@@ -28,6 +28,6 @@ class SpiderTest extends BaseTest {
 
   test("crawl with chrome headless") {
     Spider(name = "zhihu", pageProcessor = ZhihuAnswerPageProcessor(), downloader = ChromeHeadlessDownloader).start()
-    TimeUnit.SECONDS.sleep(15)
+    TimeUnit.SECONDS.sleep(30)
   }
 }

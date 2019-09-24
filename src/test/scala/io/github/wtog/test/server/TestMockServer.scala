@@ -2,6 +2,7 @@ package io.github.wtog.test.server
 
 import io.github.wtog.rest.{Router, Server}
 import io.github.wtog.selector.HtmlParser
+import io.github.wtog.utils.JsonUtils
 import io.netty.handler.codec.http.FullHttpRequest
 
 import scala.collection.JavaConverters._
@@ -25,6 +26,6 @@ object TestMockRoute extends Router {
       map ++ Map(entry.getKey -> entry.getValue)
     }
 
-    HtmlParser.toJson(resp).getBytes()
+    JsonUtils.toJson(resp).getBytes()
   }
 }

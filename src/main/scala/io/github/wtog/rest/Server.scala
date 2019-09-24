@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import io.github.wtog.utils.ConfigUtils
 import org.apache.logging.log4j.scala.Logging
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 
 /**

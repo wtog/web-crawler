@@ -23,17 +23,17 @@ class ProxyProviderTest extends BaseTest {
 
   }
 
-  test("a2u proxy") {
+  ignore("a2u proxy") {
     Spider(name = "a2u-proxy", pageProcessor = A2UPageProcessor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
 
-  test("data5u proxy") {
+  ignore("data5u proxy") {
     Spider(name = "data5u-proxy", pageProcessor = Data5UPageProcessor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
 
-  test("ip89 proxy") {
+  ignore("ip89 proxy") {
     Spider(name = "89ip-proxy", pageProcessor = IP89Processor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
