@@ -8,6 +8,7 @@ import io.github.wtog.actor.ExecutionContexts.processorDispatcher
 import io.github.wtog.pipeline.{ ConsolePipeline, Pipeline }
 import io.github.wtog.queue.TargetRequestTaskQueue
 import io.github.wtog.selector.HtmlParser
+import io.github.wtog.selector.HtmlParser.parseJson
 import io.github.wtog.utils.CharsetUtils
 
 import scala.concurrent.Future
@@ -74,6 +75,8 @@ case class Page(isDownloadSuccess: Boolean = true, bytes: Option[Array[Byte]] = 
     case None ⇒
       throw new IllegalStateException("no page source text found ")
   }
+
+  def json[T: Manifest](text: Option[String] = None) = parseJson[T](text.getOrElse(this.source))
 
   def addTargetRequest(urlAdd: String): Unit = addRequest(this.requestSetting.withUrl(url = urlAdd))
 

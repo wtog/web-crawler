@@ -23,6 +23,7 @@ trait BaseTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   override def beforeAll() = {
     System.getProperty("config.resource", "application-test.conf")
+    System.getProperty("log4j.resource", "log4j2-test.xml")
     if (!Server.running)
       TestMockServer.start
   }

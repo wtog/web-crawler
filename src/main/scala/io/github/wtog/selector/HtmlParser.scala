@@ -6,7 +6,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 /**
   * @author : tong.wang
@@ -17,55 +17,42 @@ trait HtmlParser {
 
   implicit class PageWrapper(page: Page) {
 
-    import io.github.wtog.selector.HtmlParser._
-
     val document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
 
     val title = document.title()
 
     val body = document.body()
 
-    implicit def elementsAsScala(elements: Elements): Seq[Element] = {
-      val buffer = new ListBuffer[Element]
-
-      val size = elements.size()
-      for (i <- 0 until size) {
-        buffer.append(elements.get(i))
-      }
-
-      buffer
-    }
-
     def div(element: String): Elements = document.select(element)
 
     def dom(query: String): Elements = document.select(query)
 
-    def table(query: String): Seq[Element] = document.select(s"table ${query}")
+    def table(query: String): Seq[Element] = document.select(s"table ${query}").asScala
 
-    def hrefs: Seq[String] = {
-      val hrefs            = new ListBuffer[String]
-      val elementsIterator = document.select("a").listIterator()
-      while (elementsIterator.hasNext) {
-        val element = elementsIterator.next()
-        element.attr("href") match {
-          case h if h.startsWith("http") ⇒
-            hrefs.append(element.attr("href"))
-          case _ ⇒
-        }
-      }
-
-      hrefs
+    def hrefs: Seq[String] = document.select("a").toSeq.collect {
+      case e if e.attr("href").startsWith("http") =>
+        e.attr("href")
     }
 
-    def json[T: Manifest](text: Option[String] = None) = parseJson[T](text.getOrElse(page.source))
+  }
 
+  implicit class ElementsWrapper(elements: Elements) {
+    def getText(query: String): String = elements.select(query).text()
+
+    def getElements(query: String): Elements = elements.select(query)
+
+    def toSeq: Seq[Element] = elements.asScala
+  }
+
+  implicit class ElementWrapper(element: Element) {
+    def getText(query: String): String = element.select(query).text()
   }
 
 }
 
 object HtmlParser {
 
-  def parseJson(json: String, key: String): Option[Any] = JsonUtils.parseFrom[Map[String, Any]](json).get(key)
+  def getValueFromJson[T: Manifest](json: String, key: String): Option[T] = JsonUtils.parseFrom[Map[String, T]](json).get(key)
 
   def parseJson[T: Manifest](json: String) = JsonUtils.parseFrom[T](json)
 
