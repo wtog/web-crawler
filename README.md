@@ -60,18 +60,18 @@
 - sbt
 
   1. sbt assembly # 打 jar 包
-  2. java -jar target/scala-2.12/web-crawler-assembly.jar
+  2. java -jar crawler-example/target/scala-2.12/web-crawler-assembly.jar
 
 - docker
 
-  1. build image
+  1. build
   
       ```docker
-      docker build -f docker/Dockerfile -t web-crawler:0.1.0 .
+      sh docker/build.sh
       ```
     
   2. start container
   
       ```docker
-      docker run -it --init --name web-crawler web-crawler:0.1.0 java -jar /apps/web-crawler.jar
+      docker run -it --init --name web-crawler wtog/web-crawler:latest
       ```
