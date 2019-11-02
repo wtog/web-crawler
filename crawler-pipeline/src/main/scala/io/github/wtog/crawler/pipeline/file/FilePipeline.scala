@@ -35,6 +35,8 @@ case class FilePipeline(fileBaseDir: Option[String] = None) extends Pipeline {
   }
 
   def filePathFormat(path: String): String = if (path.startsWith("/")) path else s"/${path}"
+
+  override def init(): Unit = {}
 }
 
 case class FileDTO(fileName: String, fileType: String = "html", content: String)

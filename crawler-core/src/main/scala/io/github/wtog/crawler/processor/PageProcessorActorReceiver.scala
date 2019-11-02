@@ -2,7 +2,7 @@ package io.github.wtog.crawler.processor
 
 import java.util.concurrent.LinkedBlockingQueue
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.{ Actor, ActorRef, PoisonPill, Props }
 import io.github.wtog.crawler.actor.ExecutionContexts.processorDispatcher
 import io.github.wtog.crawler.dto.{ DownloadEvent, PipelineEvent, ProcessorEvent }
 import io.github.wtog.crawler.pipeline.{ Pipeline, PipelineActorReceiver }
@@ -31,9 +31,7 @@ class PageProcessorActorReceiver extends Actor {
 
       spider.pageProcessor.process(page).onComplete {
         case Success(_) ⇒
-          pipelineProcess(page.requestSetting.url.get, page.resultItems)(
-            spider.pageProcessor.pipelines
-          )
+          pipelineProcess(page.requestSetting.url.get, page.resultItems)(spider.pageProcessor.pipelines)(downloadSender)
           spider.CrawlMetric.processedSuccessCounter
 
           continueRequest(page.requestQueue)(spider)(downloadSender)
@@ -47,10 +45,13 @@ class PageProcessorActorReceiver extends Actor {
       logger.warn(s"${self.path} reviced wrong msg ${other}")
   }
 
-  private[this] def pipelineProcess(url: String, pageResultItems: LinkedBlockingQueue[Any])(pipelines: Set[Pipeline]): Unit =
+  private[this] def pipelineProcess(url: String, pageResultItems: LinkedBlockingQueue[Any])(pipelines: Set[Pipeline])(downloadSender: ActorRef): Unit =
     while (!pageResultItems.isEmpty) {
       Option(pageResultItems.poll()).foreach { item ⇒
-        pipelineActor ! PipelineEvent(pipelines, (url, item))
+        PipelineEvent(pipelines, (url, item)).initPipelines() match {
+          case Some(e) => pipelineActor ! e
+          case None    => downloadSender ! PoisonPill
+        }
       }
     }
 

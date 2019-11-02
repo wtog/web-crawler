@@ -7,11 +7,11 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="io.github.wtog.crawler.pipeline" level="trace" additivity="false">
+        <Logger name="io.github.wtog.crawler" level="debug" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Logger name="org.openqa.selenimu" level="debug" additivity="false">
+        <Logger name="org.openqa.selenimu" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 
@@ -19,7 +19,7 @@
             <appender-ref ref="STDOUT"/>
         </Logger>
 
-        <Logger name="org.asynchttpclient" level="debug" additivity="false">
+        <Logger name="org.asynchttpclient" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>
 

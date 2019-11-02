@@ -20,6 +20,8 @@ case class CsvFilePipeline(fileName: Option[String]) extends Pipeline {
     val (pageUrl, resultItems) = pageResultItem
     IOContentCache.add(fileName.getOrElse(pageUrl), resultItems.asInstanceOf[Map[String, Any]])
   }
+
+  override def init(): Unit = {}
 }
 
 object IOContentCache extends Logging {

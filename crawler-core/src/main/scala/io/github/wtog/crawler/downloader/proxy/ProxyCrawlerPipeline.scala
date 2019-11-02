@@ -13,9 +13,9 @@ object ProxyCrawlerPipeline extends Pipeline {
     val (url, result) = pageResultItem
 
     val resultMap = result.asInstanceOf[ProxyDTO]
-    if (logger.isDebugEnabled) {
-      logger.debug(s"${url} => ${resultMap}")
-    }
+    logger.trace(s"${url} => ${resultMap}")
     ProxyProvider.proxyList.offer(resultMap)
   }
+
+  override def init(): Unit = {}
 }

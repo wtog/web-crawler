@@ -6,17 +6,14 @@ import io.github.wtog.crawler.processor.{Page, PageProcessor, RequestSetting}
 import io.github.wtog.crawler.rest.Server
 import io.github.wtog.crawler.test.server.TestMockServer
 import io.github.wtog.utils.ConfigUtils
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import io.github.wtog.utils.test.BaseTest
 
 /**
   * @author : tong.wang
   * @since : 5/16/18 9:19 PM
   * @version : 1.0.0
   */
-trait BaseTest extends FunSuite with Matchers with BeforeAndAfterAll {
+trait BaseCoreTest extends BaseTest {
 
   lazy val port = ConfigUtils.getIntOpt("crawler.server.port").getOrElse(19000)
 
@@ -64,5 +61,4 @@ trait BaseTest extends FunSuite with Matchers with BeforeAndAfterAll {
     }
   }
 
-  def await[T](future: => Future[T]) = Await.result(future, 1 minute)
 }

@@ -59,7 +59,7 @@
     
 - sbt
 
-  1. sbt assembly # 打 jar 包
+  1. sbt 'project example; assembly' # 打 jar 包
   2. java -jar crawler-example/target/scala-2.12/web-crawler-assembly.jar
 
 - docker

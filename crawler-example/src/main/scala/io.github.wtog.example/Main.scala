@@ -28,10 +28,7 @@ object Main {
       case args: Array[String] if args.contains("0") ⇒
         println("executing all processors")
         processorList
-      case args: Array[String]
-          if (args.nonEmpty && args.toSeq.forall(
-            arg ⇒ Try(arg.toInt).isSuccess
-          )) ⇒
+      case args: Array[String] if (args.nonEmpty && args.toSeq.forall(arg ⇒ Try(arg.toInt).isSuccess)) ⇒
         val processors = processorList.filter {
           case (_, order) ⇒
             args.contains(order.toString)

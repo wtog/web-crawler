@@ -30,6 +30,7 @@ lazy val utils = (project in file("utils"))
   .settings(jmhSettings: _*)
   .settings(Seq(name := "utils", organization := "io.github.wtog.utils"))
   .settings(libraryDependencies ++= Dependencies.utils.dependencies)
+  .enablePlugins(JmhPlugin)
   .disablePlugins(AssemblyPlugin)
 
 lazy val core = (project in file("crawler-core"))

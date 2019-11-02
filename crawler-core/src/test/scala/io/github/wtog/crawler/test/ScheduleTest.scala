@@ -10,7 +10,7 @@ import org.quartz.{Job, JobExecutionContext}
   * @since : 2019-05-12 23:11
   * @version : 1.0.0
   */
-class ScheduleTest extends BaseTest with Job {
+class ScheduleTest extends BaseCoreTest with Job {
 
   val intervalPrintJob = ScheduleJob(jobName = "intervalPrintJob", cronExpression = "*/1 * * ? * *", classOf[ScheduleTest], groupName = Some("test"))
 
