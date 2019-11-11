@@ -75,8 +75,10 @@ object Dependencies {
     val pg: ModuleID = "org.postgresql" % "postgresql" % postgresql
 
     val hikari = "com.zaxxer" % "HikariCP" % Versions.hikariCP
+
+    lazy val h2 = "com.h2database" % "h2" % "1.4.192"
     
-    lazy val dependencies = scalatest.test +: Seq(pg, hikari).map(_.provided)
+    lazy val dependencies = Seq(scalatest, h2).map(_.test) ++ Seq(pg, hikari).map(_.provided)
   }
 
   object example {

@@ -24,6 +24,8 @@ lazy val commonSettings = Seq(
   parallelExecution in Test := true
 )
 
+lazy val dependenciesScope = "compile->compile;test->test"
+
 lazy val utils = (project in file("utils"))
   .settings(commonSettings: _*)
   .settings(scalafixSettings: _*)
@@ -39,7 +41,7 @@ lazy val core = (project in file("crawler-core"))
   .settings(jmhSettings: _*)
   .settings(Seq(name := "crawler-core", organization := "io.github.wtog.crawler"))
   .settings(libraryDependencies ++= Dependencies.core.dependencies)
-  .dependsOn(utils)
+  .dependsOn(utils % dependenciesScope)
   .disablePlugins(AssemblyPlugin)
 
 lazy val pipeline = (project in file("crawler-pipeline"))
@@ -48,7 +50,7 @@ lazy val pipeline = (project in file("crawler-pipeline"))
   .settings(jmhSettings: _*)
   .settings(Seq(name := "crawler-pipeline", organization := "io.github.wtog.crawler.pipeline"))
   .settings(libraryDependencies ++= Dependencies.pipeline.dependencies)
-  .dependsOn(core)
+  .dependsOn(core, utils % dependenciesScope)
   .disablePlugins(AssemblyPlugin)
 
 lazy val example = (project in file("crawler-example"))

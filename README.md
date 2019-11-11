@@ -55,7 +55,7 @@
   Spider(name = "zhihu", pageProcessor = ZhihuAnswerPageProcessor()).start() 
   ```
 
-  [更多例子](https://github.com/wtog/web-crawler/tree/master/src/main/scala/io/github/wtog/example)
+  [更多例子](https://github.com/wtog/web-crawler/tree/master/crawler-example/src/main/scala/io.github.wtog.example)
     
 - sbt
 
