@@ -2,7 +2,7 @@ package io.github.wtog.crawler.test.download
 
 import io.github.wtog.crawler.downloader.{AsyncHttpClientDownloader, ChromeHeadlessDownloader}
 import io.github.wtog.crawler.spider.Spider
-import io.github.wtog.crawler.test.BaseTest
+import io.github.wtog.crawler.test.BaseCoreTest
 import org.scalatest.BeforeAndAfter
 
 /**
@@ -10,7 +10,7 @@ import org.scalatest.BeforeAndAfter
   * @since : 5/20/18 11:22 AM
   * @version : 1.0.0
   */
-class DownloaderTest extends BaseTest with BeforeAndAfter {
+class DownloaderTest extends BaseCoreTest with BeforeAndAfter {
 
   after {
     ChromeHeadlessDownloader.closeClient()

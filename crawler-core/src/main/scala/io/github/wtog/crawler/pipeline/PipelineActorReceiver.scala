@@ -21,7 +21,7 @@ class PipelineActorReceiver extends Actor {
         pipelineEvent.pipelineList
       }
 
-      pipelineList.foreach(_.process(pipelineEvent.pageResultItems))
+      pipelineList.foreach { _.process(pipelineEvent.pageResultItems) }
     case other ⇒
       logger.warn(s"${this.getClass.getSimpleName} reviced wrong msg ${other}")
   }

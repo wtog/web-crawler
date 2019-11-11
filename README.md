@@ -55,11 +55,11 @@
   Spider(name = "zhihu", pageProcessor = ZhihuAnswerPageProcessor()).start() 
   ```
 
-  [更多例子](https://github.com/wtog/web-crawler/tree/master/src/main/scala/io/github/wtog/example)
+  [更多例子](https://github.com/wtog/web-crawler/tree/master/crawler-example/src/main/scala/io.github.wtog.example)
     
 - sbt
 
-  1. sbt assembly # 打 jar 包
+  1. sbt 'project example; assembly' # 打 jar 包
   2. java -jar crawler-example/target/scala-2.12/web-crawler-assembly.jar
 
 - docker

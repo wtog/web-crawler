@@ -5,14 +5,14 @@ import java.util.concurrent.TimeUnit
 import io.github.wtog.crawler.downloader.proxy.ProxyProvider
 import io.github.wtog.crawler.downloader.proxy.crawler.{A2UPageProcessor, Data5UPageProcessor, IP89Processor}
 import io.github.wtog.crawler.spider.Spider
-import io.github.wtog.crawler.test.BaseTest
+import io.github.wtog.crawler.test.BaseCoreTest
 
 /**
   * @author : tong.wang
   * @since : 2019-05-14 22:37
   * @version : 1.0.0
   */
-class ProxyProviderTest extends BaseTest {
+class ProxyProviderTest extends BaseCoreTest {
 
   test("Spider use proxy with requestting useProxy=true") {
     Spider(name = this.getClass.getSimpleName, pageProcessor = TestProcessor(requestSettingTest.copy(useProxy = true))).start()

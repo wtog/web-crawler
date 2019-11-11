@@ -1,13 +1,18 @@
 package io.github.wtog.example
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
-import io.github.wtog.crawler.pipeline.file.CsvFilePipeline
+import io.github.wtog.crawler.pipeline.Pipeline
+import io.github.wtog.crawler.pipeline.db.{ DataSource, DataSourceInfo, PostgreSQLPipeline }
 import io.github.wtog.crawler.processor.{ Page, PageProcessor, RequestSetting }
 import io.github.wtog.utils.JsonUtils
+import io.github.wtog.utils.StringUtils._
 import org.jsoup.nodes.Element
 
 import scala.concurrent.duration._
+import scala.util.Random
 
 /**
   * @author : tong.wang
@@ -15,25 +20,34 @@ import scala.concurrent.duration._
   * @version : 1.0.0
   */
 class LianjiaErshouFangProcessor extends PageProcessor {
-  override def targetUrls: List[String] = List("https://bj.lianjia.com/ershoufang/pg1/")
-
   val pageNo           = new AtomicInteger(1)
-  val houseDetailRegex = """(.*ershoufang/[\d]+.html$)""".r
+  val houseDetailRegex = """(.*ershoufang)/([\d]+).(html$)""".r
   val houseListRegex   = """(.*ershoufang/pg[\d]+/$)""".r
 
   val queryDomValue   = (typ: String, elements: Map[String, Seq[Element]], getDomValue: Element => String) => elements.get(typ).fold("")(e => getDomValue(e.head))
   val getLiText       = (e: Element) => e.childNodes.get(1).toString
   val getLastSpanText = (e: Element) => e.select("span").last().text()
 
-  override def doProcess(page: Page) =
+  override def doProcess(page: Page): Unit =
     page.requestSetting.url.get match {
       case houseListRegex(_) =>
         addHouseDetail(page)
         page.addTargetRequest(s"https://bj.lianjia.com/ershoufang/pg${pageNo.incrementAndGet()}/")
-      case houseDetailRegex(detail) =>
-        val overviewContent      = page.dom(".overview .content")
-        val price                = overviewContent.select(".price")
-        val priceTotal           = price.getText(".total")
+      case houseDetailRegex(_, houseCode, _) =>
+        val overviewContent = page.dom(".overview .content")
+        val price           = overviewContent.select(".price")
+        val pageShoufu      = page.dom(".new-calculator").attr("data-shoufu")
+
+        val (evaluationPrice, priceTotal) = pageShoufu match {
+          case shoufu if shoufu.nonEmpty =>
+            val newCalculator = JsonUtils.parseFrom[Map[String, Any]](shoufu)
+            val evaluation    = newCalculator.get("evaluation").get.asInstanceOf[Int]
+            val total         = newCalculator.get("price").fold(0)(_.asInstanceOf[String].toInt)
+            (evaluation, total)
+          case "" =>
+            (0, 0)
+        }
+
         val pricePerMeter        = price.getText(".unitPriceValue").replace("元/平米", "")
         val room                 = overviewContent.getElements(".room")
         val roomMainInfoText     = room.getText(".mainInfo")
@@ -46,7 +60,7 @@ class LianjiaErshouFangProcessor extends PageProcessor {
         val roomAreaSubInfo      = roomArea.getText(".subInfo")
         val aroundInfo           = overviewContent.getElements(".aroundInfo")
         val communityName        = aroundInfo.getElements("a").first().text()
-        val communityAreaName    = aroundInfo.getText(".areaInfo")
+        val communityAreaName    = aroundInfo.getText(".areaName").replace("所在区域", "")
 
         val infoContent = page.dom(".m-content .base .content li")
         val basic       = infoContent.toSeq.groupBy(e => e.select("span").text)
@@ -71,9 +85,10 @@ class LianjiaErshouFangProcessor extends PageProcessor {
         val mortgageInfo: String    = queryDomValue("抵押信息", info, getLastSpanText)
 
         val house = House(
-          url = detail,
-          totalPrice = priceTotal,
-          meterPrice = pricePerMeter,
+          houseCode = houseCode,
+          totalPrice = priceTotal.toInt,
+          evaluationPrice = evaluationPrice,
+          meterPrice = pricePerMeter.toInt,
           roomMainInfo = roomMainInfoText,
           roomSubInfo = roomSubInfoText,
           roomTypeMainInfo = roomTypeMainInfoText,
@@ -85,7 +100,7 @@ class LianjiaErshouFangProcessor extends PageProcessor {
           buildType = buildType,
           buildStruct = buildStruct,
           decoration = decoration,
-          householdLadder = householdLadder,
+          householdladder = householdLadder,
           heating = heating,
           elevator = elevator,
           houseRight = houseRight,
@@ -98,7 +113,7 @@ class LianjiaErshouFangProcessor extends PageProcessor {
           mortgageInfo = mortgageInfo
         )
 
-        page.addPageResultItem(house.toMap)
+        page.addPageResultItem[Map[String, Any]](house.toMap)
       case other ⇒
         println(other)
     }
@@ -108,17 +123,38 @@ class LianjiaErshouFangProcessor extends PageProcessor {
     detailHrefs.toSeq.foreach(d => page.addTargetRequest(d.attr("href")))
   }
 
-  override def pipelines = Set(CsvFilePipeline(fileName = Some("BeijingErshouFang")))
+  override def pipelines: Set[Pipeline] = Set(
+    //    CsvFilePipeline(Some("ershoufang.csv")),
+    PostgreSQLPipeline(DataSourceInfo(jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/magicbox", username = "wtog", password = "")) { (db: String, result: Map[String, Any]) =>
+      val (keys, values) = result.unzip
+      DataSource.rows[Int]("select count(1) from house where house_code = ?", Seq(result("houseCode").asInstanceOf[String]))(r => r.getInt(1))(db).headOption.getOrElse(0) match {
+        case 0 =>
+          DataSource.executeUpdate(s"insert into house (${keys.map(_.toUnderscore).mkString(",")}) values (${Seq.fill[String](keys.size)("?").mkString(",")})", values.toSeq)(db)
+        case _ =>
+          DataSource.executeUpdate(
+            s"update house set ${keys.map(c => s"${c.toUnderscore} = ?").mkString(",")}, updated_at = '${ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}' where house_code = ? ",
+            (values.toSeq ++ Seq(result("houseCode")))
+          )(db)
+      }
+    }
+  )
 
-  override def requestSetting: RequestSetting = RequestSetting(domain = "bj.lianjia.com", sleepTime = 2 seconds)
+  override def requestSetting: RequestSetting = RequestSetting(
+    domain = "www.lianjia.com",
+    sleepTime = (Random.nextInt(3) + 5) seconds,
+    useProxy = true
+  )
+
+  override def targetUrls: List[String] = List("https://bj.lianjia.com/ershoufang/pg1/")
 
 }
 
 case class House(
-    houseType: String = HouseType.ERSHOU.toString,
-    url: String, //
-    totalPrice: String,
-    meterPrice: String,
+    id: Option[Int] = None,
+    houseCode: String,
+    totalPrice: Int,
+    evaluationPrice: Int,
+    meterPrice: Int,
     roomMainInfo: String,
     roomSubInfo: String,
     roomTypeMainInfo: String,
@@ -127,21 +163,20 @@ case class House(
     roomAreaSubInfo: String,
     communityName: String,
     communityAreaName: String,
-    buildType: String,       //建筑类型
-    buildStruct: String,     // 建筑结构
-    decoration: String,      //装修情况
-    householdLadder: String, //梯户比例
-    heating: String,         //供暖
-    elevator: String,        //电梯
-    houseRight: String,      //产权
-    saleTime: String,        //挂牌时间
-    tradingRight: String,    //交易权属
-    lastSale: String,        //上次交易
-    housingUse: String,      //房屋用途
-    houseYears: String,      //房屋年限
-    houseRightOwner: String, //产权所属
-    mortgageInfo: String     //抵押信息
-  )
+    buildType: String,
+    buildStruct: String,
+    decoration: String,
+    householdladder: String,
+    heating: String,
+    elevator: String,
+    houseRight: String,
+    saleTime: String,
+    tradingRight: String,
+    lastSale: String,
+    housingUse: String,
+    houseYears: String,
+    houseRightOwner: String,
+    mortgageInfo: String)
 
 object House {
 

@@ -10,4 +10,6 @@ object ConsolePipeline extends Pipeline {
     val (url, result) = pageResultItem
     logger.trace(s"crawl result: ${url} - ${result}")
   }
+
+  override def init(): Unit = {}
 }

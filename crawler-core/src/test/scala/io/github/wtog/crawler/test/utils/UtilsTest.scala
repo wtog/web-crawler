@@ -2,7 +2,7 @@ package io.github.wtog.crawler.test.utils
 
 import java.util.concurrent.TimeUnit
 
-import io.github.wtog.crawler.test.BaseTest
+import io.github.wtog.crawler.test.BaseCoreTest
 import io.github.wtog.utils.RetryInfo
 import io.github.wtog.utils.RetryUtils._
 
@@ -15,7 +15,7 @@ import scala.util.Try
   * @since : 2019-05-07 23:35
   * @version : 1.0.0
   */
-class UtilsTest extends BaseTest {
+class UtilsTest extends BaseCoreTest {
 
   test("retry") {
     var invokeTime = 0
