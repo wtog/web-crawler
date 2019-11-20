@@ -59,8 +59,10 @@ class LianjiaErshouFangProcessor extends PageProcessor {
         val roomAreaMainInfo     = roomArea.getText(".mainInfo").replace("平米", "")
         val roomAreaSubInfo      = roomArea.getText(".subInfo")
         val aroundInfo           = overviewContent.getElements(".aroundInfo")
-        val communityName        = aroundInfo.getElements("a").first().text()
-        val communityAreaName    = aroundInfo.getText(".areaName").replace("所在区域", "")
+        val subdistrict          = aroundInfo.getElements("a").first().text()
+        val communityAreaName    = aroundInfo.getText(".areaName").replace("所在区域", "").split(" ")
+
+        val (areaName, community, communityDetail) = (communityAreaName.headOption, communityAreaName.tail.headOption, communityAreaName.lastOption)
 
         val infoContent = page.dom(".m-content .base .content li")
         val basic       = infoContent.toSeq.groupBy(e => e.select("span").text)
@@ -95,8 +97,10 @@ class LianjiaErshouFangProcessor extends PageProcessor {
           roomTypeSubInfo = roomTypeSubInfoText,
           roomAreaMainInfo = roomAreaMainInfo,
           roomAreaSubInfo = roomAreaSubInfo,
-          communityName = communityName,
-          communityAreaName = communityAreaName,
+          subdistrict = subdistrict,
+          areaName = areaName,
+          community = community,
+          communityDetail = communityDetail,
           buildType = buildType,
           buildStruct = buildStruct,
           decoration = decoration,
@@ -125,7 +129,7 @@ class LianjiaErshouFangProcessor extends PageProcessor {
 
   override def pipelines: Set[Pipeline] = Set(
     //    CsvFilePipeline(Some("ershoufang.csv")),
-    PostgreSQLPipeline(DataSourceInfo(jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/magicbox", username = "wtog", password = "")) { (db: String, result: Map[String, Any]) =>
+    PostgreSQLPipeline(DataSourceInfo(database = this.getClass.getSimpleName, jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/magicbox", username = "wtog", password = "")) { (db: String, result: Map[String, Any]) =>
       val (keys, values) = result.unzip
       DataSource.rows[Int]("select count(1) from house where house_code = ?", Seq(result("houseCode").asInstanceOf[String]))(r => r.getInt(1))(db).headOption.getOrElse(0) match {
         case 0 =>
@@ -161,8 +165,10 @@ case class House(
     roomTypeSubInfo: String,
     roomAreaMainInfo: String,
     roomAreaSubInfo: String,
-    communityName: String,
-    communityAreaName: String,
+    subdistrict: String,
+    areaName: Option[String],
+    community: Option[String],
+    communityDetail: Option[String],
     buildType: String,
     buildStruct: String,
     decoration: String,

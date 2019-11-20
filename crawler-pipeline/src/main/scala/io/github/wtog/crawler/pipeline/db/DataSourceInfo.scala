@@ -14,4 +14,4 @@ case class DataSourceInfo(
     password: String,
     maxPoolSize: Int = 10,
     minIdleSize: Int = 1,
-    idleTimeout: Duration = 1 minutes)
+    idleTimeout: Duration = 2 seconds)

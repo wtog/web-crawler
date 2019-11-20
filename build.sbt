@@ -111,3 +111,4 @@ javaOptions in run := Seq(
   "-Dlog4j.configurationFile=log4j2.xml",
   "-Xms512m", "-Xmx512m"
 )
+
