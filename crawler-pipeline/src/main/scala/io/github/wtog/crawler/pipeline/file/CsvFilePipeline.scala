@@ -27,15 +27,15 @@ case class CsvFilePipeline(fileName: Option[String]) extends Pipeline {
 object IOContentCache extends Logging {
   private val cache: ConcurrentHashMap[String, ListBuffer[Map[String, Any]]] = new ConcurrentHashMap[String, ListBuffer[Map[String, Any]]]()
 
-  lazy val timestamp = System.currentTimeMillis()
+  lazy val timestamp: Long = System.currentTimeMillis()
 
-  def add(key: String, value: Map[String, Any]) = {
+  def add(key: String, value: Map[String, Any]): ListBuffer[Map[String,Any]] = {
     val listValue = cache.getOrDefault(key, ListBuffer.empty[Map[String, Any]])
     listValue.append(value)
     cache.put(key, listValue)
   }
 
-  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]]) =
+  def writeContentFile(fileName: String, contentList: ListBuffer[Map[String, Any]]): Any =
     if (contentList.nonEmpty) {
       val file = if (fileName.contains("/")) fileName.replace("/", "_") else fileName
 
@@ -68,7 +68,7 @@ object IOContentCache extends Logging {
       }
     }
 
-  val expire = {
+  val expire: Future[ScheduledFuture[_]] = {
     def removeExpire() = {
       import collection.JavaConverters._
       val schedule = Executors.newScheduledThreadPool(1)

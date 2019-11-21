@@ -21,7 +21,7 @@ class PageProcessorActorReceiver extends Actor {
 
   private lazy val logger: Logger = LoggerFactory.getLogger(classOf[PageProcessorActorReceiver])
 
-  val pipelineActor = context.actorOf(Props[PipelineActorReceiver].withDispatcher("crawler.pipeline-dispatcher"), "pipeline-processor")
+  val pipelineActor: ActorRef = context.actorOf(Props[PipelineActorReceiver].withDispatcher("crawler.pipeline-dispatcher"), "pipeline-processor")
 
   override def receive: Receive = {
     case processorEvent: ProcessorEvent ⇒

@@ -75,7 +75,7 @@ case class Page(isDownloadSuccess: Boolean = true, bytes: Option[Array[Byte]] = 
       throw new IllegalStateException("no page source text found ")
   }
 
-  def json[T: Manifest](text: Option[String] = None) = parseJson[T](text.getOrElse(this.source))
+  def json[T: Manifest](text: Option[String] = None): T = parseJson[T](text.getOrElse(this.source))
 
   def addTargetRequest(urlAdd: String): Unit = addRequest(this.requestSetting.withUrl(url = urlAdd))
 
@@ -110,22 +110,22 @@ case class RequestSetting(
     timeOut: Duration = 3 seconds,
     useProxy: Boolean = false) {
 
-  def withUrlAndMethod(url: String, method: String = "GET") =
+  def withUrlAndMethod(url: String, method: String = "GET"): RequestSetting =
     this.copy(url = Some(url), method = method)
 
-  def withUrl(url: String) = this.copy(url = Some(url))
+  def withUrl(url: String): RequestSetting = this.copy(url = Some(url))
 
-  def withSleepTime(sleepTime: Duration) = this.copy(sleepTime = sleepTime)
+  def withSleepTime(sleepTime: Duration): RequestSetting = this.copy(sleepTime = sleepTime)
 
-  def withHeaders(extraHeaders: Map[String, String]) =
+  def withHeaders(extraHeaders: Map[String, String]): RequestSetting =
     this.copy(
       headers = extraHeaders.foldLeft(this.headers)((common, extra) ⇒ common + extra)
     )
 
-  def withMethodAndRequestBody(method: String, requestBody: Option[String]) =
+  def withMethodAndRequestBody(method: String, requestBody: Option[String]): RequestSetting =
     this.copy(method = method, requestBody = requestBody)
 
-  def withRequestUri(requestUri: RequestUri) = {
+  def withRequestUri(requestUri: RequestUri): RequestSetting = {
     val basic = this.copy(
       url = Some(requestUri.url),
       method = requestUri.method,

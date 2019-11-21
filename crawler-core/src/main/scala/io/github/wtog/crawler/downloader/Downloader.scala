@@ -13,6 +13,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
+import java.util.concurrent.ScheduledFuture
 
 /**
   * @author : tong.wang
@@ -39,7 +40,7 @@ trait Downloader[Driver] {
   /**
     * common schedule job to close download client
     */
-  val scheduleClose = Executors
+  val scheduleClose: ScheduledFuture[_] = Executors
     .newSingleThreadScheduledExecutor()
     .scheduleAtFixedRate(new Runnable {
       override def run(): Unit =
@@ -88,7 +89,7 @@ trait Downloader[Driver] {
     downloaderClient
   }
 
-  def closeDownloaderClient(close: Driver => Unit) = {
+  def closeDownloaderClient(close: Driver => Unit): Unit = {
     import scala.collection.JavaConversions._
     for (e <- clientsPool.entrySet()) {
       val (domain, downloaderClient) = (e.getKey, e.getValue)
@@ -111,17 +112,17 @@ trait Downloader[Driver] {
 }
 
 case class DownloaderClient[C](domain: String, driver: C, consumers: AtomicInteger = new AtomicInteger(0)) {
-  def idle()      = consumers.get() == 0
-  def increment() = consumers.incrementAndGet()
-  def decrement() = consumers.decrementAndGet()
+  def idle(): Boolean      = consumers.get() == 0
+  def increment(): Int = consumers.incrementAndGet()
+  def decrement(): Int = consumers.decrementAndGet()
 }
 
 object Downloader {
 
   object ContentType {
-    lazy val FORM_URLENCODED = Map("Content-Type" -> "application/x-www-form-urlencoded")
-    lazy val TEXT_PLAIN      = Map("Content-Type" -> "text/plain")
-    lazy val TEXT_JSON       = Map("Content-Type" -> "application/json")
+    lazy val FORM_URLENCODED: Map[String,String] = Map("Content-Type" -> "application/x-www-form-urlencoded")
+    lazy val TEXT_PLAIN: Map[String,String]      = Map("Content-Type" -> "text/plain")
+    lazy val TEXT_JSON: Map[String,String]       = Map("Content-Type" -> "application/json")
   }
 
 }

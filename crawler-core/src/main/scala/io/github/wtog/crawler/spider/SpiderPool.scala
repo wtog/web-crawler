@@ -14,7 +14,7 @@ import org.quartz.{ Job, JobExecutionContext }
 object SpiderPool {
   val spiders = new ConcurrentHashMap[String, Spider]()
 
-  def addSpider(spider: Spider) = {
+  def addSpider(spider: Spider): Unit = {
     spiders.putIfAbsent(spider.name, spider)
 
     spider.pageProcessor.cronExpression.foreach { cron ⇒
@@ -26,13 +26,13 @@ object SpiderPool {
     }
   }
 
-  def removeSpider(spider: Spider) = spiders.remove(spider.name)
+  def removeSpider(spider: Spider): Spider = spiders.remove(spider.name)
 
   def getSpiderByName(name: String): Option[Spider] = Option(spiders.get(name))
 
   def fetchAllSpiders(): Array[Spider] = spiders.values().toArray().map(_.asInstanceOf[Spider])
 
-  def fetchAllUsingProxySpiders() = fetchAllSpiders().filter(_.pageProcessor.requestSetting.useProxy)
+  def fetchAllUsingProxySpiders(): Array[Spider] = fetchAllSpiders().filter(_.pageProcessor.requestSetting.useProxy)
 
 }
 

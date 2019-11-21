@@ -1,6 +1,7 @@
 package io.github.wtog.utils
 
 import com.google.common.base.CaseFormat
+import com.google.common.base.Converter
 
 /**
   * @author : tong.wang
@@ -9,16 +10,16 @@ import com.google.common.base.CaseFormat
   */
 object StringUtils {
 
-  lazy val underscoreConverter      = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
-  lazy val lowerunderscoreConverter = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
+  lazy val underscoreConverter: Converter[String,String]      = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
+  lazy val lowerunderscoreConverter: Converter[String,String] = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
 
   implicit class StringWrapper(s: String) {
 
-    def toUnderscore = underscoreConverter.convert(s)
+    def toUnderscore: String = underscoreConverter.convert(s)
 
-    def toLowercamel = lowerunderscoreConverter.convert(s)
+    def toLowercamel: String = lowerunderscoreConverter.convert(s)
 
-    def placeholderReplacedBy(placeholder: String, replacement: Any*) = {
+    def placeholderReplacedBy(placeholder: String, replacement: Any*): String = {
       val list   = s.split(placeholder).zip(replacement.toSeq)
       val buffer = new StringBuilder()
       list.foreach {

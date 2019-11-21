@@ -13,7 +13,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 trait RequestQueue {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def push(request: RequestSetting)
+  def push(request: RequestSetting): Unit
 
   def poll(): Option[RequestSetting] =
     doPoll().map { r =>

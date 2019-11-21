@@ -4,6 +4,7 @@ import akka.actor.{ Actor, Props }
 import io.github.wtog.crawler.dto.{ DownloadEvent, ProcessorEvent }
 import io.github.wtog.crawler.processor.PageProcessorActorReceiver
 import org.slf4j.{ Logger, LoggerFactory }
+import akka.actor.ActorRef
 
 /**
   * @author : tong.wang
@@ -14,7 +15,7 @@ class DownloaderActorReceiver extends Actor {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[DownloaderActorReceiver])
 
-  lazy val processorActor = context.actorOf(
+  lazy val processorActor: ActorRef = context.actorOf(
     Props[PageProcessorActorReceiver].withDispatcher("crawler.processor-dispatcher"),
     "page-processor"
   )

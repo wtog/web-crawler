@@ -32,7 +32,7 @@ object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
 
   }
 
-  def builderMethod(driver: AsyncHttpClient, url: String, method: String) =
+  def builderMethod(driver: AsyncHttpClient, url: String, method: String): BoundRequestBuilder =
     method.toUpperCase match {
       case "GET" ⇒
         driver.prepareGet(url)
@@ -76,7 +76,7 @@ object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
     client.close()
   }
 
-  override protected def getOrCreateClient(requestSetting: RequestSetting) =
+  override protected def getOrCreateClient(requestSetting: RequestSetting): DownloaderClient[AsyncHttpClient] =
     getDownloaderClient(requestSetting.domain) {
       asyncHttpClient(
         new DefaultAsyncHttpClientConfig.Builder()

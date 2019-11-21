@@ -3,6 +3,7 @@ package io.github.wtog.crawler.actor
 import akka.actor.{ ActorSystem, Props }
 
 import scala.concurrent.ExecutionContext
+import akka.actor.{ ActorRef, ActorSelection }
 
 /**
   * @author : tong.wang
@@ -10,11 +11,11 @@ import scala.concurrent.ExecutionContext
   * @version : 1.0.0
   */
 object ActorManager {
-  lazy val system = ActorSystem("crawler")
+  lazy val system: ActorSystem = ActorSystem("crawler")
 
-  def getNewSystemActor(dispatcher: String, actorName: String, props: Props) = system.actorOf(props.withDispatcher(s"crawler.${dispatcher}"), actorName)
+  def getNewSystemActor(dispatcher: String, actorName: String, props: Props): ActorRef = system.actorOf(props.withDispatcher(s"crawler.${dispatcher}"), actorName)
 
-  def getExistedAcotr(path: String) = system.actorSelection(path)
+  def getExistedAcotr(path: String): ActorSelection = system.actorSelection(path)
 }
 
 object ExecutionContexts {

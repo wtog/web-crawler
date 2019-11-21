@@ -18,7 +18,7 @@ import io.netty.handler.ssl.SslContext
   * @version : 1.0.0
   */
 object NettyServer extends Server {
-  override def doStart(routes: Set[Router]) = {
+  override def doStart(routes: Set[Router]): Unit = {
     val bossGroup   = new NioEventLoopGroup(1)
     val workerGroup = new NioEventLoopGroup()
     try {
@@ -43,7 +43,7 @@ class ServerInitializer(routes: Set[Router], sslContext: Option[SslContext] = No
 
   override def channelReadComplete(ctx: ChannelHandlerContext): Unit = ctx.flush()
 
-  override def initChannel(channel: SocketChannel) =
+  override def initChannel(channel: SocketChannel): Unit =
     channel
       .pipeline()
       .addLast(new HttpRequestDecoder)
