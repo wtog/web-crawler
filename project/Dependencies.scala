@@ -14,7 +14,7 @@ object Dependencies {
     val httpClient = "2.10.1"
     val jackson = "2.9.10"
     val guava = "28.1-jre"
-    val typesafeConfig = "1.3.3"
+    val typesafeConfig = "1.4.0"
     val scalatest = "3.0.8"
     val hikariCP = "3.4.1"
   }
@@ -25,7 +25,7 @@ object Dependencies {
     def test: ModuleID = moduleID.withConfigurations(Some("test"))
   }
 
-  lazy val crossVersion = Seq("2.12.8", "2.11.11")
+  lazy val crossVersion = Seq("2.12.10", "2.11.12")
 
   lazy val guava = "com.google.guava" % "guava" % Versions.guava
 
@@ -72,9 +72,9 @@ object Dependencies {
   object pipeline {
     lazy val postgresql = "42.2.6"
 
-    val pg: ModuleID = "org.postgresql" % "postgresql" % postgresql
+    lazy val pg: ModuleID = "org.postgresql" % "postgresql" % postgresql
 
-    val hikari = "com.zaxxer" % "HikariCP" % Versions.hikariCP
+    lazy val hikari = "com.zaxxer" % "HikariCP" % Versions.hikariCP
 
     lazy val h2 = "com.h2database" % "h2" % "1.4.192"
     

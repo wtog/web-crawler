@@ -23,6 +23,10 @@
             <appender-ref ref="STDOUT"/>
         </Logger>
 
+        <Logger name="com.zaxxer.hikari" level="debug" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </Logger>
+
         <Logger name="org.quartz" level="warn" additivity="false">
             <appender-ref ref="STDOUT"/>
         </Logger>

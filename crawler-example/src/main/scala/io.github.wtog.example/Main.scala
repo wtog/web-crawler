@@ -25,7 +25,7 @@ object Main {
       .zip(Stream.from(1))
 
     val execProcessors = args match {
-      case args: Array[String] if args.contains("0") ⇒
+      case args: Array[String] if args.isEmpty || args.contains("0") ⇒
         println("executing all processors")
         processorList
       case args: Array[String] if (args.nonEmpty && args.toSeq.forall(arg ⇒ Try(arg.toInt).isSuccess)) ⇒
@@ -33,7 +33,7 @@ object Main {
           case (_, order) ⇒
             args.contains(order.toString)
         }
-        println(s"executing ${processors}")
+        println(s"executing ${processors.map(_._1.getClass.getSimpleName).mkString(",")}")
         processors
       case _ ⇒
         println("\nshow page processor list: ")
