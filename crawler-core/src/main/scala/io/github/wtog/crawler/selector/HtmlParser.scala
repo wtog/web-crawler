@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
 import scala.collection.JavaConverters._
+import org.jsoup.nodes.Document
 
 /**
   * @author : tong.wang
@@ -19,11 +20,11 @@ trait HtmlParser {
 
   implicit class PageWrapper(page: Page) {
 
-    val document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
+    val document: Document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
 
-    val title = document.title()
+    val title: String = document.title()
 
-    val body = document.body()
+    val body: Element = document.body()
 
     def div(element: String): Elements = document.select(element)
 
@@ -56,7 +57,7 @@ object HtmlParser {
 
   def getValueFromJson[T: Manifest](json: String, key: String): Option[T] = JsonUtils.parseFrom[Map[String, T]](json).get(key)
 
-  def parseJson[T: Manifest](json: String) = JsonUtils.parseFrom[T](json)
+  def parseJson[T: Manifest](json: String): T = JsonUtils.parseFrom[T](json)
 
   def getHtmlSourceWithCharset(contentBytes: Array[Byte], defaultCharset: String = Charset.defaultCharset().name()): String = {
 

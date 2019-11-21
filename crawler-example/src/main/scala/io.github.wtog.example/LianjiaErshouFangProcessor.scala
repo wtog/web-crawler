@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element
 
 import scala.concurrent.duration._
 import scala.util.Random
+import scala.util.matching.Regex
 
 /**
   * @author : tong.wang
@@ -21,14 +22,14 @@ import scala.util.Random
   */
 class LianjiaErshouFangProcessor extends PageProcessor {
   val pageNo           = new AtomicInteger(1)
-  val houseDetailRegex = """(.*ershoufang)/([\d]+).(html$)""".r
-  val houseListRegex   = """(.*ershoufang/pg[\d]+/$)""".r
+  val houseDetailRegex: Regex = """(.*ershoufang)/([\d]+).(html$)""".r
+  val houseListRegex: Regex   = """(.*ershoufang/pg[\d]+/$)""".r
 
-  val queryDomValue   = (typ: String, elements: Map[String, Seq[Element]], getDomValue: Element => String) => elements.get(typ).fold("")(e => getDomValue(e.head))
-  val getLiText       = (e: Element) => e.childNodes.get(1).toString
-  val getLastSpanText = (e: Element) => e.select("span").last().text()
+  val queryDomValue: (String, Map[String,Seq[Element]], Element => String) => String   = (typ: String, elements: Map[String, Seq[Element]], getDomValue: Element => String) => elements.get(typ).fold("")(e => getDomValue(e.head))
+  val getLiText: Element => String       = (e: Element) => e.childNodes.get(1).toString
+  val getLastSpanText: Element => String = (e: Element) => e.select("span").last().text()
 
-  def getPage = if (pageNo.get() > 100) pageNo.set(0) else pageNo.incrementAndGet()
+  def getPage: Int = if (pageNo.get() >= 100) pageNo.getAndSet(0) else pageNo.incrementAndGet()
 
   override def doProcess(page: Page): Unit =
     page.requestSetting.url.get match {
@@ -124,7 +125,7 @@ class LianjiaErshouFangProcessor extends PageProcessor {
         println(other)
     }
 
-  def addHouseDetail(page: Page) = {
+  def addHouseDetail(page: Page): Unit = {
     val detailHrefs = page.dom(".sellListContent li div.title a")
     detailHrefs.toSeq.foreach(d => page.addTargetRequest(d.attr("href")))
   }
@@ -197,6 +198,6 @@ object House {
 object HouseType extends Enumeration {
   type HouseType = Value
 
-  val ERSHOU = Value("ershou")
-  val NEW    = Value("new")
+  val ERSHOU: Value = Value("ershou")
+  val NEW: Value    = Value("new")
 }

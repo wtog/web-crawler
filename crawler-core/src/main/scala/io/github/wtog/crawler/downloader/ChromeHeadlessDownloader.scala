@@ -39,7 +39,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     }(io.github.wtog.crawler.actor.ExecutionContexts.downloadDispatcher)
   }
 
-  override def getOrCreateClient(requestSetting: RequestSetting) = getDownloaderClient(requestSetting.domain) {
+  override def getOrCreateClient(requestSetting: RequestSetting): DownloaderClient[ChromeDriver] = getDownloaderClient(requestSetting.domain) {
     System.setProperty("webdriver.chrome.driver", chromeDriverPath)
     System.setProperty("webdriver.chrome.logfile", chromeDriverLog)
     val options = new ChromeOptions()
@@ -49,7 +49,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     new ChromeDriver(options)
   }
 
-  override def closeClient() = closeDownloaderClient { driver =>
+  override def closeClient(): Unit = closeDownloaderClient { driver =>
     try (driver.quit())
     catch {
       case e: UnreachableBrowserException =>
@@ -62,8 +62,8 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
 }
 
 object ChromeHeadlessConfig {
-  lazy val chromeDriverPath = ConfigUtils.getStringOpt("crawler.chrome.driver").getOrElse("/opt/chromedriver")
-  lazy val chromeDriverLog  = ConfigUtils.getStringOpt("crawler.chrome.log").getOrElse("/tmp/chromedriver.log")
+  lazy val chromeDriverPath: String = ConfigUtils.getStringOpt("crawler.chrome.driver").getOrElse("/opt/chromedriver")
+  lazy val chromeDriverLog: String  = ConfigUtils.getStringOpt("crawler.chrome.log").getOrElse("/tmp/chromedriver.log")
 
   def chromeDriverNotExecutable: Boolean = {
     val file       = new File(chromeDriverPath)

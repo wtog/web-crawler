@@ -4,6 +4,7 @@ import com.typesafe.config.{ ConfigException, ConfigFactory }
 
 import scala.collection.JavaConverters._
 import scala.util.{ Failure, Success, Try }
+import com.typesafe.config.Config
 
 /**
   * @author : tong.wang
@@ -16,11 +17,11 @@ object ConfigUtils {
 
   def getSeq[T](path: String): Seq[T] = config.getList(path).unwrapped().asScala.map(_.asInstanceOf[T])
 
-  def getStringOpt(path: String) = getOpt[String](path)(config.getString)
+  def getStringOpt(path: String): Option[String] = getOpt[String](path)(config.getString)
 
-  def getIntOpt(path: String) = getOpt[Int](path)(config.getInt)
+  def getIntOpt(path: String): Option[Int] = getOpt[Int](path)(config.getInt)
 
-  def getConfig(name: String) = config.getConfig(name)
+  def getConfig(name: String): Config = config.getConfig(name)
 
   private[this] def getOpt[T](path: String)(getConfig: String => T): Option[T] =
     Try(getConfig(path)) match {

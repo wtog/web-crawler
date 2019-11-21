@@ -80,15 +80,15 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
     private val downloadPageFailedNum  = new AtomicInteger(0)
     private val processPageSuccessNum  = new AtomicInteger(0)
 
-    def downloadedPageSum = downloadPageSuccessNum.get() + downloadPageFailedNum.get()
+    def downloadedPageSum: Int = downloadPageSuccessNum.get() + downloadPageFailedNum.get()
 
-    def downloadSuccessCounter = downloadPageSuccessNum.getAndIncrement()
+    def downloadSuccessCounter: Int = downloadPageSuccessNum.getAndIncrement()
 
-    def downloadFailedCounter = downloadPageFailedNum.getAndIncrement()
+    def downloadFailedCounter: Int = downloadPageFailedNum.getAndIncrement()
 
-    def processedSuccessCounter = processPageSuccessNum.getAndIncrement()
+    def processedSuccessCounter: Int = processPageSuccessNum.getAndIncrement()
 
-    def clean() = {
+    def clean(): Unit = {
       downloadPageSuccessNum.set(0)
       downloadPageFailedNum.set(0)
       processPageSuccessNum.set(0)
@@ -101,7 +101,7 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
       else downloadFailedCounter
     }
 
-    def metricInfo() = Map(
+    def metricInfo(): Map[String,Any] = Map(
       "spider"     -> name,
       "total"      -> downloadedPageSum,
       "downloaded" -> downloadSuccessCounter,

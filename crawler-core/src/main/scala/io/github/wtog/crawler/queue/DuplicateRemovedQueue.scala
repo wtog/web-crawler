@@ -29,5 +29,5 @@ abstract class DuplicateRemovedQueue(duplicateRemovedStrategy: DuplicateRemovedS
         true
     }
 
-  protected def pushWhenNoDuplicate(request: RequestSetting)
+  protected def pushWhenNoDuplicate(request: RequestSetting): Unit
 }

@@ -15,6 +15,7 @@ import org.quartz.{ Job, JobExecutionContext }
 import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.util.Try
+import java.util.concurrent.ExecutorService
 
 /**
   * @author : tong.wang
@@ -24,7 +25,7 @@ import scala.util.Try
 object ProxyProvider {
   lazy val logger: Logger = LoggerFactory.getLogger(ProxyProvider.getClass)
 
-  val checkThread = Executors.newFixedThreadPool(5)
+  val checkThread: ExecutorService = Executors.newFixedThreadPool(5)
 
   val proxyList: ArrayBlockingQueue[ProxyDTO] = new ArrayBlockingQueue[ProxyDTO](100)
 
@@ -46,7 +47,7 @@ object ProxyProvider {
     if (restart) proxyCrawlerList.foreach(_.restart())
     else proxyCrawlerList.foreach(_.start())
 
-  def startProxyCrawl(restart: Boolean = false) =
+  def startProxyCrawl(restart: Boolean = false): Unit =
     if (!proxySpiderCrawling.getAndSet(true)) {
       crawlCronJob(restart)
       ScheduleJobs.addJob(scheduleJob = ScheduleJob(jobName = "proxy-check", cronExpression = "*/2 * * ? * *", task = classOf[ProxyCheckScheduleJob]))
@@ -134,6 +135,6 @@ final case class ProxyDTO(
 
 object ProxyStatusEnums extends Enumeration {
   type ProxyStatusEnums = Value
-  val USING = Value("using")
-  val IDEL  = Value("idel")
+  val USING: Value = Value("using")
+  val IDEL: Value  = Value("idel")
 }

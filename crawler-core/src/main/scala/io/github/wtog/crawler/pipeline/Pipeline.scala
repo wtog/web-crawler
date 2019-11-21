@@ -11,5 +11,5 @@ trait Pipeline extends Logging {
 
   def init(): Unit
 
-  def process[Result](pageResultItem: (String, Result))
+  def process[Result](pageResultItem: (String, Result)): Unit
 }

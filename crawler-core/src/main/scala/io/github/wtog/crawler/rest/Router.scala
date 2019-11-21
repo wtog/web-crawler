@@ -17,7 +17,7 @@ trait Router {
 
   def handleRequest(request: FullHttpRequest): Array[Byte]
 
-  implicit def toBytes(content: String) = content.getBytes()
+  implicit def toBytes(content: String): Array[Byte] = content.getBytes()
 }
 
 object SpiderStatusRoute extends Router {

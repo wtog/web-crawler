@@ -35,11 +35,11 @@ trait Server extends Logging {
     running
   }
 
-  protected def doStart(routes: Set[Router])
+  protected def doStart(routes: Set[Router]): Unit
 
   val defaultRoutes: Set[Router] = Set(SpiderStatusRoute)
 
-  val port = ConfigUtils.getIntOpt("crawler.server.port").getOrElse(19000)
+  val port: Int = ConfigUtils.getIntOpt("crawler.server.port").getOrElse(19000)
 
 }
 
