@@ -28,11 +28,13 @@ class LianjiaErshouFangProcessor extends PageProcessor {
   val getLiText       = (e: Element) => e.childNodes.get(1).toString
   val getLastSpanText = (e: Element) => e.select("span").last().text()
 
+  def getPage = if (pageNo.get() > 100) pageNo.set(0) else pageNo.incrementAndGet()
+
   override def doProcess(page: Page): Unit =
     page.requestSetting.url.get match {
       case houseListRegex(_) =>
         addHouseDetail(page)
-        page.addTargetRequest(s"https://bj.lianjia.com/ershoufang/pg${pageNo.incrementAndGet()}/")
+        page.addTargetRequest(s"https://bj.lianjia.com/ershoufang/pg${getPage}/")
       case houseDetailRegex(_, houseCode, _) =>
         val overviewContent = page.dom(".overview .content")
         val price           = overviewContent.select(".price")

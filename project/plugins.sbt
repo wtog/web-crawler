@@ -1,6 +1,7 @@
 logLevel := Level.Warn
 
 resolvers += Classpaths.sbtPluginReleases
+resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.5")

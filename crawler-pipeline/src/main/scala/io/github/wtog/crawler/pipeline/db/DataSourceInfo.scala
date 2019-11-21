@@ -12,6 +12,6 @@ case class DataSourceInfo(
     jdbcUrl: String,
     username: String,
     password: String,
-    maxPoolSize: Int = 10,
+    maxPoolSize: Int = 5,
     minIdleSize: Int = 1,
-    idleTimeout: Duration = 2 seconds)
+    idleTimeout: Duration = 10 seconds)

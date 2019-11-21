@@ -25,7 +25,7 @@ object Dependencies {
     def test: ModuleID = moduleID.withConfigurations(Some("test"))
   }
 
-  lazy val crossVersion = Seq("2.12.8", "2.11.11")
+  lazy val crossVersion = Seq("2.12.10", "2.11.12")
 
   lazy val guava = "com.google.guava" % "guava" % Versions.guava
 
