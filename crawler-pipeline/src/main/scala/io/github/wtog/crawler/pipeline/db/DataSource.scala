@@ -74,6 +74,8 @@ object DataSource extends Logging {
             statement.setInt(index, p)
           case p: String =>
             statement.setString(index, p)
+          case p: Boolean =>
+            statement.setBoolean(index, p)
           case other =>
             throw new UnsupportedOperationException(s"parameter ${other}:${other.getClass.getName} not support by now ")
         }

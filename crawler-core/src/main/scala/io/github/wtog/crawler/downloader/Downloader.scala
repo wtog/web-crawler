@@ -112,7 +112,7 @@ trait Downloader[Driver] {
 }
 
 case class DownloaderClient[C](domain: String, driver: C, consumers: AtomicInteger = new AtomicInteger(0)) {
-  def idle(): Boolean      = consumers.get() == 0
+  def idle(): Boolean  = consumers.get() == 0
   def increment(): Int = consumers.incrementAndGet()
   def decrement(): Int = consumers.decrementAndGet()
 }
@@ -120,9 +120,9 @@ case class DownloaderClient[C](domain: String, driver: C, consumers: AtomicInteg
 object Downloader {
 
   object ContentType {
-    lazy val FORM_URLENCODED: Map[String,String] = Map("Content-Type" -> "application/x-www-form-urlencoded")
-    lazy val TEXT_PLAIN: Map[String,String]      = Map("Content-Type" -> "text/plain")
-    lazy val TEXT_JSON: Map[String,String]       = Map("Content-Type" -> "application/json")
+    lazy val FORM_URLENCODED: Map[String, String] = Map("Content-Type" -> "application/x-www-form-urlencoded")
+    lazy val TEXT_PLAIN: Map[String, String]      = Map("Content-Type" -> "text/plain")
+    lazy val TEXT_JSON: Map[String, String]       = Map("Content-Type" -> "application/json")
   }
 
 }

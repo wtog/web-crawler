@@ -24,6 +24,6 @@ object ScheduleJobs {
 }
 
 case class ScheduleJob[C <: Job](jobName: String, cronExpression: String, task: Class[C], groupName: Option[String] = None) {
-  val group: String  = groupName.getOrElse(jobName)
-  val jobKey = new JobKey(jobName, group)
+  val group: String = groupName.getOrElse(jobName)
+  val jobKey        = new JobKey(jobName, group)
 }
