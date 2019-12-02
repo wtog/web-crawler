@@ -32,12 +32,12 @@ class DownloaderActorReceiver extends Actor {
           logger.warn(s"page failed to download cause ${page.source}")
       }
     case other ⇒
-      logger.warn(s"${self.path} reviced wrong msg ${other}")
+      logger.warn(s"${self.path} received wrong msg ${other}")
   }
 
   override def postStop(): Unit =
     if (logger.isWarnEnabled())
-      logger.warn(s"downloader-processor [${self.path}] stoped!")
+      logger.warn(s"downloader-processor [${self.path}] stopped!")
 
   override def postRestart(reason: Throwable): Unit =
     if (logger.isWarnEnabled())

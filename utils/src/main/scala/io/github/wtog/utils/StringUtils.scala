@@ -10,8 +10,8 @@ import com.google.common.base.Converter
   */
 object StringUtils {
 
-  lazy val underscoreConverter: Converter[String,String]      = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
-  lazy val lowerunderscoreConverter: Converter[String,String] = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
+  lazy val underscoreConverter: Converter[String, String]      = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
+  lazy val lowerunderscoreConverter: Converter[String, String] = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
 
   implicit class StringWrapper(s: String) {
 

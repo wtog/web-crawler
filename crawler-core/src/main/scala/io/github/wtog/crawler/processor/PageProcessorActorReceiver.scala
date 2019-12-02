@@ -42,7 +42,7 @@ class PageProcessorActorReceiver extends Actor {
           )
       }
     case other ⇒
-      logger.warn(s"${self.path} reviced wrong msg ${other}")
+      logger.warn(s"${self.path} received wrong msg ${other}")
   }
 
   private[this] def pipelineProcess(url: String, pageResultItems: LinkedBlockingQueue[Any])(pipelines: Set[Pipeline])(downloadSender: ActorRef): Unit =

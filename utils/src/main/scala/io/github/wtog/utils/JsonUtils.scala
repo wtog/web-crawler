@@ -25,7 +25,7 @@ object JsonUtils {
 
   def toJson[T](t: T): String = mapper.writeValueAsString(t)
 
-  def toMap(t: Any): Map[String,Any] = mapper.convertValue[Map[String, Any]](t)
+  def toMap(t: Any): Map[String, Any] = mapper.convertValue[Map[String, Any]](t)
 
   def parseFrom[T: Manifest](json: String): T = mapper.readValue[T](json)
 }
