@@ -21,15 +21,15 @@ import scala.util.matching.Regex
   * @version : 1.0.0
   */
 class LianjiaErshouFangProcessor extends PageProcessor {
-  val pageNo           = new AtomicInteger(1)
+  val pageNo                  = new AtomicInteger(1)
   val houseDetailRegex: Regex = """(.*ershoufang)/([\d]+).(html$)""".r
   val houseListRegex: Regex   = """(.*ershoufang/pg[\d]+/$)""".r
 
-  val queryDomValue: (String, Map[String,Seq[Element]], Element => String) => String   = (typ: String, elements: Map[String, Seq[Element]], getDomValue: Element => String) => elements.get(typ).fold("")(e => getDomValue(e.head))
-  val getLiText: Element => String       = (e: Element) => e.childNodes.get(1).toString
-  val getLastSpanText: Element => String = (e: Element) => e.select("span").last().text()
+  val queryDomValue: (String, Map[String, Seq[Element]], Element => String) => String = (typ: String, elements: Map[String, Seq[Element]], getDomValue: Element => String) => elements.get(typ).fold("")(e => getDomValue(e.head))
+  val getLiText: Element => String                                                    = (e: Element) => e.childNodes.get(1).toString
+  val getLastSpanText: Element => String                                              = (e: Element) => e.select("span").last().text()
 
-  def getPage: Int = if (pageNo.get() >= 100) pageNo.getAndSet(0) else pageNo.incrementAndGet()
+  def getPage: Int = if (pageNo.get() >= 100) pageNo.getAndSet(1) else pageNo.incrementAndGet()
 
   override def doProcess(page: Page): Unit =
     page.requestSetting.url.get match {
@@ -38,7 +38,6 @@ class LianjiaErshouFangProcessor extends PageProcessor {
         page.addTargetRequest(s"https://bj.lianjia.com/ershoufang/pg${getPage}/")
       case houseDetailRegex(_, houseCode, _) =>
         val overviewContent = page.dom(".overview .content")
-        val price           = overviewContent.select(".price")
         val pageShoufu      = page.dom(".new-calculator").attr("data-shoufu")
 
         val (evaluationPrice, priceTotal) = pageShoufu match {
@@ -51,6 +50,8 @@ class LianjiaErshouFangProcessor extends PageProcessor {
             (0, 0)
         }
 
+        val price                = overviewContent.select(".price")
+        val removed              = price.hasClass("isRemove")
         val pricePerMeter        = price.getText(".unitPriceValue").replace("元/平米", "")
         val room                 = overviewContent.getElements(".room")
         val roomMainInfoText     = room.getText(".mainInfo")
@@ -117,7 +118,8 @@ class LianjiaErshouFangProcessor extends PageProcessor {
           housingUse = housingUse,
           houseYears = houseYears,
           houseRightOwner = houseRightOwner,
-          mortgageInfo = mortgageInfo
+          mortgageInfo = mortgageInfo,
+          removed = removed
         )
 
         page.addPageResultItem[Map[String, Any]](house.toMap)
@@ -185,7 +187,8 @@ case class House(
     housingUse: String,
     houseYears: String,
     houseRightOwner: String,
-    mortgageInfo: String)
+    mortgageInfo: String,
+    removed: Boolean = false)
 
 object House {
 

@@ -20,11 +20,11 @@ trait HtmlParser {
 
   implicit class PageWrapper(page: Page) {
 
-    val document: Document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
+    lazy val document: Document = Jsoup.parse(page.source, page.requestSetting.url.getOrElse(""))
 
-    val title: String = document.title()
+    lazy val title: String = document.title()
 
-    val body: Element = document.body()
+    lazy val body: Element = document.body()
 
     def div(element: String): Elements = document.select(element)
 

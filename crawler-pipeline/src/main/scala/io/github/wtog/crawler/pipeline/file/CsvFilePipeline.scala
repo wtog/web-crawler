@@ -29,7 +29,7 @@ object IOContentCache extends Logging {
 
   lazy val timestamp: Long = System.currentTimeMillis()
 
-  def add(key: String, value: Map[String, Any]): ListBuffer[Map[String,Any]] = {
+  def add(key: String, value: Map[String, Any]): ListBuffer[Map[String, Any]] = {
     val listValue = cache.getOrDefault(key, ListBuffer.empty[Map[String, Any]])
     listValue.append(value)
     cache.put(key, listValue)
