@@ -92,6 +92,7 @@ lazy val example = (project in file("crawler-example"))
   )
   .dependsOn(core, pipeline)
   .enablePlugins(DisablePublish, AssemblyPlugin)
+  .disablePlugins(ScoverageSbtPlugin)
 
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
