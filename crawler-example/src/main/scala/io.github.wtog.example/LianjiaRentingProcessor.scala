@@ -110,6 +110,7 @@ class LianjiaRentingProcessor extends PageProcessor {
 
   override def targetUrls: List[String] = List("https://bj.lianjia.com/zufang/pg1/")
 
+  override def cronExpression: Option[String] = Some("0 0/30 * * * ?")
 }
 
 case class RentingHouse(

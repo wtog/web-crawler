@@ -85,7 +85,7 @@ final case class ProxyDTO(
     port: Int,
     username: Option[String] = None,
     password: Option[String] = None,
-    var status: ProxyStatusEnums = ProxyStatusEnums.IDEL,
+    var status: ProxyStatusEnums = ProxyStatusEnums.IDLE,
     var usability: Float = 0f) {
 
   val checkUrl: URL               = new URL("http://www.baidu.com")
@@ -136,5 +136,5 @@ final case class ProxyDTO(
 object ProxyStatusEnums extends Enumeration {
   type ProxyStatusEnums = Value
   val USING: Value = Value("using")
-  val IDEL: Value  = Value("idel")
+  val IDLE: Value  = Value("idle")
 }
