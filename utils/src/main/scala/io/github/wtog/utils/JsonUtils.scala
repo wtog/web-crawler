@@ -14,11 +14,10 @@ object JsonUtils {
 
   private lazy val mapper: ObjectMapper with ScalaObjectMapper = {
     val mapper = new ObjectMapper() with ScalaObjectMapper
-    mapper
-      .setSerializationInclusion(Include.NON_NULL)
-      .setSerializationInclusion(Include.NON_ABSENT)
-      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-      .registerModule(DefaultScalaModule)
+    mapper.setSerializationInclusion(Include.NON_NULL)
+    mapper.setSerializationInclusion(Include.NON_ABSENT)
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    mapper.registerModule(DefaultScalaModule)
 
     mapper
   }
@@ -27,5 +26,7 @@ object JsonUtils {
 
   def toMap(t: Any): Map[String, Any] = mapper.convertValue[Map[String, Any]](t)
 
-  def parseFrom[T: Manifest](json: String): T = mapper.readValue[T](json)
+  def parseFrom[T: Manifest](json: String): T = mapper.readValue(json)
+
+  def parseFrom[T: Manifest](map: Map[String, Any]): T = mapper.convertValue(map)
 }

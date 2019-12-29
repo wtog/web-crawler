@@ -30,5 +30,4 @@ object HashMapStrategy extends DuplicateRemovedStrategy {
 
   private[this] def passedMinutes(latest: Long, duration: Duration) = (latest - System.currentTimeMillis()) > duration.toMillis
 
-
 }

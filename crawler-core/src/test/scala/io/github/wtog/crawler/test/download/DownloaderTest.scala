@@ -30,28 +30,28 @@ class DownloaderTest extends BaseCoreTest with BeforeAndAfter {
     assert(page.isDownloadSuccess)
   }
 
-  val procssor = LocalProcessor()
-  val url = procssor.requestSetting.url.get
+  val processor = LocalProcessor()
+  val url = processor.requestSetting.url.get
 
   test("chrome driver close resource safely") {
-    val page = await(ChromeHeadlessDownloader.download(Spider(pageProcessor = procssor), request = procssor.requestSetting.withUrl(s"${url}?id=0")))
+    val page = await(ChromeHeadlessDownloader.download(Spider(pageProcessor = processor), request = processor.requestSetting.withUrl(s"${url}?id=0")))
 
     assert(page.isDownloadSuccess)
     assert(page.source.nonEmpty)
 
     ChromeHeadlessDownloader.closeClient()
 
-    assert(ChromeHeadlessDownloader.getClient(procssor.requestSetting.domain).isEmpty)
+    assert(ChromeHeadlessDownloader.getClient(processor.requestSetting.domain).isEmpty)
   }
 
   test("asynchttpclient driver close resource safely") {
-    val page = await(AsyncHttpClientDownloader.download(Spider(pageProcessor = procssor), request = procssor.requestSetting.withUrl(s"${url}?id=0")))
+    val page = await(AsyncHttpClientDownloader.download(Spider(pageProcessor = processor), request = processor.requestSetting.withUrl(s"${url}?id=0")))
 
     assert(page.isDownloadSuccess)
     assert(page.source.nonEmpty)
     AsyncHttpClientDownloader.closeClient()
 
-    assert(AsyncHttpClientDownloader.getClient(procssor.requestSetting.domain).isEmpty)
+    assert(AsyncHttpClientDownloader.getClient(processor.requestSetting.domain).isEmpty)
   }
 
 }

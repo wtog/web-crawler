@@ -9,7 +9,7 @@ import org.apache.logging.log4j.scala.Logging
   */
 trait Pipeline extends Logging {
 
-  def init(): Unit
+  def init(): Unit = Unit
 
   def process[Result](pageResultItem: (String, Result)): Unit
 }

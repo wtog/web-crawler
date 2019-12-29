@@ -20,7 +20,8 @@ abstract class DuplicateRemovedQueue(duplicateRemovedStrategy: DuplicateRemovedS
       case "GET" ⇒
         !duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get)
       case "POST" ⇒
-        !duplicateRemovedStrategy.isDuplicate(requestHeaderGeneral.url.get + requestHeaderGeneral.requestBody
+        !duplicateRemovedStrategy.isDuplicate(
+          requestHeaderGeneral.url.get + requestHeaderGeneral.requestBody
             .getOrElse("")
         )
       case other ⇒
