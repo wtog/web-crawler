@@ -52,7 +52,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
   override def closeClient(): Unit = closeDownloaderClient { driver =>
     try (driver.quit())
     catch {
-      case e: UnreachableBrowserException =>
+      case _: UnreachableBrowserException =>
         Unit
       case e: Throwable =>
         throw e

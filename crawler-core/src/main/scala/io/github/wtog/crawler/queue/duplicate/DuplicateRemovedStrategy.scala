@@ -6,7 +6,7 @@ package io.github.wtog.crawler.queue.duplicate
   * @version : 1.0.0
   */
 trait DuplicateRemovedStrategy {
-  
+
   def isDuplicate(url: String): Boolean
 
 }

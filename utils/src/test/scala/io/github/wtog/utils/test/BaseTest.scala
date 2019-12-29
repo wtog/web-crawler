@@ -10,7 +10,7 @@ import scala.concurrent.duration._
   * @since : 10/30/19 11:54 PM
   * @version : 1.0.0
   */
-class BaseTest extends FunSuite  with Matchers with BeforeAndAfterAll{
+class BaseTest extends FunSuite with Matchers with BeforeAndAfterAll{
 
   def await[T](future: => Future[T]) = Await.result(future, 1 minute)
 
