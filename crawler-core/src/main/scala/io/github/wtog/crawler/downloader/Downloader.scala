@@ -116,13 +116,3 @@ case class DownloaderClient[C](domain: String, driver: C, consumers: AtomicInteg
   def increment(): Int = consumers.incrementAndGet()
   def decrement(): Int = consumers.decrementAndGet()
 }
-
-object Downloader {
-
-  object ContentType {
-    lazy val FORM_URLENCODED: Map[String, String] = Map("Content-Type" -> "application/x-www-form-urlencoded")
-    lazy val TEXT_PLAIN: Map[String, String]      = Map("Content-Type" -> "text/plain")
-    lazy val TEXT_JSON: Map[String, String]       = Map("Content-Type" -> "application/json")
-  }
-
-}

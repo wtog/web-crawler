@@ -17,5 +17,4 @@ object ProxyCrawlerPipeline extends Pipeline {
     ProxyProvider.proxyList.offer(resultMap)
   }
 
-  override def init(): Unit = {}
 }

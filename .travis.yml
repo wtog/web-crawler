@@ -16,7 +16,7 @@ language: scala
 script:
   - wget -q https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/chromedriver_linux64.zip
   - unzip -x chromedriver_linux64.zip -d /opt
-  - sbt ';clean ;coverage ;test ;coverageReport'
+  - sbt -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=System.getenv("SONAR_TOKEN") ';clean ;coverage ;test ;coverageReport sonarScan'
 
 jdk:
   - openjdk8
