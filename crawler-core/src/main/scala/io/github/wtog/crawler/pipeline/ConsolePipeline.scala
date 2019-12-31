@@ -11,5 +11,4 @@ object ConsolePipeline extends Pipeline {
     logger.trace(s"crawl result: ${url} - ${result}")
   }
 
-  override def init(): Unit = {}
 }
