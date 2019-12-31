@@ -10,14 +10,14 @@ import com.google.common.base.Converter
   */
 object StringUtils {
 
-  lazy val underscoreConverter: Converter[String, String]      = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
-  lazy val lowerunderscoreConverter: Converter[String, String] = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
+  lazy val underscoreConverter: Converter[String, String] = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE)
+  lazy val lowlandersConverter: Converter[String, String] = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL)
 
   implicit class StringWrapper(s: String) {
 
     def toUnderscore: String = underscoreConverter.convert(s)
 
-    def toLowercamel: String = lowerunderscoreConverter.convert(s)
+    def toLowercamel: String = lowlandersConverter.convert(s)
 
     def placeholderReplacedBy(placeholder: String, replacement: Any*): String = {
       val list   = s.split(placeholder).zip(replacement.toSeq)

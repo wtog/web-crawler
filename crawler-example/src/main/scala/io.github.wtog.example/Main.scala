@@ -2,7 +2,7 @@ package io.github.wtog.example
 
 import io.github.wtog.crawler.processor.PageProcessor
 import io.github.wtog.crawler.spider.Spider
-import io.github.wtog.utils.ClassUtils
+import io.github.wtog.utils.ReflectionUtils
 
 import scala.io.StdIn
 import scala.util.Try
@@ -16,8 +16,8 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val processorList = ClassUtils
-      .loadClasses(
+    val processorList = ReflectionUtils
+      .getInstances(
         classOf[PageProcessor],
         "io.github.wtog.example"
       )

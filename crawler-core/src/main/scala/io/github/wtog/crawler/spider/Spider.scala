@@ -66,10 +66,10 @@ case class Spider(name: String = Thread.currentThread().getName, pageProcessor: 
 
   private def execute(downloaderActor: ActorRef): Future[Unit] =
     Future {
-      this.pageProcessor.targetUrls.foreach { url ⇒
+      this.pageProcessor.targetRequests.foreach { url ⇒
         downloaderActor ! DownloadEvent(
           spider = this,
-          request = pageProcessor.requestSetting.withUrl(url)
+          request = pageProcessor.requestSetting.withRequestUri(url)
         )
         TimeUnit.MILLISECONDS.sleep(this.pageProcessor.requestSetting.sleepTime.toMillis)
       }

@@ -3,21 +3,19 @@ package io.github.wtog.utils
 import com.google.common.reflect.{ ClassPath, TypeToken }
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 /**
   * @author : tong.wang
   * @since : 11/19/18 11:39 PM
   * @version : 1.0.0
   */
-object ClassUtils {
+object ReflectionUtils {
+  private[this] lazy val CLASS_PATH = ClassPath.from(this.getClass.getClassLoader)
 
-  def loadClasses[T](clazz: Class[T], packageNames: String*): Seq[T] = {
-    val classPath = ClassPath.from(this.getClass.getClassLoader)
-
+  def getInstances[T](clazz: Class[T], packageNames: String*): Seq[T] =
     packageNames.flatMap { packageName ⇒
-      val classes = classPath.getTopLevelClassesRecursive(packageName).asScala
-      classes
-        .map(_.load())
+      getClasses(packageName)
         .filter { c ⇒
           !c.isInterface && TypeToken
             .of(c)
@@ -31,5 +29,5 @@ object ClassUtils {
         }
     }
 
-  }
+  def getClasses(packageName: String): mutable.Set[Class[_]] = CLASS_PATH.getTopLevelClassesRecursive(packageName).asScala.map(_.load())
 }
