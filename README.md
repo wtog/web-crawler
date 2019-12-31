@@ -1,6 +1,6 @@
 # web-crawler
 
-[![Build Status](https://travis-ci.com/wtog/web-crawler.svg?branch=dev)](https://travis-ci.com/wtog/web-crawler.svg?branch=dev) [![codecov](https://codecov.io/gh/wtog/web-crawler/branch/master/graph/badge.svg)](https://codecov.io/gh/wtog/web-crawler) ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.wtog/web-crawler_2.12.svg)
+[![Build Status](https://travis-ci.com/wtog/web-crawler.svg?branch=dev)](https://travis-ci.com/wtog/web-crawler.svg?branch=dev) [![codecov](https://codecov.io/gh/wtog/web-crawler/branch/dev/graph/badge.svg)](https://codecov.io/gh/wtog/web-crawler) ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.wtog/web-crawler_2.12.svg)
 
 ## 项目介绍
 

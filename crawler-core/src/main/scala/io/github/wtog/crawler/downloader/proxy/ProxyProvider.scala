@@ -10,7 +10,7 @@ import io.github.wtog.crawler.downloader.proxy.ProxyStatusEnums.ProxyStatusEnums
 import io.github.wtog.crawler.processor.PageProcessor
 import io.github.wtog.crawler.schedule.{ ScheduleJob, ScheduleJobs }
 import io.github.wtog.crawler.spider.Spider
-import io.github.wtog.utils.ClassUtils
+import io.github.wtog.utils.ReflectionUtils
 import org.quartz.{ Job, JobExecutionContext }
 import org.slf4j.{ Logger, LoggerFactory }
 
@@ -31,8 +31,8 @@ object ProxyProvider {
 
   val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
 
-  private lazy val proxyCrawlerList: Seq[Spider] = ClassUtils
-    .loadClasses(
+  private lazy val proxyCrawlerList: Seq[Spider] = ReflectionUtils
+    .getInstances(
       classOf[PageProcessor],
       "io.github.wtog.crawler.downloader.proxy.crawler"
     )
