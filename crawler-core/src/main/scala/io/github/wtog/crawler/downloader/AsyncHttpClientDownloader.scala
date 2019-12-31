@@ -22,7 +22,7 @@ object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
       buildProxy(proxy)(p => new ProxyServer.Builder(p.host, p.port).build())
     }
 
-    val builder = builderMethod(driver, request.url.get, request.method)
+    val builder = builderMethod(driver, request)
 
     val httpHeaders = new DefaultHttpHeaders
     request.headers.foreach { case (k, v) ⇒ httpHeaders.add(k, v) }
@@ -32,16 +32,21 @@ object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
 
   }
 
-  def builderMethod(driver: AsyncHttpClient, url: String, method: String): BoundRequestBuilder =
-    method.toUpperCase match {
+  def builderMethod(driver: AsyncHttpClient, requestSetting: RequestSetting): BoundRequestBuilder = {
+    val url = requestSetting.url.get
+    requestSetting.method.toUpperCase match {
       case "GET" ⇒
         driver.prepareGet(url)
       case "POST" ⇒
-        driver.preparePost(url)
+        val post = driver.preparePost(url)
+        requestSetting.requestBody.foreach(post.setBody)
+        post
       case other ⇒
-        logger.warn(s"unknown httpmethod ${other}")
+        logger.warn(s"unknown http method ${other}")
         throw IllegalArgumentsException(other)
     }
+
+  }
 
   override def doDownload(request: RequestSetting): Future[Page] = {
     val response = executeRequest(request) { proxyOpt =>
@@ -72,9 +77,7 @@ object AsyncHttpClientDownloader extends Downloader[AsyncHttpClient] {
     }(io.github.wtog.crawler.actor.ExecutionContexts.downloadDispatcher)
   }
 
-  def closeClient(): Unit = closeDownloaderClient { client =>
-    client.close()
-  }
+  def closeClient(): Unit = closeDownloaderClient(_.close())
 
   override protected def getOrCreateClient(requestSetting: RequestSetting): DownloaderClient[AsyncHttpClient] =
     getDownloaderClient(requestSetting.domain) {

@@ -1,8 +1,9 @@
-package io.github.wtog.crawler.test
+package io.github.wtog.crawler.test.schedule
 
 import java.util.concurrent.TimeUnit
 
 import io.github.wtog.crawler.schedule.{ScheduleJob, ScheduleJobs}
+import io.github.wtog.crawler.test.BaseCoreTest
 import org.quartz.{Job, JobExecutionContext}
 
 /**

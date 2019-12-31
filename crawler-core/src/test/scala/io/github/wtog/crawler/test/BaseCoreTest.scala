@@ -42,7 +42,7 @@ trait BaseCoreTest extends BaseTest {
     override protected def doProcess(page: Page): Unit = ???
   }
 
-  case class LocalProcessor() extends PageProcessor {
+  object LocalProcessor extends PageProcessor {
 
     val link = new AtomicInteger(0)
 
@@ -56,9 +56,11 @@ trait BaseCoreTest extends BaseTest {
     override def requestSetting: RequestSetting = {
       RequestSetting(
         domain = "localhost",
-        url = Some(s"http://localhost:${port}/mock/list")
+        url = Some(s"http://localhost:${port}/mock/get")
       )
     }
+
+    def getUrl(route: String): String = s"http://localhost:${port}${route}"
   }
 
 }

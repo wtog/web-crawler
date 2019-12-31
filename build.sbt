@@ -8,7 +8,7 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 lazy val scalafixSettings = Seq(
   addCompilerPlugin(scalafixSemanticdb),
-  scalacOptions ++= List("-Yrangepos", "-Ywarn-unused-import"))
+  scalacOptions ++= List(s"-P:semanticdb:targetroot:${System.getProperty("java.io.tmpdir")}/semanticdb","-Yrangepos", "-Ywarn-unused-import"))
 
 lazy val jmhSettings = Seq(
   sourceDirectory in Jmh := (sourceDirectory in Test).value,
@@ -112,4 +112,3 @@ javaOptions in run := Seq(
   "-Dlog4j.configurationFile=log4j2.xml",
   "-Xms512m", "-Xmx512m"
 )
-

@@ -2,6 +2,7 @@ package io.github.wtog.example
 
 import io.github.wtog.crawler.processor.{ Page, PageProcessor, RequestSetting }
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 
 /**
@@ -27,7 +28,7 @@ class BaiduPageProcessor() extends PageProcessor {
   override def requestSetting: RequestSetting =
     RequestSetting(
       domain = "www.baidu.com",
-      headers = Map("Content-Type" -> "text/html; charset=GB2312"),
+      headers = mutable.Map("Content-Type" -> "text/html; charset=GB2312"),
       sleepTime = 1 seconds
     )
 

@@ -9,7 +9,9 @@ import io.github.wtog.crawler.pipeline.{ ConsolePipeline, Pipeline }
 import io.github.wtog.crawler.queue.TargetRequestTaskQueue
 import io.github.wtog.crawler.selector.HtmlParser
 import io.github.wtog.crawler.selector.HtmlParser.parseJson
+import io.netty.handler.codec.http.HttpMethod
 
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Try
@@ -26,7 +28,19 @@ trait PageProcessor extends HtmlParser {
     *
     * @return
     */
+  @deprecated
   def targetUrls: List[String]
+
+  /**
+    * the target request for processor to crawl
+    * @return
+    */
+  def targetRequests: List[RequestUri] =
+    if (targetUrls.nonEmpty) {
+      targetUrls.map(url => RequestUri(url))
+    } else {
+      List.empty[RequestUri]
+    }
 
   /**
     * handle the crawled result
@@ -94,15 +108,15 @@ case class Page(isDownloadSuccess: Boolean = true, bytes: Option[Array[Byte]] = 
   override def toString: String = s"${requestSetting.url.get} downloaded ${isDownloadSuccess}"
 }
 
-case class RequestUri(url: String, method: String, requestBody: Option[String] = None, headers: Option[Map[String, String]] = None)
+case class RequestUri(url: String, method: String = HttpMethod.GET.toString, requestBody: Option[String] = None, headers: Option[Map[String, String]] = None)
 
 case class RequestSetting(
     domain: String = "",
-    method: String = "GET",
+    method: String = HttpMethod.GET.toString,
     url: Option[String] = None,
     userAgent: String = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36",
     requestBody: Option[String] = None,
-    headers: Map[String, String] = Map.empty[String, String],
+    headers: mutable.Map[String, String] = mutable.Map.empty[String, String],
     sleepTime: Duration = 1 seconds,
     cookies: Option[Map[String, String]] = None,
     charset: String = Charset.defaultCharset().name(),
@@ -110,17 +124,22 @@ case class RequestSetting(
     timeOut: Duration = 3 seconds,
     useProxy: Boolean = false) {
 
-  def withUrlAndMethod(url: String, method: String = "GET"): RequestSetting =
+  def withUrlAndMethod(url: String, method: String = HttpMethod.GET.toString): RequestSetting =
     this.copy(url = Some(url), method = method)
 
   def withUrl(url: String): RequestSetting = this.copy(url = Some(url))
 
   def withSleepTime(sleepTime: Duration): RequestSetting = this.copy(sleepTime = sleepTime)
 
-  def withHeaders(extraHeaders: Map[String, String]): RequestSetting =
-    this.copy(
-      headers = extraHeaders.foldLeft(this.headers)((common, extra) ⇒ common + extra)
-    )
+  def withHeaders(extraHeaders: Map[String, String]): RequestSetting = {
+    this.headers ++= extraHeaders.toSeq
+    this
+  }
+
+  def addHeader(header: String, value: String): RequestSetting = {
+    this.headers += (header -> value)
+    this
+  }
 
   def withMethodAndRequestBody(method: String, requestBody: Option[String]): RequestSetting =
     this.copy(method = method, requestBody = requestBody)
