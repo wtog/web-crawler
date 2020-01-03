@@ -2,7 +2,7 @@ package io.github.wtog.crawler.queue
 
 import java.util.concurrent.LinkedBlockingQueue
 
-import io.github.wtog.crawler.processor.RequestSetting
+import io.github.wtog.crawler.dto.RequestSetting
 import io.github.wtog.crawler.queue.duplicate.{ DuplicateRemovedStrategy, HashMapStrategy }
 
 /**

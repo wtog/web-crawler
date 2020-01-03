@@ -7,4 +7,5 @@ sbt assembly
 jar_name=`find target -type f -iname '*assembly*jar'`
 
 version='latest'
+
 docker build -f docker/Dockerfile -t wtog/web-crawler:${version} .

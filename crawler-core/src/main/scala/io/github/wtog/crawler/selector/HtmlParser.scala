@@ -2,7 +2,7 @@ package io.github.wtog.crawler.selector
 
 import java.nio.charset.Charset
 
-import io.github.wtog.crawler.processor.Page
+import io.github.wtog.crawler.dto.Page
 import io.github.wtog.utils.JsonUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element

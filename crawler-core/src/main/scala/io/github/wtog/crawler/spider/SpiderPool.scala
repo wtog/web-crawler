@@ -12,7 +12,8 @@ import org.quartz.{ Job, JobExecutionContext }
   * @version : 1.0.0
   */
 object SpiderPool {
-  val spiders = new ConcurrentHashMap[String, Spider]()
+
+  private[this] val spiders = new ConcurrentHashMap[String, Spider]()
 
   def addSpider(spider: Spider): Unit = {
     spiders.putIfAbsent(spider.name, spider)

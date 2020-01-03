@@ -1,7 +1,6 @@
 package io.github.wtog.crawler.dto
 
 import io.github.wtog.crawler.pipeline.Pipeline
-import io.github.wtog.crawler.processor.{ Page, RequestSetting }
 import io.github.wtog.crawler.spider.Spider
 import org.apache.logging.log4j.scala.Logging
 

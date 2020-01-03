@@ -1,8 +1,8 @@
 package io.github.wtog.crawler.downloader
 
 import io.github.wtog.crawler.downloader.proxy.ProxyDTO
+import io.github.wtog.crawler.dto.{ Page, RequestSetting }
 import io.github.wtog.crawler.exceptions.IllegalArgumentsException
-import io.github.wtog.crawler.processor.{ Page, RequestSetting }
 import io.netty.handler.codec.http.{ DefaultHttpHeaders, HttpHeaderNames }
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient._

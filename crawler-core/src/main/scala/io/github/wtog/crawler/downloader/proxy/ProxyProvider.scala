@@ -36,12 +36,7 @@ object ProxyProvider {
       classOf[PageProcessor],
       "io.github.wtog.crawler.downloader.proxy.crawler"
     )
-    .map { proxy ⇒
-      (Spider(
-        name = s"proxy-${proxy.getClass.getSimpleName}",
-        pageProcessor = proxy
-      ))
-    }
+    .map(proxy ⇒ Spider(pageProcessor = proxy))
 
   private def crawlCronJob(restart: Boolean = false) =
     if (restart) proxyCrawlerList.foreach(_.restart())
@@ -68,7 +63,7 @@ class ProxyCheckScheduleJob extends Job {
     }
 
     if (logger.isDebugEnabled) {
-      logger.debug(s"proxylist is ${proxyList.size()}")
+      logger.debug(s"proxy list is ${proxyList.size()}")
     }
 
     (1 to 5).foreach { _ =>

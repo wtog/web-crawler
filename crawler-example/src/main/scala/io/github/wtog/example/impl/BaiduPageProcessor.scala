@@ -1,6 +1,7 @@
-package io.github.wtog.example
+package io.github.wtog.example.impl
 
-import io.github.wtog.crawler.processor.{ Page, PageProcessor, RequestSetting }
+import io.github.wtog.crawler.dto.{ Page, RequestSetting }
+import io.github.wtog.example.ExampleTrait
 
 import scala.collection.mutable
 import scala.concurrent.duration._
@@ -10,7 +11,7 @@ import scala.concurrent.duration._
   * @since : 5/16/18 11:42 PM
   * @version : 1.0.0
   */
-class BaiduPageProcessor() extends PageProcessor {
+class BaiduPageProcessor() extends ExampleTrait {
 
   override def doProcess(page: Page): Unit = {
     val hotSearched = page.div("#content_right .opr-toplist1-table tr")

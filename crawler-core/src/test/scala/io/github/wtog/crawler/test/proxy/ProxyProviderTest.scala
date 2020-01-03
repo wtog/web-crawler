@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import io.github.wtog.crawler.downloader.proxy.ProxyProvider
 import io.github.wtog.crawler.downloader.proxy.crawler.{A2UPageProcessor, Data5UPageProcessor, IP89Processor}
+import io.github.wtog.crawler.dto.RequestSetting
 import io.github.wtog.crawler.spider.Spider
 import io.github.wtog.crawler.test.BaseCoreTest
 
@@ -14,27 +15,28 @@ import io.github.wtog.crawler.test.BaseCoreTest
   */
 class ProxyProviderTest extends BaseCoreTest {
 
-  test("Spider use proxy with requestting useProxy=true") {
-    Spider(name = this.getClass.getSimpleName, pageProcessor = TestProcessor(requestSettingTest.copy(useProxy = true))).start()
+  test("spider use proxy with request setting useProxy=true") {
+    val request = RequestSetting(
+      url = Some(localServerHost),
+      useProxy = true
+    )
 
-    TimeUnit.SECONDS.sleep(10)
+    Spider(pageProcessor = LocalProcessor(request)).start()
     assert(ProxyProvider.proxySpiderCrawling.get())
-    assert(ProxyProvider.proxyList.size() > 0)
-
   }
 
   ignore("a2u proxy") {
-    Spider(name = "a2u-proxy", pageProcessor = A2UPageProcessor()).start()
+    Spider(pageProcessor = A2UPageProcessor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
 
   ignore("data5u proxy") {
-    Spider(name = "data5u-proxy", pageProcessor = Data5UPageProcessor()).start()
+    Spider(pageProcessor = Data5UPageProcessor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
 
   ignore("ip89 proxy") {
-    Spider(name = "89ip-proxy", pageProcessor = IP89Processor()).start()
+    Spider(pageProcessor = IP89Processor()).start()
     TimeUnit.SECONDS.sleep(10)
   }
 }
