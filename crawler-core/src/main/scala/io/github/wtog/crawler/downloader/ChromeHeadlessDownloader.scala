@@ -97,10 +97,11 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     logPrefs.enable(LogType.PERFORMANCE, Level.ALL)
     options.setCapability("goog:loggingPrefs", logPrefs)
     options.addArguments(
+      "--no-sandbox",
       "--headless",
+      "--disable-dev-shm-usage",
       "--disable-gpu",
       "--ignore-certificate-errors",
-      "start-maximized",
       s"--user-agent=${requestSetting.userAgent}"
     )
 

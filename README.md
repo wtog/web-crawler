@@ -73,5 +73,5 @@
   2. start container
   
       ```docker
-      docker run -it --init --name web-crawler wtog/web-crawler:latest
+      docker run -it --name web-crawler wtog/web-crawler:latest
       ```

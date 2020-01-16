@@ -53,7 +53,7 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % Versions.akkaVersion)
 
-    lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1"
+    lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1" exclude("com.zaxxer", "HikariCP-java7")
 
     lazy val httpUtils = Seq("org.asynchttpclient" % "async-http-client" % Versions.httpClient)
 
