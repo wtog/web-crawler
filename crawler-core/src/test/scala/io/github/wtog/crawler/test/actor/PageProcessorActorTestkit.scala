@@ -4,7 +4,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.Props
 import akka.testkit.TestProbe
-import io.github.wtog.crawler.dto.{DownloadEvent, ProcessorEvent}
+import io.github.wtog.crawler.dto
+import io.github.wtog.crawler.dto.{DownloadEvent, Page, ProcessorEvent, RequestSetting}
 import io.github.wtog.crawler.processor._
 import io.github.wtog.crawler.spider.Spider
 
@@ -35,7 +36,7 @@ class PageProcessorActorTestkit extends ActorTestBase {
 
       val testProcessor = new TestProcessor()
       val pages = testProcessor.targetUrls.map { url =>
-        Page(bytes = Some("hh".getBytes()), requestSetting = testProcessor.requestSetting.withUrl(url))
+        dto.Page(bytes = Some("hh".getBytes()), requestSetting = testProcessor.requestSetting.withUrl(url))
       }
 
       val spider = Spider(pageProcessor = testProcessor)

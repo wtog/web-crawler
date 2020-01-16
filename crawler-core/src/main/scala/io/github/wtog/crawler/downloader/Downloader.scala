@@ -1,10 +1,12 @@
 package io.github.wtog.crawler.downloader
 
-import java.util.concurrent.{ ConcurrentHashMap, Executors, TimeUnit }
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.{ ConcurrentHashMap, Executors, ScheduledFuture, TimeUnit }
 
 import io.github.wtog.crawler.downloader.proxy.{ ProxyDTO, ProxyProvider }
-import io.github.wtog.crawler.processor.{ Page, RequestSetting }
+import scala.collection.JavaConverters._
+import io.github.wtog.crawler.dto
+import io.github.wtog.crawler.dto.{ Page, RequestSetting }
 import io.github.wtog.crawler.spider.Spider
 import io.github.wtog.utils.RetryUtils._
 import io.github.wtog.utils.{ ConfigUtils, RetryInfo }
@@ -13,7 +15,6 @@ import org.slf4j.{ Logger, LoggerFactory }
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
-import java.util.concurrent.ScheduledFuture
 
 /**
   * @author : tong.wang
@@ -69,12 +70,8 @@ trait Downloader[Driver] {
       execute(None)
     }
 
-  protected def pageResult(requestSetting: RequestSetting, results: Option[Array[Byte]] = None, downloadSuccess: Boolean = true, msg: Option[String] = None): Page = {
-    if (!downloadSuccess) {
-      logger.warn(s"failed to download ${requestSetting.url.get}, cause ${msg.getOrElse("")} ")
-    }
-    Page(downloadSuccess, bytes = results, requestSetting = requestSetting)
-  }
+  protected def pageResult(requestSetting: RequestSetting, results: Option[Array[Byte]] = None, downloadSuccess: Boolean = true, msg: Option[String] = None): Page =
+    dto.Page(downloadSuccess, bytes = results, requestSetting = requestSetting)
 
   protected def getDownloaderClient(domain: String)(driver: => Driver): DownloaderClient[Driver] = {
     val clientCache = Option(clientsPool.get(domain))
@@ -89,9 +86,8 @@ trait Downloader[Driver] {
     downloaderClient
   }
 
-  def closeDownloaderClient(close: Driver => Unit): Unit = {
-    import scala.collection.JavaConversions._
-    for (e <- clientsPool.entrySet()) {
+  def closeDownloaderClient(close: Driver => Unit): Unit =
+    for (e <- clientsPool.entrySet().asScala) {
       val (domain, downloaderClient) = (e.getKey, e.getValue)
       if (downloaderClient.idle()) {
         Try(close(downloaderClient.driver)) match {
@@ -103,7 +99,6 @@ trait Downloader[Driver] {
         clientsPool.remove(domain)
       }
     }
-  }
 
   sys.addShutdownHook {
     try (closeClient())

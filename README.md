@@ -52,7 +52,7 @@
   }
 
   // 启动爬虫
-  Spider(name = "zhihu", pageProcessor = ZhihuAnswerPageProcessor()).start() 
+  Spider(pageProcessor = ZhihuAnswerPageProcessor()).start()
   ```
 
   [更多例子](https://github.com/wtog/web-crawler/tree/master/crawler-example/src/main/scala/io.github.wtog.example)
@@ -73,5 +73,5 @@
   2. start container
   
       ```docker
-      docker run -it --init --name web-crawler wtog/web-crawler:latest
+      docker run -it --name web-crawler wtog/web-crawler:latest
       ```

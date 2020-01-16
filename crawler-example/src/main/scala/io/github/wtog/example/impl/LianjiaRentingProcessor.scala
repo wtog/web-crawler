@@ -1,17 +1,16 @@
-package io.github.wtog.example
+package io.github.wtog.example.impl
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-import io.github.wtog.crawler.pipeline.db.{ DataSource, DataSourceInfo, PostgreSQLPipeline }
+import io.github.wtog.crawler.dto.{ Page, RequestSetting }
 import io.github.wtog.crawler.pipeline.Pipeline
-import io.github.wtog.crawler.processor.{ Page, PageProcessor, RequestSetting }
-import io.github.wtog.crawler.spider.Spider
+import io.github.wtog.crawler.pipeline.db.{ DataSource, DataSourceInfo, PostgreSQLPipeline }
+import io.github.wtog.example.ExampleTrait
 import io.github.wtog.utils.JsonUtils
-import org.jsoup.nodes.Element
 import io.github.wtog.utils.StringUtils._
+import org.jsoup.nodes.Element
 
 import scala.concurrent.duration._
 import scala.util.Random
@@ -22,7 +21,7 @@ import scala.util.matching.Regex
   * @since : 10/11/19 10:01 APM
   * @version : 1.0.0
   */
-class LianjiaRentingProcessor extends PageProcessor {
+class LianjiaRentingProcessor extends ExampleTrait {
   val pageNo                  = new AtomicInteger(1)
   val houseDetailRegex: Regex = """(.*zufang)/([BJ\d]+).(html$)""".r
   val houseListRegex: Regex   = """(.*)/(zufang)/(pg[\d]+/$)""".r
@@ -128,12 +127,3 @@ case class RentingHouse(
     subway: Option[String] = None,
     decoration: Option[String] = None,
     heating: Option[String] = None)
-
-object LianjiaRentingProcessor {
-  def main(args: Array[String]): Unit = {
-    val spider = Spider(name = "renting", pageProcessor = new LianjiaRentingProcessor())
-    spider.start()
-
-    TimeUnit.SECONDS.sleep(4)
-  }
-}

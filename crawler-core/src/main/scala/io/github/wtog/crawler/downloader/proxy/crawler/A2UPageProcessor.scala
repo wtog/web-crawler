@@ -1,7 +1,7 @@
 package io.github.wtog.crawler.downloader.proxy.crawler
 
 import io.github.wtog.crawler.downloader.proxy.ProxyDTO
-import io.github.wtog.crawler.processor.{ Page, RequestSetting }
+import io.github.wtog.crawler.dto.{ Page, RequestSetting }
 
 import scala.concurrent.duration._
 

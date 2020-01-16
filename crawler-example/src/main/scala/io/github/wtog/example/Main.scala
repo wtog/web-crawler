@@ -14,19 +14,24 @@ import scala.util.Try
   */
 object Main {
 
-  def main(args: Array[String]): Unit = {
+  def printProcessors(processorList: Seq[(ExampleTrait, Int)]): Unit = {
+    for ((service, order) ← processorList) {
+      println(s"\t${order}. ${service.getClass.getSimpleName}")
+    }
+    println("")
+  }
 
+  def main(args: Array[String]): Unit = {
     val processorList = ReflectionUtils
-      .getInstances(
-        classOf[PageProcessor],
-        "io.github.wtog.example"
-      )
+      .getInstances(classOf[ExampleTrait], "io.github.wtog.example")
+      .filter(_.enable)
       .sortWith(_.getClass.getSimpleName < _.getClass.getSimpleName)
       .zip(Stream.from(1))
 
     val execProcessors = args match {
       case args: Array[String] if args.isEmpty || args.contains("0") ⇒
-        println("executing all processors")
+        println("executing all enabled processors")
+        printProcessors(processorList)
         processorList
       case args: Array[String] if (args.nonEmpty && args.toSeq.forall(arg ⇒ Try(arg.toInt).isSuccess)) ⇒
         val processors = processorList.filter {
@@ -38,9 +43,8 @@ object Main {
       case _ ⇒
         println("\nshow page processor list: ")
         println("\t0. all")
-        for ((service, order) ← processorList) {
-          println(s"\t${order}. ${service.getClass.getSimpleName}")
-        }
+
+        printProcessors(processorList)
 
         println("\nchoose number to execute.")
         println("input like 1,2,3 means to execute 1 and 2 and 3 processor")
@@ -67,9 +71,6 @@ object Main {
   def startSpiders(processorList: Seq[(PageProcessor, Int)]): Unit =
     processorList.foreach {
       case (processor, _) ⇒
-        Spider(
-          name = processor.getClass.getSimpleName,
-          pageProcessor = processor
-        ).start()
+        Spider(pageProcessor = processor).start()
     }
 }

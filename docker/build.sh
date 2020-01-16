@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-find target -type f -iname '*assembly*jar' | xargs rm
+find crawler-example -type d -iname 'target' | xargs rm -rf
 
-sbt assembly
-
-jar_name=`find target -type f -iname '*assembly*jar'`
+sbt clean assembly
 
 version='latest'
-docker build -f docker/Dockerfile -t wtog/web-crawler:${version} .
+
+docker build -f docker/Dockerfile -t wtog/web-crawler:${version} ./crawler-example/target/scala-2.12/

@@ -10,7 +10,7 @@ object Dependencies {
   object Versions {
     val akkaVersion = "2.5.23"
     val log4j2 = "2.11.0"
-    val seleniumhq = "4.0.0-alpha-2"
+    val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
     val jackson = "2.9.10"
     val guava = "28.1-jre"
@@ -22,6 +22,7 @@ object Dependencies {
 
   implicit class ModuleIDWrapper(moduleID: ModuleID) {
     def provided: ModuleID = moduleID.withConfigurations(Some("provided"))
+
     def test: ModuleID = moduleID.withConfigurations(Some("test"))
   }
 
@@ -52,7 +53,7 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % Versions.akkaVersion)
 
-    lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1"
+    lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1" exclude("com.zaxxer", "HikariCP-java7")
 
     lazy val httpUtils = Seq("org.asynchttpclient" % "async-http-client" % Versions.httpClient)
 
@@ -63,8 +64,8 @@ object Dependencies {
     )
 
     lazy val test = Seq(
-      "com.typesafe.akka" %% "akka-testkit" % Versions.akkaVersion,scalatest
-       ).map(_.test)
+      "com.typesafe.akka" %% "akka-testkit" % Versions.akkaVersion, scalatest
+    ).map(_.test)
 
     lazy val dependencies = Seq(quartz, guava, typesafeConfig) ++ jackson ++ derby ++ log ++ httpParser ++ httpUtils ++ test ++ selenium
   }
@@ -77,12 +78,12 @@ object Dependencies {
     lazy val hikari = "com.zaxxer" % "HikariCP" % Versions.hikariCP
 
     lazy val h2 = "com.h2database" % "h2" % "1.4.192"
-    
+
     lazy val dependencies = Seq(scalatest, h2).map(_.test) ++ Seq(pg, hikari).map(_.provided)
   }
 
   object example {
-    lazy val dependencies = log ++ Seq(pipeline.pg, pipeline.hikari)
+    lazy val dependencies = core.dependencies ++ log ++ Seq(pipeline.pg, pipeline.hikari)
   }
 
 }

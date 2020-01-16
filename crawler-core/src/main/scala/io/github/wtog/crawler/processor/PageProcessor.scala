@@ -1,20 +1,12 @@
 package io.github.wtog.crawler.processor
 
-import java.net.URL
-import java.nio.charset.Charset
-import java.util.concurrent.LinkedBlockingQueue
-
 import io.github.wtog.crawler.actor.ExecutionContexts.processorDispatcher
+import io.github.wtog.crawler.downloader.{ AsyncHttpClientDownloader, Downloader }
+import io.github.wtog.crawler.dto.{ Page, RequestSetting, RequestUri }
 import io.github.wtog.crawler.pipeline.{ ConsolePipeline, Pipeline }
-import io.github.wtog.crawler.queue.TargetRequestTaskQueue
 import io.github.wtog.crawler.selector.HtmlParser
-import io.github.wtog.crawler.selector.HtmlParser.parseJson
-import io.netty.handler.codec.http.HttpMethod
 
-import scala.collection.mutable
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.Try
 
 /**
   * @author : tong.wang
@@ -23,13 +15,20 @@ import scala.util.Try
   */
 trait PageProcessor extends HtmlParser {
 
+  val name: String = this.getClass.getSimpleName
+
+  /**
+    * download client
+    */
+  val downloader: Downloader[_] = AsyncHttpClientDownloader
+
   /**
     * the target urls for processor to crawl
     *
     * @return
     */
   @deprecated
-  def targetUrls: List[String]
+  def targetUrls: List[String] = Nil
 
   /**
     * the target request for processor to crawl
@@ -73,106 +72,5 @@ trait PageProcessor extends HtmlParser {
     * @return
     */
   def cronExpression: Option[String] = None
-}
 
-case class Page(isDownloadSuccess: Boolean = true, bytes: Option[Array[Byte]] = None, responseHeaders: Map[String, String] = Map.empty[String, String], requestSetting: RequestSetting) {
-
-  lazy val resultItems: LinkedBlockingQueue[Any] = new LinkedBlockingQueue[Any]
-  lazy val requestQueue: TargetRequestTaskQueue  = new TargetRequestTaskQueue()
-
-  lazy val url = requestSetting.url.get
-
-  def source: String = bytes match {
-    case Some(byte) ⇒
-      HtmlParser.getHtmlSourceWithCharset(byte, requestSetting.charset)
-    case None ⇒
-      throw new IllegalStateException("no page source text found ")
-  }
-
-  def json[T: Manifest](text: Option[String] = None): T = parseJson[T](text.getOrElse(this.source))
-
-  def addTargetRequest(urlAdd: String): Unit = addRequest(this.requestSetting.withUrl(url = urlAdd))
-
-  def addTargetRequest(requestUri: RequestUri): Unit = addRequest(this.requestSetting.withRequestUri(requestUri))
-
-  private[this] def addRequest(requestSetting: RequestSetting): Unit = {
-    val url = requestSetting.url.get
-
-    if (Try(new URL(url)).isSuccess) {
-      this.requestQueue.push(requestSetting)
-    }
-  }
-
-  def addPageResultItem[R](result: R): Unit = this.resultItems.add(result)
-
-  override def toString: String = s"${requestSetting.url.get} downloaded ${isDownloadSuccess}"
-}
-
-case class RequestUri(url: String, method: String = HttpMethod.GET.toString, requestBody: Option[String] = None, headers: Option[Map[String, String]] = None)
-
-case class RequestSetting(
-    domain: String = "",
-    method: String = HttpMethod.GET.toString,
-    url: Option[String] = None,
-    userAgent: String = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36",
-    requestBody: Option[String] = None,
-    headers: mutable.Map[String, String] = mutable.Map.empty[String, String],
-    sleepTime: Duration = 1 seconds,
-    cookies: Option[Map[String, String]] = None,
-    charset: String = Charset.defaultCharset().name(),
-    retryTime: Int = 0,
-    timeOut: Duration = 3 seconds,
-    useProxy: Boolean = false) {
-
-  def withUrlAndMethod(url: String, method: String = HttpMethod.GET.toString): RequestSetting =
-    this.copy(url = Some(url), method = method)
-
-  def withUrl(url: String): RequestSetting = this.copy(url = Some(url))
-
-  def withSleepTime(sleepTime: Duration): RequestSetting = this.copy(sleepTime = sleepTime)
-
-  def withHeaders(extraHeaders: Map[String, String]): RequestSetting = {
-    this.headers ++= extraHeaders.toSeq
-    this
-  }
-
-  def addHeader(header: String, value: String): RequestSetting = {
-    this.headers += (header -> value)
-    this
-  }
-
-  def withMethodAndRequestBody(method: String, requestBody: Option[String]): RequestSetting =
-    this.copy(method = method, requestBody = requestBody)
-
-  def withRequestUri(requestUri: RequestUri): RequestSetting = {
-    val basic = this.copy(
-      url = Some(requestUri.url),
-      method = requestUri.method,
-      requestBody = requestUri.requestBody
-    )
-
-    requestUri.headers.fold(basic) { extra ⇒
-      basic.withHeaders(extra)
-    }
-  }
-
-  override def toString: String = {
-    val fields = this.getClass.getDeclaredFields
-      .map { field =>
-        val value = field.get(this) match {
-          case v: Option[Any] =>
-            v.getOrElse("")
-          case v =>
-            v
-        }
-
-        (s"${field.getName}: $value", value)
-      }
-      .collect {
-        case (v: String, t: String) if !t.isEmpty           => v
-        case (v: String, t: Any) if !t.isInstanceOf[String] => v
-      }
-
-    s"${fields.mkString(", ")}"
-  }
 }

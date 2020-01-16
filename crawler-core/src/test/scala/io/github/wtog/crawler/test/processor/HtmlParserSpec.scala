@@ -1,6 +1,7 @@
 package io.github.wtog.crawler.test.processor
 
-import io.github.wtog.crawler.processor.{Page, RequestSetting}
+import io.github.wtog.crawler.dto
+import io.github.wtog.crawler.dto.{Page, RequestSetting}
 import io.github.wtog.crawler.selector.HtmlParser
 import io.github.wtog.crawler.test.BaseCoreTest
 
@@ -35,7 +36,7 @@ class HtmlParserSpec extends BaseCoreTest with HtmlParser {
         |]
       """.stripMargin
 
-    val pageJsonList = Page(bytes = Some(pageListJson.getBytes()), requestSetting = RequestSetting()).json[List[Map[String, Any]]]()
+    val pageJsonList = dto.Page(bytes = Some(pageListJson.getBytes()), requestSetting = RequestSetting()).json[List[Map[String, Any]]]()
 
     assert(pageJsonList.head("id") == 1)
     assert(pageJsonList.head("name") == "test")

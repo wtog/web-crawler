@@ -1,9 +1,8 @@
 package io.github.wtog.utils
 
-import com.typesafe.config.{ ConfigException, ConfigFactory }
+import com.typesafe.config.ConfigFactory
 
 import scala.collection.JavaConverters._
-import scala.util.{ Failure, Success, Try }
 import com.typesafe.config.Config
 
 /**
@@ -21,16 +20,14 @@ object ConfigUtils {
 
   def getIntOpt(path: String): Option[Int] = getOpt[Int](path)(config.getInt)
 
+  def getBooleanOpt(path: String): Option[Boolean] = getOpt[Boolean](path)(config.getBoolean)
+
   def getConfig(name: String): Config = config.getConfig(name)
 
   private[this] def getOpt[T](path: String)(getConfig: String => T): Option[T] =
-    Try(getConfig(path)) match {
-      case Success(value) =>
-        Some(value)
-      case Failure(e: ConfigException.Missing) =>
-        None
-      case Failure(e) =>
-        throw e
+    if (config.hasPath(path)) {
+      Some(getConfig(path))
+    } else {
+      None
     }
-
 }

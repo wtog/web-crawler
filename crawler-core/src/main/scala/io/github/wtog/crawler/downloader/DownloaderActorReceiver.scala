@@ -25,7 +25,7 @@ class DownloaderActorReceiver extends Actor {
       val spider = downloadEvent.spider
 
       import io.github.wtog.crawler.actor.ExecutionContexts.downloadDispatcher
-      spider.downloader.download(spider, downloadEvent.request).foreach {
+      spider.pageProcessor.downloader.download(spider, downloadEvent.request).foreach {
         case page if page.isDownloadSuccess ⇒
           processorActor ! ProcessorEvent(spider, page)
         case page =>
