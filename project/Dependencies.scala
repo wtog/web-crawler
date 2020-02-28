@@ -8,7 +8,7 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val akkaVersion = "2.5.23"
+    val akkaVersion = "2.6.3"
     val log4j2 = "2.11.0"
     val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
