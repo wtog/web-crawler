@@ -52,7 +52,8 @@ case class RequestSetting(
     val basic = this.copy(
       url = Some(requestUri.url),
       method = requestUri.method,
-      requestBody = requestUri.requestBody
+      requestBody = requestUri.requestBody,
+      xhrRequests = requestUri.xhrRequests
     )
 
     requestUri.headers.fold(basic) { extra ⇒
@@ -88,4 +89,9 @@ case class RequestSetting(
   }
 }
 
-case class RequestUri(url: String, method: String = HttpMethod.GET.toString, requestBody: Option[String] = None, headers: Option[Map[String, String]] = None)
+case class RequestUri(
+                       url: String,
+                       method: String = HttpMethod.GET.toString,
+                       requestBody: Option[String] = None,
+                       headers: Option[Map[String, String]] = None,
+                       xhrRequests: Set[String] = Set.empty[String])

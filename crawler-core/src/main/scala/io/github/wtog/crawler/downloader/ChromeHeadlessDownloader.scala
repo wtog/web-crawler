@@ -5,16 +5,16 @@ import java.util
 import java.util.logging.Level
 
 import io.github.wtog.crawler.downloader.ChromeHeadlessConfig._
-import io.github.wtog.crawler.dto.{ Page, RequestSetting, XhrResponse }
-import io.github.wtog.utils.{ ConfigUtils, JsonUtils }
-import org.openqa.selenium.chrome.{ ChromeDriver, ChromeOptions }
-import org.openqa.selenium.logging.{ LogType, LoggingPreferences }
+import io.github.wtog.crawler.dto.{Page, RequestSetting, XhrResponse}
+import io.github.wtog.utils.{ConfigUtils, JsonUtils}
+import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.logging.{LogType, LoggingPreferences}
 import org.openqa.selenium.remote.UnreachableBrowserException
 
-import scala.concurrent.Future
-import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 /**
   * @author : tong.wang
@@ -41,7 +41,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
           val xhrResponse = iterator.next()
           val message     = JsonUtils.parseFrom[Map[String, Any]](xhrResponse.getMessage).get("message").get.asInstanceOf[Map[String, Any]]
           message.get("params").foreach {
-            case params: Map[String, Any] =>
+            case params: Map[String, Any] @unchecked =>
               val headers = params.getOrElse("headers", Map.empty[String, Any]).asInstanceOf[Map[String, Any]]
               getXhrRequestUriByHeaders(headers).foreach {
                 case xhrResponseUri: String if requestSetting.xhrRequests.contains(xhrResponseUri) =>
@@ -53,7 +53,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
           }
         }
 
-        Page(requestSetting = requestSetting, xhrResponses = xhrResponseBuffer)
+        Page(requestSetting = requestSetting, bytes = Some(driver.getPageSource.getBytes()) , xhrResponses = xhrResponseBuffer)
       } catch {
         case NonFatal(exception) =>
           Page.failed(requestSetting, exception)
@@ -85,6 +85,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
         None
     }
 
+
   private[this] def buildOptions(requestSetting: RequestSetting): ChromeOptions = {
     val options = new ChromeOptions()
     options.setExperimentalOption("excludeSwitches", Array[String]("enable-automation"))
@@ -95,11 +96,19 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
 
     val logPrefs = new LoggingPreferences
     logPrefs.enable(LogType.PERFORMANCE, Level.ALL)
+    logPrefs.enable(LogType.SERVER, Level.ALL)
+    logPrefs.enable(LogType.BROWSER, Level.ALL)
+    logPrefs.enable(LogType.DRIVER, Level.ALL)
+    logPrefs.enable(LogType.CLIENT, Level.ALL)
     options.setCapability("goog:loggingPrefs", logPrefs)
     options.addArguments(
       "--no-sandbox",
       "--headless",
+      "--start-maximized",
       "--disable-dev-shm-usage",
+      "--disable-plugins-discovery",
+      "--enable-logging",
+      "--v=1",
       "--disable-gpu",
       "--ignore-certificate-errors",
       s"--user-agent=${requestSetting.userAgent}"
@@ -116,7 +125,13 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     val map    = new util.HashMap[String, Object]()
     map.put("source", """
         |Object.defineProperty(navigator, 'webdriver', {
-        |      get: () => false,
+        |      get: () => false
+        |});
+        |Object.defineProperty(navigator, 'plugins', {
+        |      get: () => [1, 2, 3, 4, 5]
+        |});
+        |Object.defineProperty(navigator, 'languages', {
+        |      get: () => ["zh-CN","zh","en-US","en"]
         |});
         |""".stripMargin)
     driver.executeCdpCommand("Page.addScriptToEvaluateOnNewDocument", map)
