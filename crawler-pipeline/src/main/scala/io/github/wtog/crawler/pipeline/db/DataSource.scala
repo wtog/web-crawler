@@ -4,7 +4,7 @@ import java.sql._
 import java.util.concurrent.ConcurrentHashMap
 
 import com.zaxxer.hikari.HikariDataSource
-import org.apache.logging.log4j.scala.Logging
+import io.github.wtog.utils.logger.Logging
 
 import scala.collection.mutable.ListBuffer
 import scala.util.control.NonFatal
@@ -81,7 +81,7 @@ object DataSource extends Logging {
         }
         index += 1
       }
-      logger.debug(sql)
+      logger.debug(s"${sql}")
       exec(statement)
     } finally {
       conn.close()

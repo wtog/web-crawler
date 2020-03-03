@@ -4,8 +4,8 @@ import java.nio.charset.Charset
 
 import io.github.wtog.crawler.rest.{Router, Server}
 import io.github.wtog.utils.JsonUtils
+import io.github.wtog.utils.logger.Logging
 import io.netty.handler.codec.http.{FullHttpRequest, HttpMethod}
-import org.apache.logging.log4j.scala.Logging
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

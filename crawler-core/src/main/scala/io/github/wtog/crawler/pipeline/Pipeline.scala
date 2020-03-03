@@ -1,6 +1,6 @@
 package io.github.wtog.crawler.pipeline
 
-import org.apache.logging.log4j.scala.Logging
+import io.github.wtog.utils.logger.Logging
 
 /**
   * @author : tong.wang
