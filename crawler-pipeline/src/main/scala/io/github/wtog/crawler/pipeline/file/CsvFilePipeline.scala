@@ -4,7 +4,7 @@ import java.io.RandomAccessFile
 import java.util.concurrent._
 
 import io.github.wtog.crawler.pipeline.Pipeline
-import org.apache.logging.log4j.scala.Logging
+import io.github.wtog.utils.logger.Logging
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import io.github.wtog.crawler.queue.TargetRequestTaskQueue
 import io.github.wtog.crawler.selector.HtmlParser
 import io.github.wtog.crawler.selector.HtmlParser.parseJson
-import org.apache.logging.log4j.scala.Logging
+import io.github.wtog.utils.logger.Logging
 
 import scala.util.Try
 

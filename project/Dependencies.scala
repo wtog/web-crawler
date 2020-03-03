@@ -9,7 +9,7 @@ object Dependencies {
 
   object Versions {
     val akkaVersion = "2.6.3"
-    val log4j2 = "2.11.0"
+    val log4j2 = "2.13.1"
     val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
     val jackson = "2.9.10"
@@ -37,21 +37,17 @@ object Dependencies {
   lazy val scalatest = "org.scalatest" %% "scalatest" % Versions.scalatest
 
   lazy val log = Seq(
-    "org.apache.logging.log4j" %% "log4j-api-scala" % "11.0",
     "org.apache.logging.log4j" % "log4j-slf4j-impl" % Versions.log4j2,
-    "org.apache.logging.log4j" % "log4j-api" % Versions.log4j2,
     "org.apache.logging.log4j" % "log4j-core" % Versions.log4j2)
 
 
   object utils {
-    lazy val dependencies = scalatest.test +: (Seq(guava, typesafeConfig) ++ jackson).map(_.provided)
+    lazy val dependencies = scalatest.test +: (Seq(guava, typesafeConfig) ++ jackson ++ log).map(_.provided)
   }
 
   object core {
 
-    lazy val derby = Seq(
-      "com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion,
-      "com.typesafe.akka" %% "akka-slf4j" % Versions.akkaVersion)
+    lazy val akka = Seq("com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion)
 
     lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1" exclude("com.zaxxer", "HikariCP-java7")
 
@@ -67,7 +63,7 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-testkit" % Versions.akkaVersion, scalatest
     ).map(_.test)
 
-    lazy val dependencies = Seq(quartz, guava, typesafeConfig) ++ jackson ++ derby ++ log ++ httpParser ++ httpUtils ++ test ++ selenium
+    lazy val dependencies = Seq(quartz, guava, typesafeConfig) ++ jackson ++ akka ++ log ++ httpParser ++ httpUtils ++ test ++ selenium
   }
 
   object pipeline {
