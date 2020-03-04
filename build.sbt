@@ -2,13 +2,14 @@ import Dependencies.crossVersion
 import sbt.Keys.organization
 import sbtassembly.{Assembly, MergeStrategy, PathList}
 
-lazy val ver = "0.1.2-SNAPSHOT"
-
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 lazy val scalafixSettings = Seq(
   addCompilerPlugin(scalafixSemanticdb),
-  scalacOptions ++= List(s"-P:semanticdb:targetroot:${System.getProperty("java.io.tmpdir")}/semanticdb","-Yrangepos", "-Ywarn-unused-import"))
+  scalacOptions ++= List(
+    s"-P:semanticdb:targetroot:${System.getProperty("java.io.tmpdir")}/semanticdb",
+    "-Yrangepos",
+    "-language:postfixOps"))
 
 lazy val jmhSettings = Seq(
   sourceDirectory in Jmh := (sourceDirectory in Test).value,
@@ -17,7 +18,6 @@ lazy val jmhSettings = Seq(
 )
 
 lazy val commonSettings = Seq(
-  version := ver,
   scalaVersion := crossVersion.head,
   fork := true,
   crossScalaVersions := crossVersion,

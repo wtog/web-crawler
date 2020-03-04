@@ -12,7 +12,7 @@ object Dependencies {
     val log4j2 = "2.13.1"
     val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
-    val jackson = "2.9.10"
+    val jackson = "2.10.2"
     val guava = "28.1-jre"
     val typesafeConfig = "1.4.0"
     val scalatest = "3.0.8"
@@ -26,7 +26,7 @@ object Dependencies {
     def test: ModuleID = moduleID.withConfigurations(Some("test"))
   }
 
-  lazy val crossVersion = Seq("2.12.10", "2.11.12")
+  lazy val crossVersion = Seq("2.13.1", "2.12.10")
 
   lazy val guava = "com.google.guava" % "guava" % Versions.guava
 
