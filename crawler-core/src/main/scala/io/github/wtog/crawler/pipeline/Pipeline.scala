@@ -9,7 +9,7 @@ import io.github.wtog.utils.logger.Logging
   */
 trait Pipeline extends Logging {
 
-  def init(): Unit = Unit
+  def init(): Unit = ()
 
   def process[Result](pageResultItem: (String, Result)): Unit
 }

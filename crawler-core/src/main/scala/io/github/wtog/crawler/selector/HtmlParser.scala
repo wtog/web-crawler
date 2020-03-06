@@ -30,7 +30,7 @@ trait HtmlParser {
 
     def dom(query: String): Elements = document.select(query)
 
-    def table(query: String): Seq[Element] = document.select(s"table ${query}").asScala
+    def table(query: String): Seq[Element] = document.select(s"table ${query}").asScala.toSeq
 
     def hrefs: Seq[String] = document.select("a").toSeq.collect {
       case e if e.attr("href").startsWith("http") =>
@@ -44,7 +44,7 @@ trait HtmlParser {
 
     def getElements(query: String): Elements = elements.select(query)
 
-    def toSeq: Seq[Element] = elements.asScala
+    def toSeq: Seq[Element] = elements.asScala.toSeq
   }
 
   implicit class ElementWrapper(element: Element) {

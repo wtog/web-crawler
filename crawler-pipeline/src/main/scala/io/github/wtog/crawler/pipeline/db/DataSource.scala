@@ -56,7 +56,7 @@ object DataSource extends Logging {
       while (resultSet.next()) {
         results.append(wrapper(resultSet))
       }
-      results
+      results.toSeq
     }
 
   def executeUpdate(sql: String, parameters: Seq[Any])(implicit db: String): Int =

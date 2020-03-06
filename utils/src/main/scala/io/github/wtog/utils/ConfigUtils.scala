@@ -14,7 +14,7 @@ object ConfigUtils {
 
   private[this] lazy val config = ConfigFactory.load()
 
-  def getSeq[T](path: String): Seq[T] = config.getList(path).unwrapped().asScala.map(_.asInstanceOf[T])
+  def getSeq[T](path: String): Seq[T] = config.getList(path).unwrapped().asScala.map(v => v.asInstanceOf[T]).toSeq
 
   def getStringOpt(path: String): Option[String] = getOpt[String](path)(config.getString)
 

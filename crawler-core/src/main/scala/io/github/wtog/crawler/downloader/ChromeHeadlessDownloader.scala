@@ -53,7 +53,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
           }
         }
 
-        Page(requestSetting = requestSetting, bytes = Some(driver.getPageSource.getBytes()) , xhrResponses = xhrResponseBuffer)
+        Page(requestSetting = requestSetting, bytes = Some(driver.getPageSource.getBytes()) , xhrResponses = xhrResponseBuffer.toSeq)
       } catch {
         case NonFatal(exception) =>
           Page.failed(requestSetting, exception)
@@ -143,7 +143,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
     try (driver.quit())
     catch {
       case _: UnreachableBrowserException =>
-        Unit
+        ()
       case e: Throwable =>
         throw e
     }
