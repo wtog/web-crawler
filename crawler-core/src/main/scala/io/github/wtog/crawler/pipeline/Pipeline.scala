@@ -1,5 +1,7 @@
 package io.github.wtog.crawler.pipeline
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import io.github.wtog.utils.logger.Logging
 
 /**
@@ -9,7 +11,15 @@ import io.github.wtog.utils.logger.Logging
   */
 trait Pipeline extends Logging {
 
-  def init(): Unit = ()
+  private val inited = new AtomicBoolean(false)
+
+  def open(): Unit = {
+    if (!inited.getAndSet(true)) {
+      init()
+    }
+  }
+
+  protected def init(): Unit = ()
 
   def process[Result](pageResultItem: (String, Result)): Unit
 }

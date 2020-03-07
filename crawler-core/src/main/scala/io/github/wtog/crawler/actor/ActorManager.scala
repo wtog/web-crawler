@@ -1,9 +1,10 @@
 package io.github.wtog.crawler.actor
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor.{ActorSystem, Props}
 
 import scala.concurrent.ExecutionContext
-import akka.actor.{ ActorRef, ActorSelection }
+import akka.actor.{ActorRef, ActorSelection}
+import akka.dispatch.MessageDispatcher
 
 /**
   * @author : tong.wang
@@ -15,11 +16,20 @@ object ActorManager {
 
   def getNewSystemActor(dispatcher: String, actorName: String, props: Props): ActorRef = system.actorOf(props.withDispatcher(s"crawler.${dispatcher}"), actorName)
 
-  def getExistedAcotr(path: String): ActorSelection = system.actorSelection(path)
+  def getExistedActor(path: String): ActorSelection = system.actorSelection(path)
 }
 
 object ExecutionContexts {
-  implicit lazy val downloadDispatcher: ExecutionContext  = ActorManager.system.dispatchers.lookup("crawler.downloader-dispatcher")
-  implicit lazy val processorDispatcher: ExecutionContext = ActorManager.system.dispatchers.lookup("crawler.processor-dispatcher")
-  implicit lazy val pipelineDispatcher: ExecutionContext  = ActorManager.system.dispatchers.lookup("crawler.pipeline-dispatcher")
+  implicit lazy val downloadDispatcher: ExecutionContext  = dispatcher("crawler.downloader-dispatcher")
+  implicit lazy val processorDispatcher: ExecutionContext = dispatcher("crawler.processor-dispatcher")
+  implicit lazy val pipelineDispatcher: ExecutionContext  = dispatcher("crawler.pipeline-dispatcher")
+
+  def dispatcher(id: String): MessageDispatcher = {
+    val dispatchers = ActorManager.system.dispatchers
+    if (dispatchers.hasDispatcher(id)) {
+      dispatchers.lookup(id)
+    } else {
+      dispatchers.defaultGlobalDispatcher
+    }
+  }
 }
