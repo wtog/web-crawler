@@ -1,9 +1,8 @@
 package io.github.wtog.utils
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory, ConfigValue}
 
 import scala.collection.JavaConverters._
-import com.typesafe.config.Config
 import java._
 
 /**
@@ -26,6 +25,10 @@ object ConfigUtils {
   def getBooleanOpt(path: String): Option[Boolean] = getOpt[Boolean](path)(config.getBoolean)
 
   def getConfig(name: String): Config = config.getConfig(name)
+
+  def getKeyAndValue(name: String): Map[String, Any] = getConfig(name).entrySet().asScala.foldLeft(Map.empty[String, Any]){(map, entry) =>
+    map + (entry.getKey -> entry.getValue.unwrapped())
+  }
 
   private[this] def getOpt[T](path: String)(getConfig: String => T): Option[T] =
     if (config.hasPath(path)) {
