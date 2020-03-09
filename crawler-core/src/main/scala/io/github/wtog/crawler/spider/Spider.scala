@@ -30,12 +30,12 @@ case class Spider(pageProcessor: PageProcessor) {
 
   def start(): Unit =
     if (!running.getAndSet(true)) {
-      if (pageProcessor.downloader.isInstanceOf[ChromeHeadlessDownloader.type] && ChromeHeadlessConfig.chromeDriverNotExecutable) {
-        throw new IllegalStateException("""
-            |cant find chrome driver to execute.
-            |choose one chrome driver from https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/ to download and install into your system
-          """.stripMargin)
-      }
+//      if (pageProcessor.downloader.isInstanceOf[ChromeHeadlessDownloader.type] && ChromeHeadlessConfig.chromeDriverNotExecutable) {
+//        throw new IllegalStateException("""
+//            |cant find chrome driver to execute.
+//            |choose one chrome driver from https://npm.taobao.org/mirrors/chromedriver/70.0.3538.16/ to download and install into your system
+//          """.stripMargin)
+//      }
 
       val downloaderActor: ActorRef = getDownloadActor
       execute(downloaderActor)
@@ -62,7 +62,7 @@ case class Spider(pageProcessor: PageProcessor) {
 
   def stop(): Unit =
     if (running.getAndSet(false)) {
-      ActorManager.getExistedAcotr(downloaderActorPath) ! PoisonPill
+      ActorManager.getExistedActor(downloaderActorPath) ! PoisonPill
       SpiderPool.removeSpider(this)
       this.CrawlMetric.clean()
     }

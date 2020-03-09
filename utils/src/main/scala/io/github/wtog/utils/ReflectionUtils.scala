@@ -1,6 +1,6 @@
 package io.github.wtog.utils
 
-import com.google.common.reflect.{ ClassPath, TypeToken }
+import com.google.common.reflect.{ClassPath, TypeToken}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -13,21 +13,17 @@ import scala.collection.mutable
 object ReflectionUtils {
   private[this] lazy val CLASS_PATH = ClassPath.from(this.getClass.getClassLoader)
 
-  def getInstances[T](clazz: Class[T], packageNames: String*): Seq[T] =
-    packageNames.flatMap { packageName ⇒
-      getClasses(packageName)
-        .filter { c ⇒
-          !c.isInterface && TypeToken
-            .of(c)
-            .getTypes
-            .asScala
-            .exists(t ⇒ t.getRawType == clazz)
-        }
-        .map { clazz ⇒
-          val constructor = clazz.getConstructors.head
-          constructor.newInstance().asInstanceOf[T]
-        }
-    }
+  def implementationClasses[T](clazz: Class[T], packageName: String): Seq[Class[T]] =
+    getClasses[T](packageName)
+      .filter { c ⇒
+        !c.isInterface && TypeToken
+          .of(c)
+          .getTypes
+          .asScala
+          .exists(t ⇒ t.getRawType == clazz)
+      }
+      .toSeq
 
-  def getClasses(packageName: String): mutable.Set[Class[_]] = CLASS_PATH.getTopLevelClassesRecursive(packageName).asScala.map(_.load())
+  def getClasses[T](packageName: String): mutable.Set[Class[T]] = CLASS_PATH.getTopLevelClassesRecursive(packageName).asScala.map(_.load().asInstanceOf[Class[T]])
+
 }

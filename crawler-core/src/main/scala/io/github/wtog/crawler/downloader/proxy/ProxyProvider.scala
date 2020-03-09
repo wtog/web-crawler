@@ -32,11 +32,11 @@ object ProxyProvider {
   val proxySpiderCrawling: AtomicBoolean = new AtomicBoolean(false)
 
   private lazy val proxyCrawlerList: Seq[Spider] = ReflectionUtils
-    .getInstances(
+    .implementationClasses(
       classOf[PageProcessor],
       "io.github.wtog.crawler.downloader.proxy.crawler"
     )
-    .map(proxy ⇒ Spider(pageProcessor = proxy))
+    .map(proxy ⇒ Spider(pageProcessor = proxy.newInstance()))
 
   private def crawlCronJob(restart: Boolean = false) =
     if (restart) proxyCrawlerList.foreach(_.restart())

@@ -21,7 +21,7 @@ case class PipelineEvent[R](pipelineList: Set[Pipeline], pageResultItems: (Strin
   def initPipelines(): Option[PipelineEvent[R]] = {
     val allInited = pipelineList
       .map { p =>
-        Try(p.init()) match {
+        Try(p.open()) match {
           case Success(_) => true
           case Failure(exception) =>
             logger.error(s"failed to init pipeline ${exception.getLocalizedMessage}")
