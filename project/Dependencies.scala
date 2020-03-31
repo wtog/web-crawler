@@ -13,7 +13,7 @@ object Dependencies {
     val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
     val jackson = "2.10.2"
-    val guava = "28.1-jre"
+    val guava = "28.2-jre"
     val typesafeConfig = "1.4.0"
     val scalatest = "3.0.8"
     val hikariCP = "3.4.1"

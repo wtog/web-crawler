@@ -46,7 +46,7 @@ trait PageProcessor extends HtmlParser {
     *
     * @return
     */
-  def pipelines: Set[Pipeline] = Set(ConsolePipeline)
+  val pipelines: Set[Pipeline] = Set(ConsolePipeline)
 
   /**
     * parse the html source code

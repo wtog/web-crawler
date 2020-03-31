@@ -4,7 +4,7 @@ import io.github.wtog.crawler.pipeline.Pipeline
 import io.github.wtog.crawler.spider.Spider
 import io.github.wtog.utils.logger.Logging
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 /**
   * @author : tong.wang

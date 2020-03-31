@@ -134,7 +134,7 @@ class LianjiaErshouFangProcessor extends ExampleTrait {
     detailHrefs.toSeq.foreach(d => page.addTargetRequest(d.attr("href")))
   }
 
-  override def pipelines: Set[Pipeline] = Set(
+  override val pipelines: Set[Pipeline] = Set(
     //    CsvFilePipeline(Some("ershoufang.csv")),
     PostgreSQLPipeline(DataSourceInfo(database = this.getClass.getSimpleName, jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/magicbox", username = "wtog", password = "")) { (db: String, result: Map[String, Any]) =>
       val (keys, values) = result.unzip

@@ -1,6 +1,6 @@
 package io.github.wtog.utils.logger
 
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
   * @author : tong.wang

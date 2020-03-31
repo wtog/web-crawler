@@ -90,8 +90,8 @@ case class RequestSetting(
 }
 
 case class RequestUri(
-                       url: String,
-                       method: String = HttpMethod.GET.toString,
-                       requestBody: Option[String] = None,
-                       headers: Option[Map[String, String]] = None,
-                       xhrRequests: Set[String] = Set.empty[String])
+    url: String,
+    method: String = HttpMethod.GET.toString,
+    requestBody: Option[String] = None,
+    headers: Option[Map[String, String]] = None,
+    xhrRequests: Set[String] = Set.empty[String])

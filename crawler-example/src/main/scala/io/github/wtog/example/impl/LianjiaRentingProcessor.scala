@@ -86,7 +86,7 @@ class LianjiaRentingProcessor extends ExampleTrait {
         println(other)
     }
 
-  override def pipelines: Set[Pipeline] = Set(
+  override val pipelines: Set[Pipeline] = Set(
     PostgreSQLPipeline(DataSourceInfo(database = "renting", jdbcUrl = "jdbc:postgresql://127.0.0.1:5432/magicbox", username = "wtog", password = "")) { (db: String, result: Map[String, Any]) =>
       val (keys, values) = result.unzip
       DataSource.rows[Int]("select count(1) from renting where house_code = ?", Seq(result("houseCode").asInstanceOf[String]))(r => r.getInt(1))(db).headOption.getOrElse(0) match {

@@ -1,9 +1,9 @@
 package io.github.wtog.crawler.actor
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ ActorSystem, Props }
 
 import scala.concurrent.ExecutionContext
-import akka.actor.{ActorRef, ActorSelection}
+import akka.actor.{ ActorRef, ActorSelection }
 import akka.dispatch.MessageDispatcher
 
 /**
