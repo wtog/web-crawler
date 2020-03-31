@@ -12,5 +12,5 @@ import io.github.wtog.crawler.processor.PageProcessor
 trait ProxyProcessorTrait extends PageProcessor {
   override def cronExpression: Option[String] = Some("*/5 * * ? * *")
 
-  override def pipelines: Set[Pipeline] = Set(ProxyCrawlerPipeline)
+  override val pipelines: Set[Pipeline] = Set(ProxyCrawlerPipeline)
 }

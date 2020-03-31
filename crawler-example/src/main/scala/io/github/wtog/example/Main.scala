@@ -23,7 +23,8 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val processorList = ReflectionUtils
-      .implementationClasses(classOf[ExampleTrait], "io.github.wtog.example").map(_.newInstance())
+      .implementationClasses(classOf[ExampleTrait], "io.github.wtog.example")
+      .map(_.newInstance())
       .filter(_.enable)
       .sortWith(_.getClass.getSimpleName < _.getClass.getSimpleName)
       .zip(Stream.from(1))

@@ -5,10 +5,10 @@ import java.util
 import java.util.logging.Level
 
 import io.github.wtog.crawler.downloader.ChromeHeadlessConfig._
-import io.github.wtog.crawler.dto.{Page, RequestSetting, XhrResponse}
-import io.github.wtog.utils.{ConfigUtils, JsonUtils}
-import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
-import org.openqa.selenium.logging.{LogType, LoggingPreferences}
+import io.github.wtog.crawler.dto.{ Page, RequestSetting, XhrResponse }
+import io.github.wtog.utils.{ ConfigUtils, JsonUtils }
+import org.openqa.selenium.chrome.{ ChromeDriver, ChromeOptions }
+import org.openqa.selenium.logging.{ LogType, LoggingPreferences }
 import org.openqa.selenium.remote.UnreachableBrowserException
 
 import scala.collection.JavaConverters._
@@ -53,7 +53,7 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
           }
         }
 
-        Page(requestSetting = requestSetting, bytes = Some(driver.getPageSource.getBytes()) , xhrResponses = xhrResponseBuffer.toSeq)
+        Page(requestSetting = requestSetting, bytes = Some(driver.getPageSource.getBytes()), xhrResponses = xhrResponseBuffer.toSeq)
       } catch {
         case NonFatal(exception) =>
           Page.failed(requestSetting, exception)
@@ -84,7 +84,6 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
       case _ =>
         None
     }
-
 
   private[this] def buildOptions(requestSetting: RequestSetting): ChromeOptions = {
     val options = new ChromeOptions()
@@ -123,7 +122,9 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
 
     val driver = new ChromeDriver(buildOptions(requestSetting))
     val map    = new util.HashMap[String, Object]()
-    map.put("source", """
+    map.put(
+      "source",
+      """
         |Object.defineProperty(navigator, 'webdriver', {
         |      get: () => false
         |});
@@ -133,7 +134,8 @@ object ChromeHeadlessDownloader extends Downloader[ChromeDriver] {
         |Object.defineProperty(navigator, 'languages', {
         |      get: () => ["zh-CN","zh","en-US","en"]
         |});
-        |""".stripMargin)
+        |""".stripMargin
+    )
     driver.executeCdpCommand("Page.addScriptToEvaluateOnNewDocument", map)
 
     driver
