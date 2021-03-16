@@ -31,7 +31,7 @@ class ChromeHeadlessDownloaderTest extends BaseCoreTest with BeforeAndAfter {
     println(page.xhrResponses)
   }
 
-  test("chrome driver on linux") {
+  ignore("chrome driver on linux") {
     val page = await(ChromeHeadlessDownloader.download(
       spider = Spider(pageProcessor = localProcessor),
       request = localProcessor.requestSetting

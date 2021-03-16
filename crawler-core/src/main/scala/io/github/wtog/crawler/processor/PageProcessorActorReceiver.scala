@@ -29,17 +29,11 @@ class PageProcessorActorReceiver extends Actor {
       val spider         = processorEvent.spider
       val downloadSender = sender()
 
-      spider.pageProcessor.process(page).onComplete {
-        case Success(_) ⇒
+      spider.pageProcessor.process(page).foreach { _ ⇒
           pipelineProcess(page.requestSetting.url.get, page.resultItems)(spider.pageProcessor.pipelines)(downloadSender)
           spider.CrawlMetric.processedSuccessCounter
 
           continueRequest(page.requestQueue)(spider)(downloadSender)
-        case Failure(value) ⇒
-          logger.error(
-            s"failed to process page ${page.url}",
-            value
-          )
       }
     case other ⇒
       logger.warn(s"${self.path} received wrong msg ${other}")

@@ -1,6 +1,6 @@
 package io.github.wtog.utils
 
-import com.typesafe.config.{ Config, ConfigFactory, ConfigValue }
+import com.typesafe.config.{Config, ConfigFactory, ConfigObject, ConfigValue}
 
 import scala.collection.JavaConverters._
 import java._
@@ -12,7 +12,11 @@ import java._
   */
 object ConfigUtils {
 
-  private[this] lazy val config = ConfigFactory.load()
+  @volatile private[this] var config: Config = ConfigFactory.load()
+
+  def init(resource: String) = {
+    config = config.withFallback(ConfigFactory.load(resource))
+  }
 
   def getSeq[T](path: String): Seq[T] = config.getList(path).unwrapped().asScala.map(v => v.asInstanceOf[T]).toSeq
 
@@ -25,6 +29,8 @@ object ConfigUtils {
   def getBooleanOpt(path: String): Option[Boolean] = getOpt[Boolean](path)(config.getBoolean)
 
   def getConfig(name: String): Config = config.getConfig(name)
+
+  def getConfigObjectOpt(path: String): Option[ConfigObject] = getOpt[ConfigObject](path)(config.getObject)
 
   def getKeyAndValue(name: String): Map[String, Any] = getConfig(name).entrySet().asScala.foldLeft(Map.empty[String, Any]) { (map, entry) =>
     map + (entry.getKey -> entry.getValue.unwrapped())

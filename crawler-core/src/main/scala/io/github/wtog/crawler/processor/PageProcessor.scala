@@ -1,10 +1,11 @@
 package io.github.wtog.crawler.processor
 
 import io.github.wtog.crawler.actor.ExecutionContexts.processorDispatcher
-import io.github.wtog.crawler.downloader.{ AsyncHttpClientDownloader, Downloader }
-import io.github.wtog.crawler.dto.{ Page, RequestSetting, RequestUri }
-import io.github.wtog.crawler.pipeline.{ ConsolePipeline, Pipeline }
+import io.github.wtog.crawler.downloader.{AsyncHttpClientDownloader, Downloader}
+import io.github.wtog.crawler.dto.{Page, RequestSetting, RequestUri}
+import io.github.wtog.crawler.pipeline.{ConsolePipeline, Pipeline}
 import io.github.wtog.crawler.selector.HtmlParser
+import io.github.wtog.utils.logger.Logging
 
 import scala.concurrent.Future
 
@@ -13,7 +14,7 @@ import scala.concurrent.Future
   * @since : 5/16/18 9:48 PM
   * @version : 1.0.0
   */
-trait PageProcessor extends HtmlParser {
+trait PageProcessor extends HtmlParser with Logging {
 
   val name: String = this.getClass.getSimpleName
 
@@ -54,7 +55,13 @@ trait PageProcessor extends HtmlParser {
     * @param page
     */
   def process(page: Page): Future[Unit] = Future {
-    doProcess(page)
+    try {
+      doProcess(page)
+    } catch {
+      case e: Throwable =>
+        logger.error(s"failed to process page ${page.url} -> ${page.source}", e)
+        throw e
+    }
   }
 
   protected def doProcess(page: Page): Unit

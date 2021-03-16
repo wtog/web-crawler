@@ -1,7 +1,7 @@
 package io.github.wtog.utils
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.databind.{ DeserializationFeature, ObjectMapper }
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
@@ -16,6 +16,7 @@ object JsonUtils {
     val mapper = new ObjectMapper() with ScalaObjectMapper
     mapper.setSerializationInclusion(Include.NON_NULL)
     mapper.setSerializationInclusion(Include.NON_ABSENT)
+    mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     mapper.registerModule(DefaultScalaModule)
 

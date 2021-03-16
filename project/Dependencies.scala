@@ -9,7 +9,7 @@ object Dependencies {
 
   object Versions {
     val akkaVersion = "2.6.3"
-    val log4j2 = "2.13.1"
+    val log4j2 = "2.12.1"
     val seleniumhq = "4.0.0-alpha-3"
     val httpClient = "2.10.1"
     val jackson = "2.10.2"
@@ -47,7 +47,7 @@ object Dependencies {
 
   object core {
 
-    lazy val akka = Seq("com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion)
+    lazy val akka = Seq(("com.typesafe.akka" %% "akka-actor" % Versions.akkaVersion).provided)
 
     lazy val quartz = "org.quartz-scheduler" % "quartz" % "2.3.1" exclude("com.zaxxer", "HikariCP-java7")
 
